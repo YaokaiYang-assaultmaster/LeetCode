@@ -1,0 +1,110 @@
+public class Solution {
+    /**
+     * (1)
+     * A iterative alglrithm / DP
+     * In dynamic programming, we need  to figure out the relationship between the answer to a big problem and the answer to the its subproblem. 
+     * So in this question, it should be the relationship between the f(n) and f(0) to f(n - 1).
+     * From n-1 to n, we are simply adding a extra pair of "()" to all the result strings. So we need to dicide how many pairs of original "()" from n-1 falls into the new "()" and how many falls out side it. 
+     * So it would be "(" + f(i) + ")" + f(n - 1 - i).
+     * 
+     * Let us consider an example to get clear view:
+     * f(0): ""
+     * f(1): "("f(0)")"
+     * f(2): "("f(0)")"f(1), "("f(1)")"
+     * f(3): "("f(0)")"f(2), "("f(1)")"f(1), "("f(2)")"
+     * So f(n) = "("f(0)")"f(n-1) , "("f(1)")"f(n-2) "("f(2)")"f(n-3) ... "("f(i)")"f(n-1-i) ... "(f(n-1)")"
+    **/
+    public List<String> generateParenthesis(int n) {
+        List<List<String>> res = new LinkedList<List<String>>();
+        res.add(Collections.singletonList(""));
+        
+        for (int i = 1; i <= n; i++) {
+            LinkedList<String> subRes = new LinkedList<>();
+            for (int j = 0; j < i; j++) {
+                for (String inSide : res.get(j)) {
+                    for (String outSide : res.get(i - 1 - j)) {
+                        subRes.add("(" + inSide + ")" + outSide);
+                    }
+                }
+            }
+            res.add(subRes);
+        }
+        
+        return res.get(res.size() - 1);
+    }
+
+
+    /**
+     * (2)
+     * Leetcode 22. Generate Parentheses
+     * BackTracking recursive algorithm / DFS
+     * Noticed that we can either put a "(" or a ")" at each position. 
+     * However, we can only put a total of n "(".
+     * Keep 2 variables total and remainLeft to track the total number of "("s and the number of unclosed "("s. 
+     * Try to put a "(" at current position when it is possible, re-enter the function, then backtrack, in other words, delet the "(", and then put a ")" at current poistion if possible, re0enter the function again. 
+    **/
+    public List<String> generateParenthesis(int n) {
+        LinkedList<String> res = new LinkedList<String>();
+        String tmpRes = "";
+        gpHelper(n, 0, 0, tmpRes, res); //start from 0 "(" and 0 unclosed "("
+        return res;
+    }
+    
+    private void gpHelper(int n, int remainLeft, int total, String tmpRes, LinkedList<String> res) {
+        if (total == n && remainLeft == 0) {
+            //if the temporary result has reached to the total number of "(" and has no unclosed "(", put it into the list.
+            res.add(tmpRes);  
+            return; 
+        }
+        if (total == n && remainLeft != 0) {
+            //if the number of "(" has reached n and there are still unclosed "(", compensate with needed number of ")" and store the result into the lise. 
+            for (int i = 0; i < remainLeft; i++) {
+                tmpRes += ")";
+            }
+            res.add(tmpRes);
+            return;
+        }
+        if (total < n) {
+            if (remainLeft == 0) {
+                //if total number of "(" is less than n and there is no unclosed "(", we can only put "(" at current poisiton.
+                //Otherwise it will violite the parentheses. 
+                tmpRes += "(";
+                gpHelper(n, remainLeft + 1, total + 1, tmpRes, res);
+            }
+            else {
+                //if total number of "(" is less than n and ther is still unclosed "(", we can either put a "(" or a ")" at current poistion, which will lead to remainLeft + 1 or remainLeft - 1 respectively. 
+                //Meanwhile, if a "(" is put at the current poistion, total should also plus 1. 
+                tmpRes += "(";
+                gpHelper(n, remainLeft + 1, total + 1, tmpRes, res);
+                tmpRes = tmpRes.substring(0, tmpRes.length() - 1);
+                tmpRes += ")";
+                gpHelper(n, remainLeft - 1, total, tmpRes, res);
+            }
+        }
+    }
+    
+    
+    /**
+     * (3)
+     * A very simple backtracking recursive method from discussion of this question. 
+      * https://discuss.leetcode.com/topic/8724/easy-to-understand-java-backtracking-solution
+    **/
+     public List<String> generateParenthesis(int n) {
+        List<String> list = new ArrayList<String>();
+        backtrack(list, "", 0, 0, n);
+        return list;
+    }
+    
+    public void backtrack(List<String> list, String str, int open, int close, int max){
+        
+        if(str.length() == max*2){
+            list.add(str);
+            return;
+        }
+        
+        if(open < max)
+            backtrack(list, str+"(", open+1, close, max);
+        if(close < open)
+            backtrack(list, str+")", open, close+1, max);
+    }
+}
