@@ -1,3 +1,7 @@
+The test case of problem is kind of wired. 
+If we first delete the tail of the snake and check for body collision and then add back the tail if the food is eaten, it will pass the OJ.
+Otherwise and more reasonably, if we check for food eating first and then check for tail deleting or body collision, it will not pass the OJ.
+
 public class SnakeGame {
     /** Initialize your data structure here.
     @param width - screen width
