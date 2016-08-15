@@ -1,0 +1,37 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    //A iterative method
+    //current is pointing to the second one of the pair at the end of every loop
+    public ListNode swapPairs(ListNode head) {
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode current = dummy;
+        while (current.next != null && current.next.next != null) {
+            ListNode n1 = current.next;
+            ListNode n2 = current.next.next;
+            n1.next = n2.next;
+            n2.next = n1;
+            current.next = n2;
+            current = current.next.next;
+        }
+        return dummy.next;
+    }
+    
+    
+    //A recursion method
+    //The characteristic of this problem makes it suitable for recursion, since we are dealing with similar problem at each turn.
+    public ListNode swapPairs(ListNode head) {
+        if (head == null || head.next == null) return head;
+        ListNode newHead = head.next;
+        head.next = swapPairs(newHead.next);
+        newHead.next = head;
+        return newHead;
+    }
+}
