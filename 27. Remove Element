@@ -1,0 +1,40 @@
+###This question is pretty much similar to the remove duplicates from sorted arrays. 
+
+public class Solution {
+    public int removeElement(int[] nums, int val) {
+        /**If the target value is rare, reassign index for every nontarget value could be unnecessary.
+         * Under this condition, we swap the target value with the last value in the array and discard the last value of the array. Since "the order of the elements can be changed"!
+         * However, we should also pay attention to condition where the last value of the array which we have changed to the current poistion is also a target value want to discard.*/ 
+        if (nums.length == 0) return 0;
+        int p = 0;
+        int len = nums.length;
+        while (p < len) { //Should judge if p is less than the current valid length(i.e. the length after discard the last value of the array) of the array at the beginning of each loop. Otherwise we may face array index out of boundary exception. 
+            if (nums[p] == val) {
+                nums[p] = nums[--len];
+            }
+            else {
+                p++;
+            }
+        }
+        return len;
+    }
+    
+    
+    
+    
+    public int removeElement(int[] nums, int val) {
+        /**
+         * similar to the thought of remove duplicates of sorted array.
+         * Traverse the array, if find any target values, skip it.
+         * If find any non-target values, put it  in the right poisition.
+         * O(n) time, O(1) space.
+         * Suit for condition that target values are not rare.*/
+        
+        if (nums.length == 0) return 0;
+        int p = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != val) nums[p++] = nums[i];
+        }
+        return p;
+    }
+}
