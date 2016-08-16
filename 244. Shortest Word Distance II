@@ -1,0 +1,51 @@
+public class WordDistance {
+    /**
+     * Since the shortest is going to be called for many times, a good choice is to trade space for time
+     * We keep a HashMap to keep track of every appearance indexes of each word. 
+     * Once we call the shortest, we simply get the shortest distance from the 2 index lists. 
+     * The way to find out shortest distance from 2 list is similar to the merge sort. 
+     * O(n) space + O(n) time.*/
+    
+    /**
+     * If the shortest is called for more than the length of the array times, we could even use O(n^2) time to pre-process the array, in which we calculate shortest distance for each pair of the different words. 
+     * Then the shortest only need O(1) time. */
+    
+    HashMap<String, List<Integer>> wordIndex;;
+    public WordDistance(String[] words) {
+        if (words == null || words.length == 0) return;
+        wordIndex = new HashMap<>();
+        for (int i = 0; i < words.length; i++) {
+            if (!wordIndex.containsKey(words[i])) {
+                List<Integer> indexes = new LinkedList<Integer>();
+                indexes.add(i);
+                wordIndex.put(words[i], indexes);
+            }
+            else {
+                wordIndex.get(words[i]).add(i);
+            }
+        }
+    }
+
+    public int shortest(String word1, String word2) {
+        List<Integer> index1 = wordIndex.get(word1);
+        List<Integer> index2 = wordIndex.get(word2);
+        int shortest = Integer.MAX_VALUE;
+        int p1 = 0;
+        int p2 = 0;
+        while (p1 < index1.size() && p2 < index2.size()) {
+            shortest = Math.min(shortest, Math.abs(index1.get(p1) - index2.get(p2)));
+            if (index1.get(p1) < index2.get(p2)) {
+                p1++;
+            }
+            else {
+                p2++;
+            }
+        }
+        return shortest;
+    }
+}
+
+// Your WordDistance object will be instantiated and called as such:
+// WordDistance wordDistance = new WordDistance(words);
+// wordDistance.shortest("word1", "word2");
+// wordDistance.shortest("anotherWord1", "anotherWord2");
