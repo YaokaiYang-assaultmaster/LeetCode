@@ -1,4 +1,3 @@
-###This question is pretty much similar to the remove duplicates from sorted arrays. 
 
 public class Solution {
     public int removeElement(int[] nums, int val) {
