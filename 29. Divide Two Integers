@@ -1,0 +1,92 @@
+public class Solution {
+    
+    
+    /**
+     * Note: take negative integer into consideration!!!
+     * Integer.MIN_VALUE = -2174783648, meanwhile Integer.MAX_VALUE = 2174783647.
+     * Thus Integer.MIN_VALUE / -1 would cause overflow*/
+     
+     /** (2) with bit manipulation replaced the while loop in longDivide*/
+     //Basic idea is that left shift equals to mulply the original number by 2.
+     public int divide(int dividend, int divisor) {
+         if (divisor == 0 || (dividend == Integer.MIN_VALUE && divisor == -1)) return Integer.MAX_VALUE;
+         int sign = 1;
+         if ((dividend < 0 && divisor > 0) || (dividend > 0 && divisor < 0)) sign = -1;
+         long lDvd = Math.abs((long)dividend);
+         long lDvs = Math.abs((long)divisor);
+         long lres = 0;
+         while (lDvs <= lDvd) {
+             long tmp = lDvs;
+             long mult = 1;
+             while (tmp << 1 <= lDvd) {
+                 tmp = tmp << 1;
+                 mult = mult << 1;
+             }
+             lDvd = lDvd - tmp;
+             lres += mult;
+         }
+         lres = sign == 1 ? lres : -lres;
+         int res = (int)lres;
+         return res;
+         
+     }
+     
+     
+     
+     
+    /** (1) */
+    //Remember the sign first and then deal with poisitive divide condition
+    //Make the 2 variables as long in order to deal with overflow during the process. 
+    //Then convert it back to int
+     public int divide(int dividend, int divisor) {
+         if (divisor == 0 ) return Integer.MAX_VALUE;
+         if (dividend == 0) return 0;
+         int symbol = 1; //stores the symbol of the result then we can treat the 2 values as positive values
+         if ((dividend < 0 && divisor > 0) || (dividend > 0 && divisor < 0)) symbol = -1;
+         long lDvd = Math.abs((long)dividend); //Pay attention to first convert the type of dividend and divisor
+         long lDvs = Math.abs((long)divisor); //Otherwise dividend like -2147483648 would be abs to 0.
+         long lans = longDivide(lDvd, lDvs);
+         int ans;
+         if (lans > Integer.MAX_VALUE) ans = (symbol == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE);
+         else ans = (int) (symbol == 1 ? lans : -lans);
+         return ans;
+     }
+     
+     private long longDivide(long dvd, long dvs) {
+         if (dvd < dvs) return (long)0;
+         long tmp = dvs;
+         long mult = 1;
+         while ((tmp + tmp) < dvd) { //This step can be implemented in bit manipulation as well.
+             tmp += tmp;
+             mult += mult;
+         }
+         return mult + longDivide(dvd - tmp, dvs);
+     }
+      
+      
+    
+    
+    
+    /**
+     * wrong answer, TLE*/
+    public int divide(int dividend, int divisor) {
+        if (divisor == 0 || (dividend == Integer.MIN_VALUE && divisor == -1)) return Integer.MAX_VALUE;
+        if (dividend == 0) return 0;
+        int symbol = 1;
+        if ((dividend < 0 && divisor > 0) || (dividend > 0 && divisor < 0)) symbol = -1;
+        long lDivisor = divisor > 0 ? divisor : -divisor;
+        long lDividend = dividend > 0 ? dividend : -dividend;
+        long tmp = lDivisor;
+        int res = 1;
+
+        // Following code would cause TLE. e.g. Integer.MAX_VALUE / 1
+        while (tmp < lDividend) {
+            tmp += lDivisor;
+            ++res;
+        }
+        
+        res = tmp == lDividend ? res : res - 1;
+        res = symbol == 1 ? res : -res;
+        return res;
+    }
+}
