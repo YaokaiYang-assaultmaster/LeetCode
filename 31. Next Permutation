@@ -11,25 +11,25 @@ public class Solution {
             return;
         }
         int p1 = -1;
-        int p2 = -1;
-        for (int i = nums.length - 2; i >= 0; i--) {
+        int p2 = -1; 
+        for (int i = nums.length - 2; i >= 0; i--) { //find the first element such that nums[i] < nums[i + 1]
             if (nums[i] < nums[i + 1]) {
                 p1 = i;
                 break;
             }
         }
-        if (p1 == -1) {
+        if (p1 == -1) { //if no such number existes, which means the array is sorted in descending order, we just reverse the array into ascending order and return
             sort(nums, 0, nums.length - 1);
             return;
         }
         
-        for (int i = nums.length - 1; i > p1; i--) {
+        for (int i = nums.length - 1; i > p1; i--) { //find the first number that it is greater than nums[p1] we have found
             if (nums[i] > nums[p1]) {
                 p2 = i;
                 break;
             }
         }
-        swap(nums, p1, p2);
+        swap(nums, p1, p2); 
         sort(nums, p1 + 1, nums.length - 1);
     }
     
