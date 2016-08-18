@@ -1,0 +1,33 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Use a dummy node to point to the head of the Linkedlist. Otherwise, the condition where we should delete the head node would be hard to deal with.
+     * Use 2 pointers to solve the question.
+     * The fast pointer moves n steps forward than the slow pointer. 
+     * Once the next node of the fast poiner is null, the slow pointer is pointing to the previous one of the node which we want to delete.
+     * Than we can easily delete the node we want to delete.  
+     * Since the question gives that n is valid, we don't have to do too much checks.*/
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        if (head == null) return null;
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode n1 = dummy; //slow pointer
+        ListNode n2 = dummy; //fast pointer
+        for (int i = 0; i < n; i++) {
+            n2 = n2.next;
+        }
+        while (n2.next != null) {
+            n1 = n1.next;
+            n2 = n2.next;
+        }
+        n1.next = n1.next.next;
+        return dummy.next;
+    }
+}
