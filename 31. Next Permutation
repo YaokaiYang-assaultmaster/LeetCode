@@ -1,0 +1,51 @@
+public class Solution {
+    /**
+     * Next permutation algorithm has existed since 14th centery. Based on this classic and simple algorithm, this question can be solved in following steps.
+     * (1) Start from the end of the array and find the first number that is less then its next element in the array, i.e. nums[first] < nums[first + 1]. If no such number exists, which means that the array is sorted in descending order, we re-sort it in the ascending order and return.
+     * (2) Start from the end of the array and find a nums[p] such that nums[p] is greater than nums[first] we have found. We called it nums[p]. 
+     * (3) Swap nums[p] with nums[first].
+     * (4) Reverse the numbers from and including nums[first + 1] up to and including nums[nums.length - 1] into ascending order. */
+    
+    public void nextPermutation(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return;
+        }
+        int p1 = -1;
+        int p2 = -1;
+        for (int i = nums.length - 2; i >= 0; i--) {
+            if (nums[i] < nums[i + 1]) {
+                p1 = i;
+                break;
+            }
+        }
+        if (p1 == -1) {
+            sort(nums, 0, nums.length - 1);
+            return;
+        }
+        
+        for (int i = nums.length - 1; i > p1; i--) {
+            if (nums[i] > nums[p1]) {
+                p2 = i;
+                break;
+            }
+        }
+        swap(nums, p1, p2);
+        sort(nums, p1 + 1, nums.length - 1);
+    }
+    
+    private void swap (int[] nums, int p1, int p2) {
+        int tmp = nums[p2];
+        nums[p2] = nums[p1];
+        nums[p1] = tmp;
+    }
+    
+    private void sort(int[] nums, int start, int end) {
+        while (start < end) {
+            if (nums[start] > nums[end]) {
+                swap(nums, start, end);
+            }
+            start++;
+            end--;
+        }
+    }
+}
