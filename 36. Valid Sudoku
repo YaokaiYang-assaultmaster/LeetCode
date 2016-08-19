@@ -1,0 +1,64 @@
+public class Solution {
+
+    /** (2) 
+     * Use three 1-dimension int array to store existed numbers in the board. 
+     * Indexes of every array is the index of actually rows, columns and subblocks.
+     * However, each int is responsible of recording the 9 possible values of each row, column and 3 * 3 subblock. 
+     * This is done with the 1 to 9 bit in the integer. int idx records the current number we want to check. Once the corresponding bit in the corresponding int value is 1, return false. Otherwise, set that bit to be 1 by set[index] |= idx. 
+     * O(n) space, O(n^2) time. 3ms */
+    
+    // public boolean isValidSudoku(char[][] board) {
+    //     int [] vset = new int [9];
+    //     int [] hset = new int [9];
+    //     int [] bckt = new int [9];
+    //     int idx = 0;
+    //     for (int i = 0; i < 9; i++) {
+    //         for (int j = 0; j < 9; j++) {
+    //             if (board[i][j] != '.') {
+    //                 idx = 1 << (board[i][j] - '0') ;
+    //                 if ((hset[i] & idx) > 0 ||
+    //                     (vset[j] & idx) > 0 ||
+    //                     (bckt[(i / 3) * 3 + j / 3] & idx) > 0) return false;
+    //                 hset[i] |= idx;
+    //                 vset[j] |= idx;
+    //                 bckt[(i / 3) * 3 + j / 3] |= idx;
+    //             }
+    //         }
+    //     }
+    // return true;
+    // }
+        
+        
+        
+        
+    /** (1)
+     * Use three boolean arrays to keep the existed values at each row, column and each subblock. 
+     * Once we found a new value already existed in its row or column or subblock, return false.
+     * After successfully traverse the whole board, we know it is a valid board.
+     * O(n^2) space, O(n^2) time. 4ms*/
+    
+    public boolean isValidSudoku(char[][] board) {  
+        boolean res = false;
+        if (board == null || board.length != 9 || board[0].length != 9) return res;
+        boolean[][] row = new boolean[9][9]; //keep existed values in each row
+        boolean[][] col = new boolean[9][9]; //keep existed values in each column
+        boolean[][] block = new boolean[9][9]; //keep existed values in each 3 * 3 subblock
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (board[i][j] != '.') {
+                    if (row[i][board[i][j] - '1'] || col[j][board[i][j] - '1'] || block[(i / 3) * 3 + j / 3][board[i][j] - '1']) { //Once the value existed in the row or column or subblock, return false
+                        return res;
+                    }
+                    else { //otherwise, record this value in the three boolean array. 
+                        row[i][board[i][j] - '1'] = true;
+                        col[j][board[i][j] - '1'] = true;
+                        block[(i / 3) * 3 + j / 3][board[i][j] - '1'] = true;
+                    }
+                }
+            }
+        }
+        
+        res = true;
+        return res;
+    }
+} 
