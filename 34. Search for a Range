@@ -1,0 +1,80 @@
+public class Solution {
+    /** Use firstEqual to find the first element nums that is greater than or equal to targt
+     * The left boundary would be searching for target
+     * The right boundary would be the result of searching for target + 1 minus 1 */
+    
+    public int[] searchRange(int[] nums, int target){
+        int[] ret = new int[]{-1, -1};
+        if (nums == null || nums.length == 0) return ret;
+        int left = firstEqual(nums, target);
+        if (left == nums.length || nums[left] != target) return ret;
+        ret[0] = left;
+        ret[1] = firstEqual(nums, target + 1) - 1;
+        return ret;
+    }
+    
+    private int firstEqual(int[] nums, int target) {
+        //Find the first element in nums greater than or equal to target and return the index
+        //May return nums.length if target is greater than all element in nums
+        //Code with # could be used to replace code with *
+        int left = 0;
+        int right = nums.length - 1; //(#)
+        //int right = nums.length; (*)
+        while (left < right) {
+            int mid = left + ((right - left) >> 1);
+            if (nums[mid] < target) {
+                left = mid + 1;
+            }
+            else {
+                right = mid;
+            }
+        }
+        //return left (*)
+        if (left == nums.length - 1 && nums[left] < target) return left + 1; // if target is greater than every element in nums, return nums.length (#)
+        else return left; //(#)
+    }
+    
+    
+    
+    
+    
+    
+    /**
+     * In the first binary search loop we find the left boundary. And in the second loop we find the right boundary. 
+     * In the first loop we make the mid left biased, and in the second we make the mid right biased. 
+     * Make sure the left and right don't get stuck. 
+     * https://discuss.leetcode.com/topic/5891/clean-iterative-solution-with-two-binary-searches-with-explanation */
+    
+    // public int[] searchRange(int[] nums, int target) {
+    //     int[] ret = new int[]{-1, -1};
+    //     if (nums == null || nums.length == 0) return ret;
+    //     //if (nums[0] > target || nums[nums.length - 1] < target) return ret;
+    //     int left = 0;
+    //     int right = nums.length - 1;
+    //     while (left < right) { //looking for left index
+    //         int mid = left + (right - left) / 2; //prevent overflow
+    //         //int mid = (left + right) / 2 may overflow under the condition of left + right > Integer.MAX_VALUE
+    //         if (nums[mid] < target) {
+    //             left = mid + 1;
+    //         }
+    //         else {
+    //             right = mid;
+    //         }
+    //     }
+    //     if (nums[left] == target) ret[0] = left;
+    //     else return ret; // if target does not exist, return
+        
+    //     right = nums.length - 1; //Don't have to reset the left value since we want to find right boundary in this loop
+    //     while (left < right) {
+    //         int mid = left + (right - left) / 2 + 1; //make the mid right biased
+    //         if (nums[mid] > target) {
+    //             right = mid - 1;
+    //         }
+    //         else {
+    //             left = mid;
+    //         }
+    //     }
+    //     ret[1] = left;
+    //     return ret;
+    // }
+}
