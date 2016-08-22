@@ -1,0 +1,74 @@
+public class Solution {
+    /**(2) 
+     * Dynamic programming iteration
+     * Use a three dimension list dp to store every intermediate result from 1 to target.
+     * dp[target] = candidates[i] + dp[target - candidates[i] - 1]
+     * Every List inside the result 2 dimensional list for each intermediate target is in ascending order for the purpose of preventing duplicates. 
+    **/
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        Arrays.sort(candidates);
+        List<List<List<Integer>>> dp = new ArrayList<>(); //keeps the intermediate result from 1 to target.
+        for (int i = 1; i <= target; i++) {
+            List<List<Integer>> curr = new ArrayList<>(); //current result for subproblem i
+            for (int j = 0; j < candidates.length; j++) {
+                if (candidates[j] == i) { //if candidates[j] equals to the target directly, add it to current result
+                    curr.add(Arrays.asList(candidates[j]));
+                }
+                else if (candidates[j] < i) { //otherwise, a possible solution can only exist when candidates[j] is less than i since the candidates is sorted.
+                    for (List<Integer> l : dp.get(i - candidates[j] - 1)) {
+                        if (candidates[j] <= l.get(0)) { //keep every solution in ascending order. 
+                            List<Integer> tmp = new ArrayList<>();
+                            tmp.add(candidates[j]);
+                            tmp.addAll(l);
+                            curr.add(tmp);
+                        }
+                    }    
+                }
+            }
+            dp.add(curr);
+        }
+        
+        return dp.get(target - 1);
+    }
+    
+    
+    
+    
+    
+    
+    /**(1) 
+     * Recursion backtracking algorithm
+     * In order to prevent duplicates in result, we first sort the array. 
+     * By sorting the array, we are increasing the number we try with the increasing of the index i and thus prevent duplicates. 
+     * Meanwhile, we increase the searching start index to prevent duplicate results. e.g. Once the first element in our return array is at index 1, than we only search for numbers after 1 in later loop. 
+     * So the subproblems of this question can be described as following: 
+     * (1) target == 0, which means we have already find out a possible combination, simply add it into the result list. 
+     * (2) number at current position is less than target, solving a new subproblem with target = target - candidates[i].
+     * (3) number at current position is greater than target, as the candidates array is sorted, we should end current loop since there are definitely no solution under current condition. 
+     * After each condition, we should backtrack the solutino by removing the last element in the curr list. 
+    **/
+    
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        Arrays.sort(candidates);
+        List<List<Integer>> ret = new LinkedList<>();
+        if (candidates == null || candidates.length == 0) {
+            return ret;
+        }
+        getResult(candidates, target, 0, ret, new LinkedList<Integer>());
+        
+        return ret;
+    }
+    
+    private void getResult(int[] candidates, int target, int start, List<List<Integer>> ret, List<Integer> curr) {
+        if (target > 0) {
+            for (int i = start; i < candidates.length && candidates[i] <= target; i++) {
+                curr.add(candidates[i]);
+                getResult(candidates, target - candidates[i], i, ret, curr);
+                curr.remove(curr.size() - 1);
+            }
+        }
+        else if (target == 0) {
+            ret.add(new LinkedList<Integer>(curr));
+        }
+    }
+}
