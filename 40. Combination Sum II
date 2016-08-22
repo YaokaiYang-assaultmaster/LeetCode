@@ -1,0 +1,51 @@
+public class Solution {
+    /** Backtracking / recursion
+     * A few observations first: 
+     * -The array is not sorted, so we sort the array first
+     * -The array contains duplicated numbers
+     * -Each number can only be used once, which indicates that the search starting index should increase for every recursion, unlike question 39. So start index should be a parameter for the getResult method.
+     * 
+     * So the algorithm should be like following:
+     * For each number at index i as the first element in the result list, we solve for subproblem which use target - candidates[i] as the new target.
+     * Then we iterate through each index j from start index to candidates.length - 1
+     * There could be three conditions for this:
+     * (1) candidates[j] == target, we add current result to the ret list and backtracking than.
+     * (2) candidates[j] < target, we solve for subproblem with a new taregt = target - candidates[j], and add candidates[j] to the current list.
+     * (3) candidates[j] > target, which means there cannot be any possible solution after this point. End current loop.
+     * 
+     * Meanwhile, since the question requires no duplicates in the ret list, we should take into account the duplicate elements in candidates.
+     * This can be guaranteed by not using the same number as the start of the current list since the candidates array is sorted. 
+     * So we simply skip any number with a index greater than start that is equal to its previous one.
+    **/
+    
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        Arrays.sort(candidates);
+        List<List<Integer>> ret = new LinkedList<>(); 
+        if (candidates == null || candidates.length == 0) {
+            return ret;
+        }
+        
+        getResult(candidates, target, ret, new LinkedList<Integer>(), 0);
+        return ret;
+    }
+    
+    private void getResult(int[] candidates, int target, List<List<Integer>> ret, List<Integer> curr, int start) {
+        if (target == 0) { //if targt == 0, we have find out a possible solution, store it in ret. (1)
+            ret.add(new LinkedList<Integer>(curr));
+        }
+        else { //if target != 0, keep trying (2)
+            for (int i = start; i < candidates.length; i++) {
+                if (i > start && candidates[i] == candidates[i - 1]) continue;  //handle duplicates. If a number which is no the start of current loop is equals to its previous one, we simply skip it. 
+                if (candidates[i] <= target) { //
+                    curr.add(candidates[i]);
+                    int newTarget = target - candidates[i];
+                    getResult(candidates, newTarget, ret, curr, i + 1);
+                    curr.remove(curr.size() - 1);
+                }
+                else { //if candidates[j] > target, there cannot be any solution after this point.  (3)
+                    break;
+                }
+            }
+        }
+    }
+}
