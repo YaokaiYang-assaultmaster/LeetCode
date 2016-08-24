@@ -1,0 +1,68 @@
+public class Solution {
+    /**(2)
+     * We could also use the multiplication of prime numbers associated with each letter of a string as the key. 
+     * Use multiplication of primes numbers associated with 26 letters is a great idea but it may lead to overflow if a string is too long. 
+     * Moreover, use a hashmap with `<Integer, Integer>` as the key-value pair could further optimize the running time, in which the first integer is the multiplication of prime numbers as the key and the second integer is the index of the list of strings related to this key in the ret list. 
+    **/
+    
+    public List<List<String>> groupAnagrams(String[] strs) {
+        int[] primes = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103};
+        List<List<String>> ret = new ArrayList<>();
+        if (strs == null || strs.length == 0) return ret;
+        Map<Integer, Integer> map = new HashMap<>();
+        for (String s : strs) {
+            int key = 1;
+            char[] ca = s.toCharArray();
+            for (char c : ca) {
+                key *= primes[c - 'a'];
+            }
+            List<String> curr;
+            if (!map.containsKey(key)) {
+                curr = new LinkedList<>();
+                ret.add(curr);
+                map.put(key, ret.size() - 1);
+            }
+            else {
+                curr = ret.get(map.get(key));
+            }
+            curr.add(s);
+        }
+    
+        return ret;
+    }
+    
+    
+    
+    
+    
+    
+    /** (1)
+     * Use sorted string as the key. In this way, all of the strings with the same characters could have the same key. 
+     * So we use a hashmap with <String, List<String>> as the key-value pair. Each list stores all the strings associated with this key.
+    **/
+    
+    public List<List<String>> groupAnagrams(String[] strs) {
+        List<List<String>> ret = new LinkedList<>();
+        if (strs == null || strs.length == 0) {
+            return ret;
+        }
+        
+        Map<String, List<String>> map = new HashMap<>();
+        for (String s : strs) {
+            char[] ca = s.toCharArray();
+            Arrays.sort(ca);
+            String key = String.valueOf(ca);
+            if (!map.containsKey(key)) {
+                List<String> curr = new LinkedList<>();
+                map.put(key, curr);
+            }
+            map.get(key).add(s);
+        }
+        
+        for (List<String> list : map.values()) {
+            ret.add(list);
+        }
+        
+        return ret;
+    }
+}
