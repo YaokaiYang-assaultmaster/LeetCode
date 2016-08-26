@@ -1,0 +1,86 @@
+public class Solution {    
+    /**(2)
+     * Mimic the python one-line solution
+     * def spiralOrder(self, matrix):
+     *     return matrix and list(matrix.pop(0)) + self.spiralOrder(zip(*matrix)[::-1])
+     * O(m * n * (min{m,n}^2)) time and O(m * n) space
+    **/
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> result = new LinkedList<>();
+        if (matrix == null || matrix.length == 0) {
+            return result;
+        }
+        
+        for (int i = 0; i < matrix[0].length; i++) {
+            result.add(matrix[0][i]); //Add the first row of the matrix into result list
+        }
+        
+        //Construct a new array without the first row by let the last column of the original matrix be the first row in the new column and so on. Like left rotate the original matrix without the first row. 
+        if (matrix.length > 1) {
+            int[][] newMatrix = new int[matrix[1].length][matrix.length - 1];
+            int row = 0;
+            for (int i = matrix[1].length - 1; i >= 0; i--) {
+                for (int j = 1; j < matrix.length; j++) {
+                    newMatrix[row][j - 1] = matrix[j][i];
+                    //System.out.println(row + " " + (j - 1) + ":" + newMatrix[row][j - 1] + ", ");
+                }
+                row++;
+            }
+            result.addAll(spiralOrder(newMatrix));
+        }
+        
+        return result;
+    }
+    
+    
+    /**(1)
+     * Follow the natural thought of this question, first move right, then down, then left, then up. And decrease the start and end of row and column accordingly. 
+     * However, we need to judge if start of row and column is less than end to prevent duplicates before we move left and up
+    **/
+    
+    public List<Integer> spiralOrder(int[][] matrix) {
+        List<Integer> result = new LinkedList<>();
+        if (matrix == null || matrix.length == 0) {
+            return result;
+        }
+        
+        result = spiralPrinter(matrix, 0, 0, matrix.length - 1, matrix[0].length - 1);
+        return result;
+    }
+    
+    private List<Integer> spiralPrinter(int[][] matrix, int startR, int startC, int endR, int endC) {
+        List<Integer> ret = new LinkedList<>();
+        while (startR <= endR && startC <= endC) {
+            //Move right
+            for (int j = startC; j <= endC; j++) {
+                ret.add(matrix[startR][j]);
+            }
+            startR++;
+            
+            //Move down
+            for (int j = startR; j <= endR; j++) {
+                ret.add(matrix[j][endC]);
+            }
+            endC--;
+            
+            //Move left
+            if (startR <= endR) {
+                for (int j = endC; j >= startC; j--) {
+                    ret.add(matrix[endR][j]);
+                }
+            }
+            endR--;
+            
+            //Move up
+            if (startC <= endC) {
+                for (int j = endR; j >= startR; j--) {
+                    ret.add(matrix[j][startC]);
+                }
+            }
+            startC++;
+
+        }
+        
+        return ret;
+    }
+}
