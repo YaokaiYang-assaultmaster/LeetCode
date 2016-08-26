@@ -1,0 +1,84 @@
+public class Solution {
+    /**(2)
+     * Another aspect of this quesiton is that we should aviod any 0 in the array since if we cannot aviod reaching it, we cannot move further. 
+     * So we should work on an algorithm that could check if we can skip any 0 in the array. 
+     * If we want to skip a 0, we should make sure that the ith-previous position before the 0 can jump at least (i+1) further, that is, it can at least jump to the latter position of the 0.
+    **/
+    public boolean canJump(int[] nums) {
+        if (nums == null || nums.length == 0) return false;
+        if (nums.length == 1) return true;
+        
+        //Start from the second last element in the array cause if we can skip the second last 0, we already are at the last position in the array. 
+        for (int i = nums.length - 2; i>= 0; i--) {
+            if (nums[i] == 0) { //judge if we can skip this zero.
+                int needMove = 1;
+                while (needMove > nums[i]) {
+                    i--;
+                    needMove++;
+                    if (i < 0) return false;
+                }
+            }
+        }
+        
+        return true;
+        
+    }
+    
+    
+    
+    
+    
+    /**(1)
+     * First ask ourself what is the hidden question of this problem.
+     * We want to reach the last position of the array, so the last position should be reachable by its previous positions. And thus its previous positions should be reachable by their previous positions and so on. 
+     * 
+     * Try each position from 0 to nums.length - 1 to see the farthest position we can reach from them and record that position. 
+     * If we reached a position i which is larger than the current farthest position, we know we cannot reach it from its previous positions. And thus its subsquent positions cannot be reached by its previous positions neither. So return fasle.
+     * If we reached a maxPosition that is greater than nums.length - 1, return true.
+     * Or if we have finished the for loop, return true since every position is the array is reachable. 
+    **/
+    public boolean canJump(int[] nums) {
+        //deal with inllegal inputs
+        if (nums == null || nums.length == 0) return false; 
+        //deal with edge case
+        if (nums.length == 1) return true;
+        
+        int maxPosition = 0;
+        for (int i = 0; i <= nums.length - 1; i++) {
+            if (maxPosition < i) return false;
+            maxPosition = (i + nums[i] > maxPosition) ? (i + nums[i]) : maxPosition;
+            if (maxPosition >= nums.length - 1) break;
+        }
+        return true;
+    }
+    
+    
+    
+    /**
+     * Start from index 0, try each possible jump for a position and recurse. See if the farthest position it can reach is greater than the last index of the nums array. 
+     * Inefficient. 
+     * TLE for large input. 
+    **/
+    public boolean canJump(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return false;
+        }
+        
+        int result;
+        result = jump(0, nums);
+        return result >= nums.length - 1 ? true : false;
+    }
+    
+    private int jump(int curr, int[] nums) {
+        if (curr >= nums.length - 1) return curr;
+        int step = nums[curr];
+        //if (step == 0) return curr;
+        int ret = curr;
+        for (; step > 0; step--) {
+            int tmp = jump(curr + step, nums);
+            if (tmp > ret) ret = tmp;
+            if (ret >= nums.length - 1) break;
+        }
+        return ret;
+    }
+}
