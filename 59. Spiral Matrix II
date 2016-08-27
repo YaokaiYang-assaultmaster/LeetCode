@@ -1,0 +1,85 @@
+public class Solution {
+    /**(2)
+     * Yet another way of doing it naturally but using a direction array
+    **/
+    
+    public int[][] generateMatrix(int n) {
+        int[][] result = new int[n][n];
+        if (n == 0) return result;
+        
+        int row = 0;
+        int column = 0;
+        int flag = 0; //indicating the direciton we should take
+        int[][] direction = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}}; 
+        //The change should be made to row and column index for every direction
+        
+        for (int num = 1; num <= n * n; num++) {
+            result[row][column] = num;
+            int rowOffset = direction[flag % 4][0];
+            int colOffset = direction[flag % 4][1];
+            if ((row + rowOffset) <= n - 1 && (row + rowOffset) >= 0 && (column + colOffset) <= n - 1 && (column + colOffset) >= 0 && result[row + rowOffset][column + colOffset] == 0) {
+                //new index of the row and column should be within the range of array and that position should not have been assigned.
+                row = row + rowOffset; //new row index
+                column = column + colOffset; //new column index
+            }
+            else {
+                flag += 1;
+                row = row + direction[flag % 4][0];
+                column = column + direction[flag % 4][1];
+            }
+        }
+        
+        return result;
+    }
+    
+    
+    
+    /**(1)
+     * Following the natural loop of filling the 2-dimensional array.
+     * First fill in the top row, then the right most column, then the bottom row, then the left most column
+     * Use 4 indexes to lable the filling status and change them accordingly during the loop. 
+    **/
+    
+    public int[][] generateMatrix(int n) {
+        int [][] result = new int[n][n];
+        if (n == 0) return result;
+        int beginRow = 0; //The begining index of row
+        int beginCol = 0; //The begining index of column
+        int endRow = n - 1; //The end index of row
+        int endCol = n - 1; //The end index of column
+        int num = 1; //The begining of the numbers that is going to be filled in the array
+        
+        while (beginRow <= endRow && beginCol <= endCol) {
+            for (int i = beginCol; i <= endCol; i++) { //Fill in the top remaining row
+                result[beginRow][i] = num;
+                num++;
+            }
+            beginRow++;
+            
+            for (int i = beginRow; i <= endRow; i++) { //Fill in the right most remaining column
+                result[i][endCol] = num;
+                num++;
+            }
+            endCol--;
+            
+            if (beginRow <= endRow) { //If there is still remaining rows
+                for (int i = endCol; i >= beginCol; i--) { //Fill in the bottom remaining row
+                    result[endRow][i] = num;
+                    num++;
+                }
+                endRow--;
+            }
+            
+            if (beginCol <= endCol) { //If there is still remaining columns
+                for (int i = endRow; i >= beginRow; i--) { //Fill in the left most remaining column
+                    result[i][beginCol] = num;
+                    num++;
+                }
+                beginCol++;
+            }
+            
+        }
+        
+        return result;
+    }
+}
