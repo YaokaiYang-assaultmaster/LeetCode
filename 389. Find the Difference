@@ -1,0 +1,19 @@
+public class Solution {
+    /**
+     * Bit manipulation
+     * Any number XOR with it self generates a 0 and 0 XOR with any number generates itself.
+     * Observed that t has at least one letter, and t is always 1 letter long than s, we can use following code 
+    **/
+    
+    public char findTheDifference(String s, String t) {
+        int n = t.length(); //t has at least one character
+        char result = t.charAt(n - 1);
+        
+        for (int i = 0; i < n - 1; i++) {
+            result ^= s.charAt(i);
+            result ^= t.charAt(i);
+        }
+        
+        return result;
+    }
+}
