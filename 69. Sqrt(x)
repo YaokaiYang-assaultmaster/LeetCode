@@ -1,0 +1,70 @@
+public class Solution {
+    /**(3)
+     * Newton's method
+     * To calculate for the seuare root of a large integer n, the formula is:
+     * $$ x_(k+1) = 1/2 (x_k + (n / x_k)) $$
+     * x_k+1 approaching the midpoint of x_k and n / x_k step by step and thus approaching the square root of n.
+     * It can stop as soon as x_k+1 - x_k < 1
+    **/
+    
+    public int mySqrt(int x) {
+        long r = x;
+        while (r * r > x) {
+            r = (r + x / r) / 2;
+        }
+        
+        return (int)r;
+    }
+
+
+
+    /**(2)
+     * Bit manipulation method
+     * Decide the bit value of each poisition from the most significant bit to the least significant of the result
+     * Since the sqrt of a int is at most 15-bits long besides the symbol, the running time can be O(15) = O(1)
+    **/
+    public int mySqrt(int x) {
+        if (x <= 1) return x;
+        long result = 0;
+        long bit = 1l << 15;
+        while (bit > 0) {
+            result |= bit;
+            if (result * result > x) { //Can use result > x / result to prevent overflow
+                result ^= bit;
+            }
+            bit >>= 1;
+        }
+        return (int)result;
+    }
+    
+    
+    
+    /**(1)
+     * Use technique similar to binary search. 
+     * initial range would be 0 to x. 
+     * test the mid point every time.
+     * O(logn) algorithm. Since n is at most 2147483647 whose log is 31, it's constant time.
+    **/
+    
+    public int mySqrt(int x) {
+        if (x <= 1) return x;
+        
+        int start = 0;
+        int end = x;
+        int result = 0;
+        while (start < end) {
+            result = (start + end) / 2;
+            if (result > x / result) { //Use division to prevent overflow
+                end = result;
+            }
+            else if (result < x / result) {
+                if (result + 1 > x / (result + 1)) return result;
+                start = result;
+            }
+            else { //result = x / result
+                return result;
+            }
+        }
+        return result;
+    }
+}
