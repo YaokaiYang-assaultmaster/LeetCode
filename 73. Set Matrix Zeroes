@@ -1,0 +1,30 @@
+public class Solution {
+    /**
+     * Use the first row and first column as the marker to store the condition of the corresponding row and column. 
+     * If there is a 0 at matrix[i][j], then matrix[i][0] = 0; matrix[0][j] = 0. For the first row and column, since matrix[0][0] can only store 1 state, use a extra marker row0 or col0 to store the state.
+    **/
+    
+    public void setZeroes(int[][] matrix) {
+        if (matrix == null || matrix.length == 0) return;
+        
+        int col0 = 1; //keeps the marker of the first column
+        for (int i = 0; i < matrix.length; i++) { //set the marker for each row and column
+            if (matrix[i][0] == 0) col0 = 0;
+            for (int j = 1; j < matrix[0].length; j++) { //since first column is already considerd, we start from the second column
+                if (matrix[i][j] == 0) {
+                    matrix[i][0] = 0;
+                    matrix[0][j] = 0;
+                }
+            }
+        }
+        
+        for (int i = matrix.length - 1; i >= 0; i--) { //set the values bottom-up
+            for (int j = matrix[0].length - 1; j > 0; j--) { //the first column is gonna be set separately, we stops at the second column
+                if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+                    matrix[i][j] = 0;
+                }
+            }
+            if (col0 == 0) matrix[i][0] = 0; //consider the first column
+        }
+    }
+}
