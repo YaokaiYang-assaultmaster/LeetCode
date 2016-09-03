@@ -1,0 +1,86 @@
+public class Solution {
+    /**(2)
+     * Use 2 rounds of binary search
+     * First decide the row index, then the column index
+     * O(logm + logn) time complexity
+    **/
+    public boolean searchMatrix(int[][] matrix, int target) {
+        if (matrix ==  null || matrix.length == 0) return false;
+        
+        int row = matrix.length - 1, col = matrix[0].length - 1;
+        if (target < matrix[0][0] || target > matrix[row][col]) return false;
+        
+        int rowIndex = 0;
+        //First figure out the row index
+        //Since we have checked that target is within the range of the matrix, the following while loop is guaranteed to return a valid row index
+        int start = 0, end = row;
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if (matrix[mid][0] <= target && (mid == row || matrix[mid + 1][0] > target)) {
+                rowIndex = mid;
+                break;
+            }
+            else if (matrix[mid][0] > target) {
+                end = mid - 1;
+            }
+            else {
+                start = mid + 1;
+            }
+        }
+        
+        //Then check the specific row for the target by binary search
+        start = 0;
+        end = col;
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if (matrix[rowIndex][mid] == target) {
+                return true;
+            }
+            else if (matrix[rowIndex][mid] < target) {
+                start = mid + 1;
+            }
+            else {
+                end = mid - 1;
+            }
+        }
+        
+        return false;
+    }
+
+    
+    
+    
+    
+    /**(1)
+     * Regard the matrix as a 1-dimensional array and use binary search on it
+     * O(log(m*n)) = O(logm + logn) time complexity
+    **/
+    public boolean searchMatrix(int[][] matrix, int target) {
+        if (matrix == null || matrix.length == 0) return false;
+        
+        int row = matrix.length, col = matrix[0].length;
+        //return as soon as the target is out of the range of the matrix
+        if (target < matrix[0][0] || target > matrix[row - 1][col - 1]) return false; 
+        
+        int start = 0, end = row * col - 1; //regard the matrix as a 1-dimensional array
+        
+        //Perform a typical binary search
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            //The row index of  the mid point would be mid / col
+            //The column index of the mid point would be mid % col
+            int midValue = matrix[mid / col][mid % col];
+            if (target == midValue) {
+                return true;
+            }
+            else if (target < midValue) {
+                end = mid - 1;
+            }
+            else {
+                start = mid + 1;
+            }
+        }
+        
+        return false;
+    }
+}
