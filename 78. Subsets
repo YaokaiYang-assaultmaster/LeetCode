@@ -1,5 +1,35 @@
 public class Solution {
     /**
+     * Iterative method
+     * The algorithm is like following:
+     * Creat a  result 2-dimensional list and add a empty list into it as the initial case.
+     * For every number in the nums array, add it to every existing list in the result list. 
+     * Iterate until there is no remaining numbers. 
+     * O(2 * 2^(n-1)) = O(2^n) time
+    **/
+    
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return result;
+        }
+        
+        result.add(new ArrayList<>());
+        for (int i = 0; i < nums.length; i++) {
+            int size = result.size();
+            for (int j = 0; j < size; j++) {
+                List<Integer> tmp = new ArrayList<>(result.get(j));
+                tmp.add(nums[i]);
+                result.add(tmp);
+            }
+        }
+        return result;
+    }
+
+
+
+
+    /**
      * Bit manipulation
      * Noticed that there will be 2^n subsets in total. 
      * And 1 appears once every 2 subsets, 2 appears twice in every 4 consective subsets. 3 appears four times in every 8 consective subsets. 
