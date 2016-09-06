@@ -1,0 +1,108 @@
+public class Solution {
+    
+    /**(2)
+     * Avoid using the visited array by using a bit mask or, in other words, change the board array.
+     * Following is a list of XOR a to n with 256
+     * a=š
+     * b=Ţ
+     * c=ţ
+     * d=Ť
+     * e=ť
+     * f=Ŧ
+     * g=ŧ
+     * h=Ũ
+     * i=ũ
+     * j=Ū
+     * k=ū
+     * l=Ŭ
+     * m=ŭ
+     * n=Ů
+    **/
+    
+    public boolean exist(char[][] board, String word) {
+        if (board == null || board.length == 0) {
+            return false;
+        }
+        
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if ((board[i][j] == word.charAt(0)) && search(board, word, i, j, 0)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    private boolean search(char[][] board, String word, int row, int col, int start) {
+        if (start == word.length()) {
+            return true;
+        }
+        
+        if (row >= board.length || row < 0 || col >= board[0].length || col < 0 || board[row][col] != word.charAt(start)) {
+            return false;
+        }
+        
+        board[row][col] ^= 256;
+        //XOR board[row][col] with 256 will make it not a valid character, which avoids the cycle.
+        //The range of char is between 0 to 255, by XOR it with 256, board[row][col] will become a number greater than 256 and is thus different with any character.
+        //This can also be implemented using assigning board[i][j] with some non-character value like *.
+        
+        boolean res = search(board, word, row + 1, col, start + 1);
+        if (!res) res = search(board, word, row - 1, col, start + 1);
+        if (!res) res = search(board, word, row, col + 1, start + 1);
+        if (!res) res = search(board, word, row, col - 1, start + 1);
+        
+        if (res) return true;
+        
+        board[row][col] ^= 256;
+        //XOR board[row][col] with 256 again will result in the original character
+        return false;
+    }
+    
+    
+    /**(1)
+     * Use A 2-dimension boolean array visited to store the poisitions that have been visited.
+     * If there exists a character in the board that is the same as the first character of the word, start searching.
+     * Search up, down, left and right side of the current character that is not in the existed array to avoid cycle.
+     * Once find a match, return true
+     * If a match is not found, set visited of that poistion to false and return false
+    **/
+    boolean[][] visited;
+    public boolean exist(char[][] board, String word) {
+        if (board == null || board.length == 0) {
+            return false;
+        }
+        
+        char[] words = word.toCharArray();
+        visited = new boolean[board.length][board[0].length];
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if ((board[i][j] == words[0]) && searchWord(board, words, i, j, 0)) {
+                    return true;
+                } 
+            }
+        }
+        
+        return false;
+    }
+    
+    private boolean searchWord(char[][] board, char[] words, int row, int col, int start) {
+        if (start == words.length) {
+            return true;
+        }
+        
+        if (row >= board.length || row < 0 || col >= board[0].length || col < 0 || board[row][col] != words[start] || visited[row][col]) {
+            return false;
+        }
+        visited[row][col] = true;
+        
+        if (searchWord(board, words, row + 1, col, start + 1) || searchWord(board, words, row - 1, col, start + 1) || searchWord(board, words, row, col + 1, start + 1) || searchWord(board, words, row, col - 1, start + 1)) {
+            return true;
+        }
+        
+        visited[row][col] = false;
+        return false;
+    }
+}
