@@ -1,0 +1,60 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Recursion
+    **/
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null || head.next == null) return head;
+        
+        if (head.next != null && head.val == head.next.val) {
+            while (head.next!= null && head.val == head.next.val) {
+                head = head.next;
+            }
+            return deleteDuplicates(head.next);
+        }
+        else {
+            head.next = deleteDuplicates(head.next);
+        }
+        
+        return head;
+    }
+    
+    /**
+     * Iteration
+    **/
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        
+        ListNode prev = new ListNode(-1);
+        ListNode dummy = prev; //Use a dummy node to deal with the situation where the original head is getting deleted
+        prev.next = head;
+        ListNode curr = head;
+        
+        while (curr != null && curr.next != null) {
+            if (curr.val == curr.next.val) {
+                //remove all duplicate nodes
+                //After the while loop, curr will point to the last one of the duplicate nodes
+                while (curr.next != null && curr.val == curr.next.val) {
+                    curr = curr.next;
+                }
+                prev.next = curr.next;
+                curr = curr.next;
+            }
+            else {
+                prev = prev.next;
+                curr = curr.next;
+            }
+        }
+        
+        return dummy.next;
+    }
+}
