@@ -1,0 +1,82 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Record the end of the first half with tail
+     * Make sure every thing before this tail is less than x. 
+    **/
+    public ListNode partition(ListNode head, int x) {
+        if (head == null || head.next == null) return head;
+        
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        ListNode tail = dummy;
+        ListNode curr = dummy;
+        while (curr != null && curr.next != null) {
+            if (curr.next.val >= x) {
+                curr = curr.next;
+            }
+            else {
+                if (curr == tail) {
+                    curr = curr.next;
+                    tail = tail.next;
+                }
+                else {
+                    ListNode tmp = curr.next;
+                    curr.next = tmp.next;
+                    tmp.next = tail.next;
+                    tail.next = tmp;
+                    tail = tail.next;
+                }
+            }
+        }
+        
+        return dummy.next;
+    }
+    
+    
+    
+    /**
+     * If we want to deal with this problem, we need to at least scan the linkedlist once. 
+     * So the Best Conceived Time of the algorithm is O(n). 
+     * May be a simple way is to allocate a new linkedlist and rebuild the original one. 
+     * However, this is not optimal. 
+     * There may be a O(1) space one which simply manipulates the pointers of nodes in the original list. 
+     * Use 2 pointers, one pointing to the end of the first half, and the other pointing to the end of the second half. 
+     * At the same time, keep track of the head of the 2 half with 2 dummy nodes. 
+     * Finally set the next of the tail node of the second half to be null
+    **/
+    public ListNode partition(ListNode head, int x) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        
+        ListNode dummy1 = new ListNode(-1); //keeps the head of the first half
+        ListNode dummy2 = new ListNode(-1); //keeps the head of the second half
+        ListNode curr1 = dummy1; //keeps the end of the first half
+        ListNode curr2 = dummy2; //keeps the end of the second half
+        
+        while (head != null) {
+            if (head.val < x) {
+                curr1.next = head;
+                curr1 = curr1.next;
+            }
+            
+            else {
+                curr2.next = head;
+                curr2 = curr2.next;
+            }
+            
+            head = head.next;
+        }
+        curr2.next = null;
+        curr1.next = dummy2.next;
+        return dummy1.next;
+    }
+}
