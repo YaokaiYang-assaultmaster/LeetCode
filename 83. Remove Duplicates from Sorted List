@@ -1,0 +1,46 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**(2)
+     * Recursive solution
+    */
+    
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null || head.next == null) return head;
+        
+        head.next = deleteDuplicates(head.next);
+        return head.val == head.next.val ? head.next : head;
+    }
+    
+    
+    
+    /**(1)
+     * Two pointers. 
+     * Can further be solved by one pointer. Simply replace p2 with p1.next
+    **/
+    public ListNode deleteDuplicates(ListNode head) {
+        if (head == null || head.next == null) return head;
+        
+        ListNode p1 = head;
+        ListNode p2 = head.next;
+        
+        while(p2 != null) {
+            if (p1.val == p2.val) {
+                p1.next = p2.next;
+                p2 = p2.next;
+            }
+            else {
+                p1 = p1.next;
+                p2 = p2.next;
+            }
+        }
+        
+        return head;
+    }
+}
