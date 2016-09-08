@@ -10,6 +10,10 @@ public class Solution {
     /**
      * Record the end of the first half with tail
      * Make sure every thing before this tail is less than x. 
+     * Why this method does not have to modify the last next to null??
+     * If the last element is greater than x, then it won't have to move and the last next pointer is pointing to null naturally.
+     * If the last element is less than x, then at the time we checking it, curr is pointing to the second last element, which is also the lase element greater than x. By step (1), curr.next is set to curr.next.next, which is null.
+     * So the last next pointer would be null anyway. 
     **/
     public ListNode partition(ListNode head, int x) {
         if (head == null || head.next == null) return head;
@@ -29,7 +33,7 @@ public class Solution {
                 }
                 else {
                     ListNode tmp = curr.next;
-                    curr.next = tmp.next;
+                    curr.next = tmp.next; //(1)
                     tmp.next = tail.next;
                     tail.next = tmp;
                     tail = tail.next;
