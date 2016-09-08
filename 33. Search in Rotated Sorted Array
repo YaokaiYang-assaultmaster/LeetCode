@@ -1,0 +1,123 @@
+public class Solution {
+    /**
+     * Since the array is partially sorted, for example, [7,8,9,1,2,3,4]. We can perform a normal binary search by adjusting the array. 
+     * If the target is 8, we adjust the array to [7,8,9,inf,inf,inf,inf]
+     * If the target is 3, we adjust the array to [-inf,-inf,-inf,1,2,3,4]
+     * Then we perform a normal binary search
+     * Actually we don't have to change every value, we can just change the value on the go. 
+    **/
+    
+    public int search(int[] nums, int target) {
+        if (nums == null || nums.length == 0 || (target < nums[0] && target > nums[nums.length - 1])) {
+            return -1;
+        }
+        
+        int start = 0, end = nums.length - 1;
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            
+            double num = ((target < nums[0]) == (nums[mid] < nums[0])) ? (double)nums[mid] : target >= nums[0] ? Math.pow(2, 32) : -Math.pow(2, 32);
+            
+            if (num == (double)target) {
+                return mid;
+            }
+            
+            if (num < (double)target) {
+                start = mid + 1;
+            }
+            
+            if (num > (double)target) {
+                end = mid - 1;
+            }
+            
+        }
+        
+        return -1;
+    }
+    
+    
+    
+    
+    /**
+     * The idea is simple. 
+     * Since the array is partially sorted, each time we have a mid point, we judge which part of the partially sorted array it is in and if target is in this sorted part. 
+     * If target is in this sorted part, continue with this part
+     * Otherwise, search in the other half. 
+    **/
+    
+    public int search(int[] nums, int target) {
+        if (nums == null || nums.length == 0 || (target > nums[nums.length - 1] && target < nums[0])) {
+            return -1;
+        }
+        
+        int start = 0, end = nums.length - 1;
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if (nums[mid] == target) {
+                return mid;
+            }
+            
+            if (nums[start] <= nums[mid]) {
+                if (target < nums[mid] && target >= nums[start]) {
+                    end = mid;
+                }
+                else {
+                    start = mid + 1;
+                }
+            }
+            
+            if (nums[mid] <= nums[end]) {
+                if (target > nums[mid] && target <= nums[end]) {
+                    start = mid + 1;
+                }
+                else {
+                    end = mid;
+                }
+            }
+        }
+        
+        return -1;
+    }
+    
+    
+    /**
+     * Find the minimum value first, and then perform binary search
+     * The second while may lead to inifite loop for case like [3,1] 0
+    **/
+    
+    // public int search(int[] nums, int target) {
+    //     if (nums == null || nums.length == 0 || (target < nums[0] && target > nums[nums.length - 1])) {
+    //         return -1;
+    //     }
+        
+    //     //First find the minimum value, which is also the rotate pivot
+    //     int start = 0, end = nums.length - 1;
+    //     while (start < end) {
+    //         int mid = (start + end) / 2;
+    //         if (nums[mid] > nums[nums.length - 1]) {
+    //             start = mid + 1;
+    //         }
+    //         else {
+    //             end = mid;
+    //         }
+    //     }
+        
+    //     int rotate = start;
+    //     start = 0;
+    //     end = nums.length - 1;
+        
+    //     while (start <= end) {
+    //         int mid = (((start + end) / 2) + rotate) % nums.length;;
+            
+    //         if (nums[mid] == target) return mid;
+    //         if (nums[mid] < target) {
+    //             start = mid + 1;
+    //         }
+    //         else {
+    //             end = mid - 1;
+    //         }
+    //     }
+        
+    //     return -1;
+    // }
+}
