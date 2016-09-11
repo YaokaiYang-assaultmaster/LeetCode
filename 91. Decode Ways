@@ -1,0 +1,35 @@
+public class Solution {
+    /**
+     * It can be easily seen that this question contains subproblem attribity which is suitable for dynamic programming. 
+     * Since if we want to know the decode ways of n numbers, we have to calculate it with n - 1 numbers subproblem and n - 2 subproblem. 
+     * if s.substring(n - 2, n) <= 26, that means mem[n] = mem[n - 1] + mem[n - 2]. Otherwise, mem[n] = mem[n - 1].
+     * The reason is that if the number constructed by the last 2 digits is greater than 26, than it cannot form a valid encode, and all we can get for n number is the last digit combined with every possibility with n - 1 number.
+     * Otherwise, if the number constructed by the last 2 digits is less than or equal to 26, which means it is a valid encode, the decode way of n numbers would be the last 2 digits combined with every possibility of n - 2 number plus the last 1 digit combined with every possibility of n - 1 number. 
+    **/
+    
+    /**
+     * O(n) time
+     * O(n) space
+     * Can be optimized to O(1) space by only caching the result of previous 1 and 2 subproblems.
+    **/
+    public int numDecodings(String s) {
+        if (s == null || s.length() == 0) return 0;
+        
+        int n = s.length();
+        int[] mem = new int[n + 1];
+        mem[0] = 1;
+        for (int i = 0; i < n; i++) {
+            //System.out.println(Integer.parseInt(s.substring(i, i + 1)));
+            if (Integer.valueOf(s.substring(i, i + 1)) >= 1 && Integer.valueOf(s.substring(i, i + 1)) <= 9) {
+                mem[i + 1] += mem[i];
+            }
+            if (i >= 1) {
+                if (Integer.valueOf(s.substring(i - 1, i + 1)) <= 26 && Integer.valueOf(s.substring(i - 1, i + 1)) >= 10) {
+                    mem[i + 1] += mem[i - 1];
+                }
+            }
+        }
+        //for (int i : mem) System.out.println(i);
+        return mem[n];
+    }
+}
