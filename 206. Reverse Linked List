@@ -62,7 +62,7 @@ public class Solution {
      * And use a dummy node pointed to the head to keep track of the new head.
      * In each iteration, we let dummy.next pointed to the right most node we have iterated, which is then, and let then.next point to the previous right most node, which is dummy.next. And let then become the next node following it, which is kept by curr.next at the beginning of the iteration. 
      * By the time then reaches the last node of the linkedlist(indicated by then == null), we end the iteration and return dummy.next
-     * O(n) time, O(1) space
+     * O(n) time, O(1) space.
     **/
     public ListNode reverseList(ListNode head) {
         if (head == null || head.next == null) {
