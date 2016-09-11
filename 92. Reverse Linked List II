@@ -1,0 +1,40 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Solve by iteration
+     * Using the iteration method from Reverse LinkedList
+     * Just put the prev and start and then in right poisition.
+     * O(n) time where n is the length of the linkedlist, O(1) space
+    **/
+    public ListNode reverseBetween(ListNode head, int m, int n) {
+        //Deal with corner case
+        if (head == null || head.next == null) return head;
+        if (m >= n) return head;
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode prev = dummy;
+        ListNode start = prev.next;
+        ListNode then = start.next;
+        for (int i = 0; i < m - 1; i++) {
+            prev = prev.next;
+            start = start.next;
+            then = then.next;
+        }
+        
+        for (int j = 0; j <= n - m - 1; j++) {
+            start.next = then.next;
+            then.next = prev.next;
+            prev.next = then;
+            then = start.next;
+        }
+        
+        return dummy.next;
+    }
+}
