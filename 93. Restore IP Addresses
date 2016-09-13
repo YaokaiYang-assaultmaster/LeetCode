@@ -1,0 +1,74 @@
+public class Solution {
+    /**
+     * Iteration
+     * Just iterate every possible value of the whole string and test if each block is valid.
+     * Add the IP made up by four blocks that are all valid.
+     * O(n ^ 3) time, O(n) space
+    **/
+    public List<String> restoreIpAddresses(String s) {
+        List<String> ret = new ArrayList<>();
+        if (s == null || s.length() == 0) return ret;
+        for (int i = 1; i < 4 && i <= s.length() - 3; i++) {
+            for (int j = i + 1; j < i + 4 && j <= s.length() - 2; j++) {
+                for (int k = j + 1; k < j + 4 && k <= s.length() - 1; k++) {
+                    String s1 = s.substring(0, i);
+                    String s2 = s.substring(i, j);
+                    String s3 = s.substring(j, k);
+                    String s4 = s.substring(k, s.length());
+                    if (isValid(s1) && isValid(s2) && isValid(s3) && isValid(s4)) {
+                        ret.add(s1 + "." + s2 + "." + s3 + "." + s4);
+                    } 
+                    
+                }
+            }
+        }
+        
+        return ret;
+    }
+    
+    private boolean isValid(String s) {
+        if (s.length() == 0 || s.length() > 3 || (s.charAt(0) == '0' && s.length() > 1) || Integer.parseInt(s) > 255) {
+            return false;
+        }
+        return true;
+    }
+    
+    
+    
+    
+    /**
+     * Recursion Backtracking
+     * One extension to my knowledge:
+     * Backtracking does not necessary meant to extend one character or one number further in each recursion.
+     * We can decide the recursion based on basic element of the problem. 
+     * In Ip address, every block is a basic element, so we recurse for every block
+     * And we use a for loop to construct the block for recursion.
+     * 
+    **/
+    
+    public List<String> restoreIpAddresses(String s) {
+        List<String> ret = new ArrayList<>();
+        if (s == null || s.length() == 0) {
+            return ret;
+        }
+        
+        getResult(s, ret, 0, 4, "");
+        return ret;
+    }
+    
+    private void getResult(String s, List<String> ret, int start, int blocks, String curr) {
+        System.out.println(curr);
+        if (start == s.length() && blocks == 0) {
+            ret.add(curr);
+            return;
+        }
+        if (s.length() - start >= 4 * blocks) return;
+        for (int i = 1; i < 4; i++) {
+            if (start + i > s.length()) break;
+            String tmp = s.substring(start, start + i); //keeps the current block of substring of the length 1 to 3
+            if ((i == 3 && Integer.parseInt(tmp) > 255) || (tmp.startsWith("0") && tmp.length() > 1)) continue;
+            getResult(s, ret, start + i, blocks - 1, curr + tmp + (blocks == 1 ? "" : "."));
+        }
+
+    }
+}
