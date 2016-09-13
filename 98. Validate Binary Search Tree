@@ -1,0 +1,58 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Recursion
+     * During each recursion, test the value of the node based on the input boundary of the value.
+     * O(n) time where n is the number of the nodes
+    **/
+    public boolean isValidBST(TreeNode root) {
+        return isValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE);
+    }
+    
+    public boolean isValidBST(TreeNode root, long min, long max) {
+        if (root == null) return true;
+        if ((long)root.val >= max || (long)root.val <= min) return false;
+        return isValidBST(root.left, min, (long)root.val) && isValidBST(root.right, (long)root.val, max);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    /**
+     * Since inorder traversal gives us the incending order traversal of a BST, so we can use inorder traversal so test the input tree.
+     * Use 2 pointers to keep track of the current and previous tree node during the traversal and compare the val of the two nodes each time. 
+     * Based on the definition, pre.val < curr.val is the valid case. So return false when pre.val >= curr.val.
+     * O(n) time where n is the number of nodes. O(logn) space
+    **/
+    public boolean isValidBST(TreeNode root) {
+        if (root == null) return true; 
+        
+        Deque<TreeNode> stack = new ArrayDeque<>();
+        TreeNode curr = root;
+        TreeNode pre = null;
+        while (curr != null || !stack.isEmpty()) {
+            while (curr != null) {
+                stack.push(curr);
+                curr = curr.left;
+            }
+            curr = stack.pop();
+            if (pre != null && pre.val >= curr.val) return false;
+            
+            pre = curr; 
+            curr = pre.right;
+        }
+        return true;
+    }
+}
