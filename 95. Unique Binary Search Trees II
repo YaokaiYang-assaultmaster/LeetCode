@@ -1,0 +1,116 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    public List<TreeNode> generateTrees(int n) {
+        /**(1)
+         * If we want to know all different BST of n nodes, we may need to consider the condition in which each of the node can be the root. And in each conditon, we need to consider 2 subproblems, which is the left subtree and right subtree. If we use, say, the ith node to be the root, than we have to consider how left subtrees contain nodes 0 to i-1 look like and how right subtrees contain nodes i+1 through n look like. Then we have subproblem of subproblem. Apparently this is a dynamic programming problem. We could use cache to reduce the run time, which, in this case, is to cache the different subtree structures of nodes. 
+        **/
+        if (n == 0){
+            List<TreeNode> result = new ArrayList<TreeNode>();
+            return result;
+        }
+        int[] numoftree = numOfBST(n);
+        
+        TreeNode[] resultarr = generateSubTrees(1, n, numoftree);
+        
+        List<TreeNode> result= new ArrayList<TreeNode>();
+        
+        for (int i = 0; i < resultarr.length; i++) {
+            result.add(resultarr[i]);
+        }
+        return result;
+    }
+    
+    private TreeNode[] generateSubTrees(int start, int end, int[] dp) {
+        // ArrayList<TreeNode>[] resultarr = new ArrayList<TreeNode>()[dp[end - start + 1]];
+        TreeNode[] resultarr = new TreeNode[dp[end - start + 1]];
+        int currpos = 0;
+        if (start > end) {
+            resultarr[0] = null;
+            return resultarr;
+        }
+        for (int i = start; i <= end; i++) {
+            TreeNode[] nodeL = generateSubTrees(start, i - 1, dp);
+            TreeNode[] nodeR = generateSubTrees(i + 1, end, dp);
+            for (TreeNode nodel : nodeL) {
+                for (TreeNode noder : nodeR) {
+                    TreeNode root = new TreeNode(i);
+                    root.left = nodel;
+                    root.right = noder;
+                    resultarr[currpos] = root;
+                    currpos++;
+                }
+            }
+        }
+        return resultarr;
+    }
+    
+    private int[] numOfBST(int n) {
+        /*
+        use dynamic programming to calculate the number of different BST
+        */
+        int[] num = new int[n+1];
+        num[0] = 1;
+        if (n == 0){
+            return num;
+        }
+        num[1] = 1;
+        for (int i = 2; i <= n; i++){
+            for (int j = 1; j <= i; j++){
+                num[i] += num[j - 1] * num[i - j];
+            }
+        }
+        return num;
+    }
+    
+    
+    /**
+     * (2)
+    **/
+    public List<TreeNode> generateTrees(int n) {
+        List<TreeNode>[] result = new List[n+1];
+        result[0] = new ArrayList<TreeNode>();
+        result[0].add(null);
+        if (n == 0){
+            //OJ requires to return [], so we cannot just return result[0] which is [[]].
+            return new ArrayList<TreeNode>();
+        }
+        
+        for (int len = 1; len <= n; len++){
+            //result[i] stores the root of different BSTs for node number equals i
+            //since we don't know how many different BSTs are there, we use ArrayList to store roots
+            result[len] = new ArrayList<TreeNode>();
+            for (int j = 0; j < len; j++){
+                //use result j as left subtree and j+1 as the root
+                for (TreeNode nodeL : result[j]){
+                    for (TreeNode nodeR : result[len - 1 - j]){
+                        //use result j+1(not included) through len as the right subtree, however, the tree structure of result j+1 through len is similar to 0 through len-1-j while only the node values have a difference of j+1
+                        TreeNode root = new TreeNode(j+1);
+                        root.left = nodeL;
+                        //since we are using result[len-1-j] as the right subtree, we only have to change the values of each node with the clone method.
+                        root.right = clone(nodeR, j + 1);
+                        result[len].add(root);
+                    }
+                }
+            }
+        }
+        return result[n];
+    }
+    private static TreeNode clone(TreeNode node, int offset){
+        //change the value of each node to val+offset
+        if (node == null){
+            return null;
+        }
+        TreeNode root = new TreeNode(node.val + offset);
+        root.left = clone(node.left, offset);
+        root.right = clone(node.right, offset);
+        return root;
+    }
+}
