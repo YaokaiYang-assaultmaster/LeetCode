@@ -1,0 +1,89 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**(2)
+     * Iteration
+     * The basic idea is to deal with 2 subtree of the root seperately.
+     * Then we DFS or BFS the two subtree symmetricly, in other words, we DFS or BFS the leftsubtree from left to right and DFS or BFS the right subtree from right to left. Then we compare each node each time. Once there is a mismatch, return false. 
+     * Data structure to be used would be the same as DFS and BFS.
+     * This code implement DFS method using a Deque
+    **/
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) return true;
+        
+        return compareSubtree(root.left, root.right);
+    }
+    
+    private static boolean compareSubtree(TreeNode left, TreeNode right) {
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        if (left != null) {
+            if (right == null) return false;
+            deque.offerLast(left);
+            deque.offerLast(right);
+        }
+        else if (right != null) {
+            return false;
+        }
+        
+        while (!deque.isEmpty()) {
+            if (deque.size() % 2 != 0) return false;
+            
+            TreeNode currR = deque.pollLast();
+            TreeNode currL = deque.pollLast();
+            if (currR.val != currL.val) return false;
+            if (currR.right != null) {
+                if (currL.left == null) return false;
+                deque.offerLast(currL.left);
+                deque.offerLast(currR.right);
+            }
+            else if (currL.left != null) {
+                return false;
+            }
+            
+            if (currR.left != null) {
+                if (currL.right == null) return false;
+                deque.offerLast(currL.right);
+                deque.offerLast(currR.left);
+            }
+            else if (currL.right != null) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    
+    
+    
+    /**(1)
+     * Recursion
+     * In order for the tree to be symmetric, every left subtree of its left subtree shoule be the same as right subtree of its right subtree and vise versa. 
+     * If both left and right we are comparing are null or have the same value, compare one level down. Otherwise, return false
+     * O(n) time where n is the numeber of nodes
+    **/
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) return true;
+        
+        return compareSubTree(root.left, root.right);
+    }
+    
+    private static boolean compareSubTree(TreeNode left, TreeNode right) {
+        if (left != null && right != null && left.val == right.val) {
+            return compareSubTree(left.left, right.right) && compareSubTree(left.right, right.left);
+        }
+        
+        if (left == null && right == null) {
+            return true;
+        }
+        
+        return false;
+    }
+}
