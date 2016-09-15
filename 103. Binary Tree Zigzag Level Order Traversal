@@ -1,0 +1,88 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Recursion
+     * Both inorder and preorder traversal works
+     * The zigzag traverse can actually be obtained by reverse the order of specific levels of a normal BFS result. 
+     * In this question, all odd levels are traversed from right to left, so after the normal traversal, we reverse the value order of all odd levels
+     * O(n) time where n is the number of nodes.
+     * O(n) space
+    **/
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        List<List<Integer>> ret = new ArrayList<>();
+        if (root == null) return ret;
+        
+        zigzagRecurse(root, ret, 0);
+        for (int i = 0; i < ret.size(); i++) {
+            if (i % 2 != 0) {
+                Collections.reverse(ret.get(i));
+            }
+        }
+        
+        return ret;
+    }
+    
+    private static void zigzagRecurse(TreeNode root, List<List<Integer>> ret, int level) {
+        if (ret.size() <= level) {
+            ret.add(new ArrayList<>());
+        }
+        
+        ret.get(level).add(root.val);
+        
+        if (root.left != null) zigzagRecurse(root.left, ret, level + 1);
+        if (root.right != null) zigzagRecurse(root.right, ret, level + 1);
+    }
+    
+    
+    /**
+     * Iterative BFS
+     * This question is essentially a BFS problem with a requirement to traver in zigzag style.
+     * Zigzag depends on the level of the nodes actually. Use a int level to indicate the level currently being visited and decide in which direction should we store the TreeNode of current level. 
+     * Sinc the child of the node that is being visited at last in previous level is being visited first, we should store the nodes in a FILO style, which can be realized using a stack, or Deque in Java.
+     * O(n) time since every node is visited exactly once, where n is the number of nodes of the tree.
+     * O(n) space
+    **/
+    
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        List<List<Integer>> ret = new ArrayList<>();
+        if (root == null) {
+            return ret;
+        }
+        
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        deque.offerLast(root);
+        zigzagHelper(deque, 0, ret);
+        return ret;
+    }
+    
+    private static void zigzagHelper(Deque<TreeNode> deque, int level, List<List<Integer>> ret) {
+        while (!deque.isEmpty()) {
+            int size = deque.size();
+            List<Integer> tmp = new ArrayList<>();
+            Deque<TreeNode> nextLevel = new ArrayDeque<>();
+            for (int i = 0; i < size; i++) {
+                TreeNode curr = deque.pollLast();
+                tmp.add(curr.val);
+                if ((level + 1) % 2 != 0) {
+                    if (curr.left != null) nextLevel.offerLast(curr.left);
+                    if (curr.right != null) nextLevel.offerLast(curr.right);
+                }
+                else if ((level + 1) % 2 == 0) {
+                    if (curr.right != null) nextLevel.offerLast(curr.right);
+                    if (curr.left != null) nextLevel.offerLast(curr.left);
+                }
+            }
+            ret.add(tmp);
+            deque = nextLevel;
+            level++;
+        }
+    }
+}
