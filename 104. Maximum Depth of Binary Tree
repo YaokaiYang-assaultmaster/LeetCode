@@ -8,6 +8,12 @@
  * }
  */
 public class Solution {
+    /**
+     * This problem can also be solved by BFS.
+     * We only add 1 to the length while looping through all nodes of that level.
+    **/
+    
+    
     /** 
      * Iteration solution.
      * Using DFS with a stack
