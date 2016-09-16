@@ -1,0 +1,64 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /** 
+     * Iteration solution.
+     * Using DFS with a stack
+    **/
+    class Pair { //keeps the treenode and its corresponding length from root in the tree
+        TreeNode node; 
+        int length;
+        Pair(TreeNode node, int length) {
+            this.node = node;
+            this.length = length;
+        }
+    }
+    
+    public int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+        
+        int max = 0;
+        Deque<Pair> deque = new ArrayDeque<>();
+        deque.push(new Pair(root, 1));
+        while (!deque.isEmpty()) {
+            Pair curr = deque.pop();
+            if (curr.node.left != null) {
+                deque.push(new Pair(curr.node.left, curr.length + 1));
+            }
+            
+            if (curr.node.right != null) {
+                deque.push(new Pair(curr.node.right, curr.length + 1));
+            }
+            
+            if (curr.node.left == null && curr.node.right == null) { //reaching a leaf node
+                max = Math.max(max, curr.length);
+            }
+        }
+        return max;
+    }
+    
+    
+    
+    
+    
+    /**
+     * The max length of a tree would be the greater one among 1 plus the length of root.left and 1 plus the length of root.right.
+     * This structure is obviously suitable for a recursion method.
+     * O(n) time where n is the number of nodes.
+    **/
+    
+    public int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+        
+        if(root.left == null && root.right == null) return 1;
+        int length = 1;
+        return Math.max(length + maxDepth(root.left), length + maxDepth(root.right));
+    }
+}
