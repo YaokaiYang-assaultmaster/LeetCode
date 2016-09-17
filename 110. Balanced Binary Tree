@@ -1,0 +1,64 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**(2)
+     * For a given root, in order to define it as balanced tree, we have to make sure:
+     * 1. the difference between the depth of the left subtree of this root and the right subtree of this root is less than or equal to 1.
+     * 2. the left subtree of the root is balanced.
+     * 3. the right subtree of the root is balalced. 
+     * So this is the aspect we used to solve this problem.
+    **/
+    
+    
+    /**
+     * Bottom up approach
+     * Using a function height to calculate the height of a subtree from the left node. 
+     * Return -1 as a sign of unbalance if the height of 2 subtree have a difference greater than 1.
+     * Otherwise return the max height of current tree.
+     * In this approach, each node is visited once. So the runtime would be O(n) where n is the number of nodes in the tree.
+    **/
+    
+    public boolean isBalanced(TreeNode root) {
+        return height(root) != -1;
+    }
+    
+    private static int height(TreeNode root) {
+        if (root == null) return 0;
+        int leftHeight = height(root.left);
+        if (leftHeight == -1) return -1;
+        int rightHeight = height(root.right);
+        if (rightHeight == -1) return -1;
+        if (Math.abs(leftHeight - rightHeight) > 1) return -1;
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+    
+    
+    
+
+    /**(1)
+     * Top down approach
+     * Use a depth function to calculate the maximum depth of each node.
+     * Then for a given node to be the root of a balanced tree, the difference between the depth of its left and right subtree returned by the depth() function should be less than or equal to 1. And its left subtree and right subtree should also be balanced subtree. 
+     * So this problem should be solved recursively as following. 
+     * The runtime of depth() for a given node should be O(n) where n is the number of nodes in the tree. 
+     * And we do this for n nodes, resulting in a O(n^2) overall run time. 
+    **/
+    public boolean isBalanced(TreeNode root) {
+        if (root == null) return true;
+        
+        return (Math.abs(depth(root.left) - depth(root.right)) <= 1) && isBalanced(root.left) && isBalanced(root.right);
+    }
+    
+    private static int depth(TreeNode root) {
+        if (root == null) return 0;
+        
+        return Math.max(depth(root.left), depth(root.right)) + 1;
+    }
+}
