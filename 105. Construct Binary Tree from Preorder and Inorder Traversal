@@ -1,0 +1,109 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**(3)
+     * Iterative solution
+     * Keep inserting nodes from preorder to the left child of current node and stack until we reach at a node that is equal to the inorder, indicating that we have reached the end of this left subtree. 
+     * Then keep poping nodes out from stack until we reaches a node different from inorder, indicating that there is a right child of the last node we have tested. So add next node in preorder into right child of the last node. 
+     * Then doing the same process again until there is no nodes in preorder array. 
+    **/
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        if (preorder == null || inorder == null || preorder.length == 0 || inorder.length == 0) return null;
+        
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        TreeNode root = new TreeNode(preorder[0]);
+        TreeNode curr = root;
+        
+        for (int i = 1, j = 0; i < preorder.length; i++) {
+            if (curr.val != inorder[j]) {
+                curr.left = new TreeNode(preorder[i]);
+                deque.push(curr);
+                curr = curr.left;
+            }
+            else {
+                j++;
+                while (!deque.isEmpty() && deque.peekFirst().val == inorder[j]) {
+                    curr = deque.pop();
+                    j++;
+                }
+                curr.right = new TreeNode(preorder[i]);
+                curr = curr.right;
+            }
+        }
+        
+        return root;
+    }
+    
+    
+    
+    
+    /**(2)
+     * A small optimization would be not construct new arrays in each recursion. 
+     * Instead, we could pass the leftLength variable to the recursion
+     * Moreover, we can use a HashMap to keep the indices of each number in inorder and thus reduce the time of loop throughing the inorder array
+    **/
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        Map<Integer, Integer> inMap = new HashMap<>();
+        
+        for (int i = 0; i < inorder.length; i++) {
+            inMap.put(inorder[i], i);
+        }
+        
+        TreeNode root = buildTree(preorder, 0, preorder.length - 1, inorder, 0, inorder.length - 1, inMap);
+        
+        return root;
+    }
+    
+    private static TreeNode buildTree(int[] preorder, int preStart, int preEnd, int[] inorder, int inStart, int inEnd, Map<Integer, Integer> inMap) {
+        if (preStart > preEnd || inStart > inEnd) return null;
+        
+        TreeNode root = new TreeNode(preorder[preStart]);
+        int inRoot = inMap.get(root.val);
+        int leftLength = inRoot - inStart;
+        root.left = buildTree(preorder, preStart + 1, preStart + leftLength, inorder, inStart, inRoot - 1, inMap);
+        root.right = buildTree(preorder, preStart + leftLength + 1, preEnd, inorder, inRoot + 1, inEnd, inMap);
+        
+        return root;
+    }
+
+    
+    /**(1) 
+     * initial solution
+     * Since construct a tree includes 3 subproblem -- construct the root node, construct its left subtree and construct its right subtree.
+     * This is obviously solvable by a recursion.
+     * So in each recursion we construct the root first, than deal with its left and right subtree. 
+     * Since in inorder traversal the root is always at the middle between the inorder traversal of left subtree and right subtree. 
+     * And root is always at the beginning of the preorder traversal. 
+     * We can easily get the length of the left subtree and right subtree by looking at the index of the root, which is preorder[0] in the inorder traversal array. 
+     * Then using this length we can devide the preorder and inorder traversal into 3 parts, the root, which is used to construct the root of current tree, left subtree and right subtree. 
+     * Then we use those left subtree and right subtree traversal subarrays to construct the left and right subtrees respectively using recursion. 
+     * O(n^2) worst case runtime where n is the number of nodes under the condition that the tree only have left subtree from root. Since every time we have to traverse the whole inorder array whose length is n, n - 1, n - 2,... during each recursion respectively, the runtime is O(n^2).
+     * However, the average running time should be O(n) if the tree could be reasonabley balalce so we could roughly only traverse half of the array,T(n) = T(n / 2) + T(n / 2), which is O(n).
+    **/
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        if (preorder == null || inorder == null || preorder.length == 0 || inorder.length == 0) return null;
+        
+        TreeNode root = new TreeNode(preorder[0]);
+        int leftLength = 0;
+
+        for (int i = 0; i < inorder.length; i++) {
+            if (inorder[i] == preorder[0]) {
+                leftLength = i - 1;
+                break;
+            }
+        }
+        
+        root.left = buildTree(Arrays.copyOfRange(preorder, 1, leftLength + 2), Arrays.copyOfRange(inorder, 0, leftLength + 1));
+        root.right = buildTree(Arrays.copyOfRange(preorder, leftLength + 2, preorder.length), Arrays.copyOfRange(inorder, leftLength + 2, inorder.length));
+        
+        return root;
+    }
+    
+}
