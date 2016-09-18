@@ -1,0 +1,90 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**(1)
+     * Recursion
+     * Idea is the same as path sum.
+     * But add backtracking mechanism during DFS to store every path satisfying the sum requirement to a 2 dimensional list.
+     * O(n) time regards to the number of nodes n since every node is visited once.
+    **/
+    
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        List<List<Integer>> ret = new ArrayList<>();
+        pathSum(root, sum, ret, new ArrayList<Integer>());
+        return ret;
+    }
+    
+    private static void pathSum(TreeNode root, int sum, List<List<Integer>> ret, List<Integer> curr) {
+        if (root == null) return;
+        
+        curr.add(root.val);
+        if (root.val == sum && root.left == null && root.right == null) {
+            ret.add(new ArrayList<Integer>(curr)); //Make sure a new list object is added instead of the index of current list
+            
+            //Following 2-lind code avoid 2 recursion calls to 2 null childs of the current node. 
+            // curr.remove(curr.size() - 1);
+            // return;
+        }
+        
+        pathSum(root.left, sum - root.val, ret, curr);
+        pathSum(root.right, sum - root.val, ret, curr);
+        curr.remove(curr.size() - 1);
+    }
+    
+    
+    /**(2)
+     * Iteration
+     * Postorder traversal
+     * Same idea as Path Sum. 
+     * Just add the path satisfying the requirement to the ret list and add appropriate code to recover the status of deque, path and tmpSum to the status corresponding to its previous node.
+     * Remember to set pre to curr to avoid the code dead lock at finding a result at some right child of a node. Otherwise, the code will loop infinitely at line 75-76 and try to add that path to ret infinitely. 
+     * O(n) time, O(n) space where n is the number of nodes. 
+    **/
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        List<List<Integer>> ret = new ArrayList<>();
+        if (root == null) return ret;
+        TreeNode curr = root, pre = null;
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        List<Integer> path = new ArrayList<>();
+        int tmpSum = 0; //intermediate sum result
+        while (curr != null || !deque.isEmpty()) {
+            while (curr != null) {
+                deque.push(curr);
+                path.add(curr.val);
+                tmpSum += curr.val;
+                curr = curr.left;
+            }
+            
+            curr = deque.peekFirst();
+            if (curr.left == null && curr.right == null && tmpSum == sum) {
+                ret.add(new ArrayList<Integer>(path));
+                deque.pop();
+                path.remove(path.size() - 1);
+                tmpSum -= curr.val;
+                pre = curr;
+                curr = null;
+                continue;
+            }
+            
+            if (curr.right != null && pre != curr.right) {
+                curr = curr.right;
+            }
+            else {
+                pre = curr;
+                deque.pop();
+                tmpSum -= curr.val;
+                path.remove(path.size() - 1);
+                curr = null;
+            }
+        }
+        
+        return ret;
+    }
+}
