@@ -1,0 +1,101 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * What we want is to get the sum from the root to a left node that equals the specific sum given in the argument. 
+     * So this is obviously a DFS problem that could be solve by recursion. 
+     * The algorithm would be:
+     * 1. judge if the current root node is a leaf node and its value equals to the current sum, if so, return true.
+     * 2. solve the subproblem of searching sum - root.val from left subtree and right subtree. 
+     * 3. if root is null, return false. 
+     * We have to visit each node once, so the run time would be O(n) regards to the number of nodes n.
+    **/
+    
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if (root == null) return false;
+        
+        if (root.val == sum && root.left == null && root.right == null) return true;
+        return hasPathSum(root.left, sum - root.val) || hasPathSum(root.right, sum - root.val);
+    }
+    
+    
+    /**
+     * However, DFS related problems can also be solved by iteration ueing a stack
+     * At the same time, using another stack to store the intermediate sum. The sum is stored with redundancy in order to make the stored values corresponding to the nodes stored in the node stack.
+     * Showed as following
+     * O(n) time, O(2n) space where n is the number of nodes.
+    **/
+    
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if (root == null) return false;
+        
+        Deque<TreeNode> nodeDeque = new ArrayDeque<>(); //stores the treenodes for DFS
+        nodeDeque.push(root); //initilize the stack for following loop
+        Deque<Integer> partialSum = new ArrayDeque<>(); //stores the intermediate partial sums we got to deal with the situation while we have to backtrack to previous values while encountering a lefe that return false.
+        partialSum.push(sum);
+        
+        while (!nodeDeque.isEmpty()) {
+            TreeNode curr = nodeDeque.pop();
+            int tmpSum = partialSum.pop();
+            System.out.println(tmpSum);
+            if (curr.val == tmpSum && curr.left == null && curr.right == null) return true;
+            if (curr.left != null) {
+                partialSum.push(tmpSum - curr.val);
+                nodeDeque.push(curr.left);
+            }
+            if (curr.right != null) {
+                partialSum.push(tmpSum - curr.val);
+                nodeDeque.push(curr.right);
+            }
+        }
+        
+        return false;
+    }
+    
+    
+    /**
+     * Solve this question iteratively with O(n) sapce and post order traversal
+     * The algorithm is showed as following:
+     * 1. While there is still left child, visiting left child and add its val to tmpsum. Put it in the stack meanwhile. 
+     * 2. While there is no more left child, test if the tmpSum is equal to sum given in arguments and both left and right child of current node is null. If so, return true. Else, go to step 3.
+     * 3. Test if there exists a right child for current node and it has not been visited(recorded by pre, if pre == curr.right then the right node has already been visited since it's a post order traversal). If the right child has not been visited, set curr to be curr.right and go to setp 1
+     * 4. if the right child has been visited, we have to go back and check the parent of curr. Meanwhile, tmpSum should be substracted by the current node's value since we will discard it. 
+    **/
+    
+    public boolean hasPathSum(TreeNode root, int sum) {
+        if (root == null) return false;
+        
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        TreeNode pre = null, curr = root;
+        int tmpSum = 0;
+        while (!deque.isEmpty() || curr != null) {
+            while (curr != null) {
+                deque.push(curr);
+                tmpSum += curr.val;
+                curr = curr.left;
+            }
+            curr = deque.peekFirst();
+            if (curr.left == null && curr.right == null && tmpSum == sum) {
+                return true;
+            }
+            if (curr.right != null && pre != curr.right) {
+                curr = curr.right;
+            }
+            else {
+                pre = curr;
+                deque.pop();
+                tmpSum -= curr.val;
+                curr = null;
+            }
+        }
+        
+        return false;
+    }
+}
