@@ -1,0 +1,89 @@
+/**
+ * Definition for binary tree with next pointer.
+ * public class TreeLinkNode {
+ *     int val;
+ *     TreeLinkNode left, right, next;
+ *     TreeLinkNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * 如何解决一个follow up问题？
+     * 在原有问题的基础上思考为什么我们原来的算法不能解决这个问题？这个follow up影响了原有算法的哪个方面？如何解决这个影响？
+    **/
+    
+    /**
+     * Another solution using 2 pointers.
+     * The using of dummyHead combines the 2 conditions of each child in previous method.
+    **/
+    
+    public void connect(TreeLinkNode root) {
+        TreeLinkNode dummyHead = new TreeLinkNode(0);
+        TreeLinkNode prev = dummyHead;
+        
+        while (root != null) {
+            if (root.left != null) {
+                prev.next = root.left;
+                prev = prev.next;
+            }
+            if (root.right != null) {
+                prev.next = root.right;
+                prev = prev.next;
+            }
+            root = root.next;
+            if (root == null) { //current level is over
+                prev = dummyHead;
+                root = dummyHead.next;
+                dummyHead.next = null;
+            }
+        }
+    }
+    
+    
+    
+    /**
+     * For this question, the algorithm in Populating Next Pointers in Each Node cannot work becasue the tree in the previous problem is a complete tree and we can traverse each level of it from the left most node. 
+     * However, in this question, we can't do this. So we have to figure out a new way to traverse each level. 
+     * Just like the idea of using a dummy node in questions of LinkedList, we use a head pointing at the beginning of each level.
+     * And yet there is another problem, since the tree is not a complete tree, we don't know where is the previous node whose next should point to current node being visited. So we use a prev to mark this node. 
+     * And prev == null indicate that current node is the beginning of current level, so we store it with head in order to perform next traverse. 
+     * O(n) time, O(1) space. 
+    **/
+    
+    public void connect(TreeLinkNode root) {
+        TreeLinkNode head = root; //Keeps the start node of each level
+        TreeLinkNode prev = null; //Keeps the node previous to current node we are visiting in the next level
+        TreeLinkNode curr = null; //Keeps the node currently being visited
+        
+        while (head != null) {
+            curr = head;
+            head = null;
+            prev = null;
+            
+            while (curr != null) {
+                if (curr.left != null) {
+                    //there is 2 conditions for both left and right child
+                    //1. prev == null, indicating that this node is the beginning of this level
+                    //2. prev != null, indicating that this node is in the middle or end of this level
+                    if (prev != null) { 
+                        prev.next = curr.left;
+                    }
+                    else { //current node is the beginning of current level
+                        head = curr.left;
+                    }
+                    prev = curr.left;
+                }
+                if (curr.right != null) {
+                    if (prev != null) {
+                        prev.next = curr.right;
+                    }
+                    else {
+                        head = curr.right;
+                    }
+                    prev = curr.right;
+                }
+                curr = curr.next;
+            }
+        }
+    }
+}
