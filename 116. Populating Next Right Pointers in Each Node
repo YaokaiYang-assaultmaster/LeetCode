@@ -1,0 +1,85 @@
+/**
+ * Definition for binary tree with next pointer.
+ * public class TreeLinkNode {
+ *     int val;
+ *     TreeLinkNode left, right, next;
+ *     TreeLinkNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * And yet we also want to solve the problem iteratively with O(1) space.
+     * Use 2 pointers pre and curr. 
+     * pre always pointing to the left most node of each level.
+     * curr is used to traverse through this level and we setting each next to corresponding value during this process.
+     * And the next values being assigned is the next of next level. 
+    **/
+    public void connect(TreeLinkNode root) {
+        if (root == null) return;
+        
+        TreeLinkNode pre = root;
+        TreeLinkNode curr = null;
+        while (pre.left != null) {
+            curr = pre;
+            while (curr != null) {
+                if (curr.left != null) curr.left.next = curr.right;
+                if (curr.next != null) curr.right.next = curr.next.left;
+                
+                curr = curr.next;
+            }
+            
+            pre = pre.left;
+        }
+    }
+    
+    
+    
+    
+    /**
+     * Consider about constant space solution.
+     * The tricky part of the problem is to set the next pointer of current node's right child to the left child of the node next to current in the same level. 
+     * Having considered that the next pointer we are creating is doing the exact same thing, link a node to its neighbor node in the tree. So we may use next pointer to implement the O(1) space method. 
+    **/
+    
+    public void connect(TreeLinkNode root) {
+        if (root == null) return;
+        
+        if (root.left != null && root.right != null) {
+            root.left.next = root.right;
+            root.right.next = root.next == null? null : root.next.left;
+            connect(root.left);
+            connect(root.right);
+        }
+    }
+    
+    
+    
+    /**
+     * Use a queue to perform a BFS search
+     * O(n) time and O(n) space
+     * Need more optimization.
+    **/
+    
+    public void connect(TreeLinkNode root) {
+        if (root == null) return;
+        Queue<TreeLinkNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            int length = queue.size();
+            for (int i = 0; i < length; i++) {
+                TreeLinkNode curr = queue.poll();
+                if (i == length - 1) {
+                    curr.next = null;
+                }
+                else {
+                    curr.next = queue.peek();
+                }
+                if (curr.left != null && curr.right != null) {
+                    queue.offer(curr.left);
+                    queue.offer(curr.right);
+                }
+            }
+        }
+
+    }
+}
