@@ -1,0 +1,88 @@
+public class Solution {
+    /**
+     * Did you consider the condition where the number in the triangle is a negative number?
+     * This assumption should be talked with the interviewer before solving the problem. 
+     * Have to fully consider all the possibilities of the problem.
+     * What is negative number, what is overflow?
+     * Can we modify the original 2 dimensional space in order to solve this problem in O(1) space?
+    **/
+    
+    /**
+     * First solve it in O(n) space where n is the total number of numbers in the triangle. 
+    **/
+    
+    public int minimumTotal(List<List<Integer>> triangle) {
+        if (triangle == null || triangle.size() == 0) return 0;
+        List<List<Integer>> dp = new ArrayList<>();
+        int ret = Integer.MAX_VALUE;
+        
+        dp.add(new ArrayList<Integer>(triangle.get(0)));
+        for (int i = 1; i < triangle.size(); i++) {
+            List<Integer> curr = new ArrayList<>();
+            curr.add(dp.get(i - 1).get(0) + triangle.get(i).get(0));
+            for (int j = 1; j <= i - 1; j++) {
+                int min = triangle.get(i).get(j) + Math.min(dp.get(i - 1).get(j - 1), dp.get(i - 1).get(j));
+                curr.add(min);
+            }
+            curr.add(triangle.get(i).get(i) + dp.get(i - 1).get(i - 1));
+            dp.add(new ArrayList<Integer>(curr));
+        }
+        
+        for (int sum : dp.get(dp.size() - 1)) {
+            if (sum < ret) ret = sum;
+        }
+        
+        return ret;
+    }
+    
+    
+    /**
+     * Then we wnat to solve it with O(n) space where n is the number of rows
+     * Same idea as last question. Scan from right to left and cover unused values. 
+    **/
+    
+    public int minimumTotal(List<List<Integer>> triangle) {
+        if (triangle == null || triangle.size() == 0) return 0;
+        
+        List<Integer> dp = new ArrayList<>();
+        dp.add(triangle.get(0).get(0));
+        for (int i = 1; i < triangle.size(); i++) {
+            dp.add(triangle.get(i).get(i) + dp.get(i - 1));
+            for (int j = i - 1; j >= 1; j--) {
+                int min = triangle.get(i).get(j) + Math.min(dp.get(j), dp.get(j - 1));
+                dp.set(j, min);
+            }
+            dp.set(0, triangle.get(i).get(0) + dp.get(0));
+        }
+        
+        int ret = Integer.MAX_VALUE;
+        for (int sum : dp) {
+            if (ret > sum) {
+                ret = sum;
+            }
+        }
+        
+        return ret;
+    }
+    
+    
+    /**
+     * Moveover, we could avoid the second loop of the final list which is aiming at finding the minimal value in it. 
+     * The approach is to calculate the minimal sum path bottom up. Thus in every level we are decreasing the number of sums we got and finally in the last step there is only 1 number left, which is what we want. 
+     * Initilize a array of length triangle.size() + 1, which would solve the problem of the last line in the triangle. Otherwise the last number in the last line would need to be solved explicitly. Our approach standardilized the whole loop. 
+    **/
+    
+    public int minimumTotal(List<List<Integer>> triangle) {
+        if (triangle == null || triangle.size() == 0) return 0;
+        
+        int[] dp = new int[triangle.size() + 1];
+        for (int i = triangle.size() - 1; i >= 0; i--) {
+            for (int j = 0; j <= i; j++) {
+                dp[j] = triangle.get(i).get(j) + Math.min(dp[j], dp[j + 1]); 
+                //find the lesser one of its two children, and add it with the current value in the triangle. 
+            }
+        }
+        
+        return dp[0];
+    }
+}
