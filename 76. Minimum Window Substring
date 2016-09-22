@@ -1,0 +1,121 @@
+public class Solution {
+    /**
+     * There is 2 questions to answer in this problem. Where is the start of the substring and where is the end of the substring. 
+     * So we can solve this problem in O(n^2) time.
+     * However, in order to solve this problem in O(n) time, we should consider moving both of the pointers within one loop. 
+     * How to store characters?
+     * In order to know if current character we are visiting is in the target stirng in O(1) time, it is natural that we should use Hash. And since there may be multiple duplicate characters in t, we may also need to record the number of appearance of a character as well. So a HashMap<Character, Integer> which stores the characters in the target and its corresponding frequencies is used. 
+     * 
+     * When to move start/end?
+     * We move end pointer before finding a match. And we update frequencies of characters each time. Once we find a match(count == 0), we update global min. 
+     * After that, we move the start pointer until current substring is not a match any more. And during moving we update the frequencies of characters each time.
+     * 
+     * Identify a match?
+     * At the same time, in order to determine if we have found a match in O(1) time, we may need to use a counter to store the time of matches we have found. Once the counter reaches 0, we know we have found a match. Meanwhile, we have to determine when to plus or minus the counter by 1. 
+     * Since the frequency in hashmap may be negative when overmatch happened in our current substring, we only have to minus count by 1 when the frequency is greater than or equal to 1 before minus 1 or greater than or equal to 0 after minus 1(minus 1 because we found a match). In other words, we minus count by 1 only current match is not a overmatch. 
+     * And the condition is the same for augment counter with 1. We only augment counter with 1 while moving start pointer when the character we deleted from the substring is not a overmatch. That is, the frequency before adding 1 is greater than or equal to 0.
+     * 
+     * Record the min length?
+     * This one is fairly easy to solve with a global min value, which is common in many questions. 
+    **/
+    
+    public String minWindow(String s, String t) {
+        if (s == null || t == null || s.length() == 0 || t.length() == 0) {
+            return "";
+        }
+        
+        int p1 = 0, p2 = 0;
+        int[] pointer = new int[2];
+        int min = Integer.MAX_VALUE;
+        Map<Character, Integer> existed = new HashMap<>(); //Map of characters in t and their corresponding remaining number
+        char[] charT = t.toCharArray();
+        char[] charS = s.toCharArray();
+        int count = charT.length;
+        for (int i = 0; i < charT.length; i++) {
+            if(existed.containsKey(charT[i])) {
+                existed.put(charT[i], existed.get(charT[i]) + 1);
+            }
+            else {
+                existed.put(charT[i], 1);
+            }
+        }
+
+        while (p2 < charS.length) {
+            if (existed.containsKey(charS[p2])) {
+                existed.put(charS[p2], existed.get(charS[p2]) - 1);
+                if (existed.get(charS[p2]) >= 0) {
+                    --count;
+                }
+            }
+            while (count == 0) {
+                if (p2 - p1 + 1 < min) {
+                    pointer[0] = p1;
+                    pointer[1] = p2;
+                    min = p2 - p1 + 1;
+                }
+                p1++;
+                if (existed.containsKey(charS[p1 - 1])) {
+                    existed.put(charS[p1 - 1], existed.get(charS[p1 - 1]) + 1);
+                    if (existed.get(charS[p1 - 1]) > 0) {
+                        ++count;
+                    }
+                }
+            }
+            p2++;
+        }
+        
+        return min == Integer.MAX_VALUE ? new String() : s.substring(pointer[0], pointer[1] + 1);
+    }
+    
+    
+    /**
+     * Great code from bittiger.io course
+    **/
+    
+    public String minWindow(String s, String t) {
+        //Corner case checked
+        if (s == null || t == null || s.length() == 0 || t.length() == 0) return "";
+        
+        Map<Character, Integer> frequency = new HashMap<>();
+        char[] chS = s.toCharArray();
+        for (char c : t.toCharArray()) { //put all characters in t into map
+            Integer freq = frequency.get(c);
+            if (freq == null) {
+                frequency.put(c, 1);
+            }
+            else {
+                frequency.put(c, freq + 1);
+            }
+        }
+        
+        int left = 0, right = 0, count = t.length(), minLen = Integer.MAX_VALUE, startIndex = -1;
+        
+        while (right < chS.length) { //Move right to find a match
+            Integer freq = frequency.get(chS[right]);
+            if (freq != null) {
+                frequency.put(chS[right], freq - 1);
+                if (freq > 0) { //in case of overmatch
+                    count--;
+                }
+            }
+            right++;
+            while (count == 0) { //Move left when a match is found
+                if (right - left < minLen) {
+                    minLen = right - left;
+                    startIndex = left;
+                }
+                Integer exist = frequency.get(chS[left]);
+                if (exist != null) { //update frequency when we are deleting a matched character from this substring
+                    frequency.put(chS[left], exist + 1);
+                    if (exist == 0) { //while count is 0, exist can only be 0 or negative
+                        count++;
+                    }
+                }
+                left++;
+            }
+        }
+        
+        return minLen == Integer.MAX_VALUE ? new String() : new String(chS, startIndex, minLen); 
+        //new String(char[] c, int offset, int count)
+    }
+}
