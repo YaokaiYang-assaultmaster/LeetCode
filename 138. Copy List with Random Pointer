@@ -1,0 +1,136 @@
+/**
+ * Definition for singly-linked list with a random pointer.
+ * class RandomListNode {
+ *     int label;
+ *     RandomListNode next, random;
+ *     RandomListNode(int x) { this.label = x; }
+ * };
+ */
+public class Solution {
+    /**
+     * In order to make a deep copy of the RandomListNode, we have to not only copy the next pointer, but also copy the randmo pointer. 
+     * This is the 2 aspects we need to consider in this problem. 
+     * A straightforward solution would be scan the original linkedlist for 2 rounds. 
+     * In the first rounds we set the next pointers and in the second roung we set the random pointers. 
+     * However, there is a problem. How could we know which is the corresponding node that should be pointed by random pointer in the new list by scanning through the original list? 
+     * Takling about relating 2 object together, we could consider a HashMap. So we could construct a HashMap linking the nodes in the original RandomLinkedList to its corresponding nodes in the new List.
+     * The corner case would be head == null
+     * This approach would be O(2n) time, O(n) space in which n is the number of nodes in the list. 
+     * Showed in code as following:
+    **/
+    
+    public RandomListNode copyRandomList(RandomListNode head) {
+        if (head == null) return null;
+        
+        Map<RandomListNode, RandomListNode> nodeMap = new HashMap<>();
+        RandomListNode curr = head;
+        RandomListNode prev = new RandomListNode(0);
+        while (curr != null) {
+            RandomListNode currCopy = new RandomListNode(curr.label);
+            prev.next = currCopy;
+            nodeMap.put(curr, currCopy);
+            curr = curr.next;
+            prev = currCopy;
+        }
+        
+        curr =  head;
+        while (curr != null) {
+            nodeMap.get(curr).random = nodeMap.get(curr.random);
+            curr = curr.next;
+        }
+        
+        return nodeMap.get(head);
+    }
+    
+    
+    /**
+     * Now we want to try to solve this problem within one round. In order to solve it within one round, we need to copy both nodes, next pointer, random pointer in to new list at the same time. We can still use the HashMap to determine if a node has already been copied and what is it corresponding node in the new list. 
+    **/
+    public RandomListNode copyRandomList(RandomListNode head) {
+        if (head == null) return null;
+        
+        Map<RandomListNode, RandomListNode> nodeMap = new HashMap<>();
+        RandomListNode curr = head;
+        while (curr != null) {
+            if (!nodeMap.containsKey(curr)) { //deep copy the current node
+                RandomListNode currCopy = new RandomListNode(curr.label);
+                nodeMap.put(curr, currCopy);
+            }
+            
+            /* If there is no curr.next and curr.random existing in the map, we create them and add them into the map */
+            if (curr.next != null && !nodeMap.containsKey(curr.next)) {
+                RandomListNode nextCopy = new RandomListNode(curr.next.label);
+                nodeMap.put(curr.next, nextCopy);
+            }
+            if (curr.random != null && !nodeMap.containsKey(curr.random)) {
+                RandomListNode randomCopy = new RandomListNode(curr.random.label);
+                nodeMap.put(curr.random, randomCopy);
+            }
+            
+            /* If nodes curr.next and curr.random are already existed in the map, we simply get them by their original node as indexes and set the new node's pointer pointing to them. */
+            if (curr.next!= null) {
+                nodeMap.get(curr).next = nodeMap.get(curr.next);
+            }
+            if (curr.random != null) {
+                nodeMap.get(curr).random = nodeMap.get(curr.random);
+            }
+            
+            curr = curr.next;
+            
+        }
+        
+        return nodeMap.get(head);
+    }
+    
+    /**
+     * Then we would want to know if we could do it without a HashMap. Without using a HashMap, we could solve it within O(1) space. 
+     * In order to store the relationship between original node and the newly generated node, we could make use of the next pointer in the original list. 
+     * If we use the next pointer in the original list, we would lose track of the next node in the original list. So we would let the next pointer of the newly generated node pointing to the next node in the original list. 
+     * The algorithm includes three steps:
+     * 1. Iterate through the original list and duplicates each node. The duplicate of each node follows its original node using next pointer of its original node.
+     * 2. Iterate through the new list and assign the random pointer of each duplicate node.
+     * 3. Restore the original list and extract the copied list. 
+     * O(n) time, O(1) space in which n is the number of nodes. 
+    **/
+    
+    public RandomListNode copyRandomList(RandomListNode head) {
+        if (head == null) return null;
+        
+        RandomListNode curr = head;
+        
+        //First round, duplicate each node and make it follows its original node
+        while (curr != null) {
+            RandomListNode currCopy = new RandomListNode(curr.label);
+            currCopy.next = curr.next;
+            curr.next = currCopy;
+            curr = curr.next.next;
+        }
+        
+        //Second round, assign random pointer of each duplicate node
+        curr = head;
+        while (curr != null) {
+            if (curr.random != null) {
+                curr.next.random = curr.random.next;
+            }
+            curr = curr.next.next;
+        }
+        
+        //Third round, restore the original list and extract the copied list
+        curr = head;
+        RandomListNode dummyHead = new RandomListNode(0);
+        RandomListNode copyCurr = dummyHead;
+        while (curr != null) {
+            //extract the copied list
+            copyCurr.next = curr.next;
+            copyCurr = copyCurr.next;
+            
+            //restore the original list
+            curr.next = curr.next.next;
+            
+            curr = curr.next;
+        }
+        
+        
+        return dummyHead.next;
+    }
+}
