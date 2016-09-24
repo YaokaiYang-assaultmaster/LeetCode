@@ -1,0 +1,56 @@
+public class Solution {
+    /**
+     * Greedy algorithm
+     * Since we can make as many transactions as we can, we would greedly buy and sell stocks as long as we can make profit our of it.
+     * Use a int buy to keep the lowest prices we met so far. Once we meet a price that is higher than it, we sell it.
+     * Once current prices is less than buy, we would update buy to current value.
+    **/
+    
+    public int maxProfit(int[] prices) {
+        if (prices == null || prices.length == 0) {
+            return 0;
+        }
+        
+        int profit = 0, buy = Integer.MIN_VALUE;
+        for (int i = 0; i < prices.length; i++) {
+            if (buy == Integer.MIN_VALUE || buy > prices[i]) {
+                buy = prices[i];
+            }
+            else if (buy < prices[i]) {
+                profit += (prices[i] - buy);
+                buy = prices[i];
+            }
+        }
+        
+        return profit;
+    }
+    
+    
+    /**
+     * Yet another solution without greedy thought.
+     * The idea is to find local minimum and local maximum and then we make profit.
+    **/
+    
+    public int maxProfit(int[] prices) {
+        if (prices == null || prices.length == 0) return 0; //deal with corner case
+        
+        int profit = 0;
+        for (int i = 0; i < prices.length; i++) {
+            int local_minimum, local_maximum;
+            while (i < prices.length - 1 && prices[i + 1] <= prices[i]) {
+                i++;
+            }
+            local_minimum = prices[i];
+            
+            while (i < prices.length - 1 && prices[i + 1] >= prices[i]) {
+                i++;
+            }
+            local_maximum = prices[i];
+            
+            profit += (local_maximum - local_minimum);
+        }
+        
+        return profit;
+    }
+    
+}
