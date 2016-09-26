@@ -1,0 +1,80 @@
+public class Solution {
+    /**
+     * The method is based on the observation that if we cannot reach x from i, then no station k from i + 1 to x - 1 can reach x.
+     * Otherwise, if i can reach k and k can reach x, then i can reach x as well. 
+     * Becasue of this, we can jump directly from i to x and thus reduce the time complexity from O(n^2) to O(n).
+     */
+    
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        //dealing with illegal inputs
+        if (gas == null || cost == null || gas.length == 0 || gas.length != cost.length) return -1;
+        
+        int sum = 0;
+        int len = gas.length;
+        for (int i = 0; i < len; i++) {
+            sum += gas[i] - cost[i];
+        }
+        if (sum < 0) return -1;
+        
+        int start = 0;
+        int j;
+        //the reason why we terminate the loop when start >= len is that once the start index is looped over again, it is guaranteed that there is no solution for the quesiton since we have already searched through the semicircle start from 0 at the beginning. 
+        for (; start < len; start = start + j) {
+            sum = 0;
+            //go forward for j stations
+            for (j = 1; j <= len; j++) {
+                int k = (start + j - 1) % len;
+                sum += gas[k] - cost[k];
+                if (sum < 0) {
+                    break;
+                }
+            }
+            if (j > len) {
+                return start;
+            }
+        }
+        return -1;
+        
+    }
+    
+    
+    
+    
+    
+    /**
+     * It seems like we have 2 arrays to consider in this question, while what we should consider is actually the substraction bewteen the gas and cost, which is the gas left if we start from current point and go the next point. 
+     * The algorithm is showed following:
+     * Start from the end point of the circle.
+     * There will be two conditions:
+     * (1) there is not sufficient oil in the tank (tank < 0), so we have to move backwards to see if we can find more oil.
+     * (2) there is sufficient oil in the tank (tank > 0), so we can move forwards to see what happens.
+     * The algorithm terminates when start = end, indicating that we have travered the whole circle and we can return. 
+     * Since we move backwards to get more oil, we are actually finding the last point in the circle from which we start the travel. 
+     * O(1) space, O(n) time since we only visit each point once. 
+     */
+    
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        if (gas == null || cost == null || gas.length == 0 || gas.length != cost.length) return -1;
+        
+        int tank = 0;
+        int[] gasMinusCost = new int[gas.length];
+        for (int i = 0; i < gas.length; i++) {
+            gasMinusCost[i] = gas[i] - cost[i];
+        }
+        
+        int start = gas.length - 1;
+        int end = 0;
+        tank = tank + gasMinusCost[start];
+        while (start > end) {
+            if (tank < 0) { 
+                //case1: tank < 0, current oil is not sufficient for travel further, move backwards for more oil
+                tank += gasMinusCost[--start];
+            } else { 
+                //case2: tank >=0, current oil is at least sufficient for travel one point further, move forwards
+                tank += gasMinusCost[end++];
+            }
+        }
+        
+        return tank >= 0 ? start : -1; //Also consider the case that there is no solution
+    }
+}
