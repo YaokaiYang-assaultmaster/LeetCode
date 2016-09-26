@@ -1,0 +1,61 @@
+public class Solution {
+    /**
+     * Use a stack and only stores the numbers into it.
+     * Once we meet a operators, we perform a operation and stores the result into the deque.
+     * O(n) time, O(n) space, in which n is the length of the array.
+     */
+    public int evalRPN(String[] tokens) {
+        if (tokens == null || tokens.length == 0) {
+            return 0;
+        }
+        
+        Deque<String> deque = new ArrayDeque<>();
+        
+        int num1, num2;
+        for(String token : tokens) {
+            switch (token) {
+                case "+": 
+                    if (deque.size() < 2) {
+                        return 0;
+                    } else {
+                        num1 = Integer.parseInt(deque.pop());
+                        num2 = Integer.parseInt(deque.pop());
+                        deque.push(String.valueOf(num2 + num1));
+                    }
+                    break;
+                case "-": 
+                    if (deque.size() < 2) {
+                        return 0;
+                    } else {
+                        num1 = Integer.parseInt(deque.pop());
+                        num2 = Integer.parseInt(deque.pop());
+                        deque.push(String.valueOf(num2 - num1));
+                    }
+                    break;
+                case "*":
+                    if (deque.size() < 2) {
+                        return 0;
+                    } else {
+                        num1 = Integer.parseInt(deque.pop());
+                        num2 = Integer.parseInt(deque.pop());
+                        deque.push(String.valueOf(num2 * num1));
+                    }
+                    break;
+                case "/":
+                    if (deque.size() < 2) {
+                        return 0;
+                    } else {
+                        num1 = Integer.parseInt(deque.pop());
+                        num2 = Integer.parseInt(deque.pop());
+                        deque.push(String.valueOf(num2 / num1));
+                    }
+                    break;
+                default: 
+                    deque.push(token);
+                    break;
+            }
+        }
+        
+        return Integer.parseInt(deque.pop());
+    }
+}
