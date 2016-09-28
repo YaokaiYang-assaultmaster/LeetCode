@@ -1,0 +1,108 @@
+public class Solution {
+    
+    /**
+     * Brute-force BFS.
+     * Search from beginword and try to replace its each character with 'a' to 'z'. Then check if this word has been tested or not. (Requires us to  use some data structure to store existed words. Using a HashSet is obviously ideal for this condition)
+     * If not, store it into the hashset and the queue. 
+     * The using of StringBuilder for each poisition saves memory and time. Since we only have to use one StringBuilder for one poisition. 
+     * O(n * m * 24) time complexity where n is the size of the wordList and m is the length of the words. 
+     * O(n) space. 
+     * How to optimize? Since we use one-directional BFS, it would extremely ineffective if the word tree contains a large size level. 
+     * May be we can use bi-directional BFS.
+     */
+    public int ladderLength(String beginWord, String endWord, Set<String> wordList) {
+        if (beginWord.isEmpty() || endWord.isEmpty()) return 0;
+        
+        if (wordList == null || wordList.size() == 0) return 0;
+        
+        int len = beginWord.length();
+        Queue<String> queue = new LinkedList<>();
+        int count = 0;
+        Set<String> existed = new HashSet<>();
+        existed.add(beginWord);
+        queue.add(beginWord);
+        while (!queue.isEmpty()) {
+            int size = queue.size(); 
+            count++;
+            for (int j = 0; j < size; j++) {
+                String curr = queue.poll();
+                for (int i = 0; i < len; i++) {
+                    StringBuilder sb = new StringBuilder(curr);
+                    for (char c = 'a'; c <= 'z'; c++) {
+                        sb.setCharAt(i, c);
+                        String tmp = sb.toString();
+                        if (tmp.equals(endWord)) {
+                            return count + 1;
+                        } else if (wordList.contains(tmp) && existed.add(tmp)) {
+                            queue.offer(tmp);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return 0;
+    }
+    
+    
+    
+    /**
+     * Use a bi-directional BfS to search. Start from beginWord and endWord at the same time. Save a lot of time. 
+     * For a BFS, we search 1 + B * 2 + ... +  B * 2 ^ k
+     * For a bi-directional BFS, we search 2 * (1 + B * 2 + ... + B * 2 ^ (k / 2)), which is B ^ (k / 2) times less than one-directional BFS. 
+     */
+     public int ladderLength(String beginWord, String endWord, Set<String> wordList) {
+         if (beginWord == null || endWord == null || beginWord.length() != endWord.length()) return 0;
+         if (wordList == null || wordList.size() == 0) return 0;
+         
+         int step = 0;
+         Set<String> visited = new HashSet<>(); //keep the words already being visited
+         Set<String> beginSet = new HashSet<>(); //keep the words which we would visit in next round
+         Set<String> endSet = new HashSet<>(); //keep the words from the other end
+         beginSet.add(beginWord);
+         endSet.add(endWord);
+         visited.add(beginWord);
+         visited.add(endWord);
+         
+         while (!beginSet.isEmpty() && !endSet.isEmpty()) {
+             step++;
+             //Always start from a smaller set
+             if (beginSet.size() > endSet.size()) {
+                 Set<String> tmpSet = endSet;
+                 endSet = beginSet;
+                 beginSet = tmpSet;
+             }
+             
+             Set<String> nextLevel = new HashSet<>();
+             for (String str : beginSet) {
+                 //Try every possibility of the word with only one character being replaced. 
+                 for (int i = 0; i < str.length(); i++) {
+                     for (char c = 'a'; c <= 'z'; c++) {
+                         String toStr = replace(str, i, c);
+                         if (endSet.contains(toStr)) {
+                             return step + 1;
+                         } else if (wordList.contains(toStr) && visited.add(toStr)) {
+                             nextLevel.add(toStr);
+                         }
+                     }
+                 }
+             }
+             
+             beginSet = nextLevel;
+         }
+         
+         return 0;
+     }
+     
+     /**
+      * Replace the character at index in the string with c
+      * Returns a new String
+      */
+     private String replace(String str, int index, char c) {
+         if (str == null || str.isEmpty()) return str;
+         
+         char[] ch = str.toCharArray();
+         ch[index] = c;
+         return new String(ch);
+     }
+}
