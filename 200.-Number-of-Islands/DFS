@@ -1,0 +1,98 @@
+public class Solution {
+    /**
+     * When input cannot be changed
+     * 3 step algorithm:
+     * 1. find an entrance of an island
+     * 2. marked the islands using DFS
+     * 3. counting the number of entrance
+     * As is common in graph questions, we need to mark the nodes we have already visited. Since we cannot manipulate the input, we need extra space to store them. A boolean array is used in this question. 
+     * So in each recursion, we only consider nodes whose visited value is false. 
+     * O(n ^ 2) time, O(n ^ 2) space without consider the recursion stack.
+     * The recursion stack would be O(n ^ 2) in the worse case. 
+     * n ^ 2 is the size of grid. 
+     */
+    public int numIslands(char[][] grid) {
+        if (grid == null) return 0;
+        if (grid.length == 0 || grid[0].length == 0) return 0;
+        
+        int count = 0;
+        int row = grid.length;
+        int col = grid[0].length;
+        boolean[][] visited = new boolean[grid.length][grid[0].length];
+        for (int i = 0; i < row; i++) { 
+            for (int j = 0; j < col; j++) { 
+                //find the entrance
+                //Traversing graph is always related to find the entrance
+                if (grid[i][j] == '1' && visited[i][j] == false) {
+                    visited[i][j] = true;
+                    count++;
+                    DFS(grid, i, j, visited, row, col);
+                }
+            }
+        }
+        
+        return count;
+    }
+    
+    private void DFS(char[][] grid, int x, int y, boolean[][] visited, int row, int col) {
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                //Search 4 direction from current point and mark them as visited. 
+                if (isValid(i, j, x, y, row, col) && grid[x + i][y + j] == '1' && visited[x + i][y + j] == false) {
+                    visited[x + i][y + j] = true;
+                    DFS(grid, x + i, y + j, visited, row, col);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Boundary check. 
+     * Since we only want to check 4 direction (vertical and horizontal), we need to make sure di and dj won't be 1 or 0 at the same time. 
+     */
+    private boolean isValid(int di, int dj, int x, int y, int row, int col) {
+        return (Math.abs(di) != Math.abs(dj) && x + di >= 0 && x + di < row && y + dj >= 0 && y + dj < col);
+    }
+    
+    /**
+     * If we can change the input, we can mark visited points in place without using the extra boolean array.
+     * We marded every '1' point we have visited as '0' and thus marked it. 
+     * O(n ^ 2) time and O(1) space without considering the recursion stack
+     * The recursion stack would be O(n ^ 2) in the worse case. 
+     */
+    public int numIslands(char[][] grid) {
+        if (grid == null) return 0;
+        if (grid.length == 0 || grid[0].length == 0) return 0;
+        
+        int count = 0;
+        int row = grid.length;
+        int col = grid[0].length;
+        
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (grid[i][j] == '1') {
+                    count++;
+                    removeIslands(grid, i, j, row, col);
+                }
+            }
+        }
+        
+        return count;
+    }
+    
+    private void removeIslands(char[][] grid, int x, int y, int row, int col) {
+        grid[x][y] = '0';
+        
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (isValid(i, j, x, y, row, col) && grid[x + i][y + j] == '1') {
+                    removeIslands(grid, x + i, y + j, row, col);
+                }
+            }
+        }
+    }
+    
+    private boolean isValid(int di, int dj, int x, int y, int row, int col) {
+        return (Math.abs(di) != Math.abs(dj) && x + di >= 0 && x + di < row && y + dj >= 0 && y + dj < col);
+    }
+}
