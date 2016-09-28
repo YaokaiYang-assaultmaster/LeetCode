@@ -1,0 +1,78 @@
+public class Solution {
+    /**
+     * Union Find
+     * O(n ^ 2) time, O(n ^ 2) space
+     */
+    public int numIslands(char[][] grid) {
+        if (grid == null) return 0;
+        if (grid.length == 0 || grid[0].length == 0) return 0;
+        
+        int row = grid.length;
+        int col = grid[0].length;
+        int[] tag = new int[row * col];
+        
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                tag[i * col + j] = grid[i][j] == '1' ? i * col + j : -1;
+            }
+        }
+        
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (grid[i][j] == '0') {
+                    continue;
+                }
+                if (j + 1 < col && grid[i][j + 1] == '1') { //union down
+                    union(i, j, i, j + 1, tag, col);
+                }
+                if (i + 1 < row && grid[i + 1][j] == '1') { //union right
+                    union(i, j, i + 1, j, tag, col);
+                }
+            }
+        }
+        
+        int count = 0;
+        //count root whose tag is equal to itself
+        for (int i = 0; i < row * col; i++) {
+            if (tag[i] == i) {
+                count++;
+            }
+        }
+        
+        return count;
+    }
+    
+    private void union(int i1, int j1, int i2, int j2, int[] tag, int col) {
+        int index1 = i1 * col + j1;
+        int index2 = i2 * col + j2;
+        
+        if (tag[index1] == tag[index2]) { //same root
+            return;
+        }
+        
+        //change the one with bigger tag
+        if (tag[index1] < tag[index2]) { 
+            if (tag[index2] != index2) {
+                find(index1, index2, tag);
+            } else {
+                tag[index2] = tag[index1];
+            }
+        } else {
+            if (tag[index1] != tag[index2]) {
+                find(index2, index1, tag);
+            } else {
+                tag[index1] = tag[index2];
+            }
+        }
+    }
+    
+    private void find(int smIndex, int bgIndex, int[] tag) {
+        while (tag[bgIndex] != bgIndex) {
+            //find previous root and chang its tag
+            int tmp = tag[bgIndex];
+            tag[bgIndex] = tag[smIndex];
+            bgIndex =  tmp;
+        }
+        tag[bgIndex] = tag[smIndex];
+    }
+}
