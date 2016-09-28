@@ -1,0 +1,50 @@
+public class Solution {
+    /**
+     * BFS method
+     * Solve 2-dimension problem with 1-dimension index. index = i * n + j
+     * Using a Queue
+     * O(n ^ 2) time, O(n ^ 2) space in the worse case.
+     */
+    
+    public int numIslands(char[][] grid) {
+         if (grid == null) return 0;
+         if (grid.length == 0 || grid[0].length == 0) return 0;
+         
+         int count = 0;
+         int row = grid.length, col = grid[0].length;
+         for (int i = 0; i < row; i++) {
+             for (int j = 0; j < col; j++) {
+                 if (grid[i][j] == '1') {
+                     removeIslands(grid, i, j, row, col);
+                     count++;
+                 }
+             }
+         }
+         
+         return count;
+    }
+    
+    private void removeIslands(char[][] grid, int x, int y, int row, int col) {
+        grid[x][y] = '0';
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(x * col + y);
+        while (!queue.isEmpty()) {
+            int cur = queue.poll();
+            int curX = cur / col;
+            int curY = cur % col;
+            
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <=1; j++) {
+                    if (isValid(i, j, curX, curY, row, col) && grid[curX + i][curY + j] == '1') {
+                        queue.add((curX + i) * col + curY + j);
+                        grid[curX + i][curY + j] = '0';
+                    }
+                }
+            }
+        }
+    }
+    
+    private boolean isValid(int di, int dj, int x, int y, int row, int col) {
+        return (Math.abs(di) != Math.abs(dj) && x + di >= 0 && x + di < row && y + dj >= 0 && y + dj < col);
+    }
+}
