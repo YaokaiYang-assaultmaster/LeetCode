@@ -1,0 +1,91 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Try to solve it with O(1) space
+     * 
+     */
+    public TreeNode upsideDownBinaryTree(TreeNode root) {
+        if (root == null || root.left == null) return root;
+        
+        TreeNode curr = root; //keep current root
+        TreeNode prev = null; //keep root of previous level
+        TreeNode next = null; //keep root of next level
+        TreeNode temp = null; //keep right child
+        
+        while (curr != null) {
+            next = curr.left;
+            
+            curr.left = temp;
+            temp = curr.right;
+            curr.right = prev;
+            
+            prev = curr;
+            curr = next;
+        }
+        
+        return prev;
+    }
+    
+    
+    
+    
+    /**
+     * Using recursion to solve this question. 
+     * The most important feature of recursion: Identical Subproblem
+     * And we solve this problem lower level first
+     */
+    public TreeNode upsideDownBinaryTree(TreeNode root) {
+        if (root == null || root.left == null) return root;
+        
+        TreeNode newRoot = upsideDownBinaryTree(root.left);
+        
+        root.left.left = root.right;
+        root.left.right = root;
+        root.left = null;
+        root.right = null;
+        
+        return newRoot;
+    }
+    
+    
+    
+    
+    
+    /**
+     * We use a stack to store the tree from root to left most child. Then we pop each node and construct the new tree.
+     * At the same time, set the left and right pointer in the original node to be null.
+     * O(n) time, O(n) space since left subtree could contains n / 2 nodes, which is stored in the deque. 
+     * n is the size of the original tree.
+     */
+    public TreeNode upsideDownBinaryTree(TreeNode root) {
+        if (root == null) return null;
+        
+         Deque<TreeNode> deque = new ArrayDeque<TreeNode>();
+         TreeNode curr = root;
+         while (curr != null) {
+             deque.offerLast(curr);
+             curr = curr.left;
+         }
+         
+         TreeNode newRoot = deque.pollLast();
+         curr = newRoot;
+         while (!deque.isEmpty()) {
+             TreeNode oriParent = deque.pollLast();
+             curr.left = oriParent.right;
+             curr.right = oriParent;
+             oriParent.left = null;
+             oriParent.right = null;
+             curr = curr.right;
+         }
+         
+         return newRoot;
+    }
+}
