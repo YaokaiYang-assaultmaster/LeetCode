@@ -1,0 +1,123 @@
+public class Solution {
+    /**(1)
+     * Not exactly binary search. Throw away less than half of the values each recursion. 
+     * Compare the value of mid point of startX, startY, endX and endY with target. 
+     * Since the matrix is not strictly sorted, so once we find the mid point value, the target can be either in left and upper part of the submatrix or in the right and lower part of the submatrix depends on the comparison result. So we need to search in both part. 
+     * Case1: found, return true;
+     * Case2: mid point value is less than target, which means the target must be in the right submatrix of which the upper left index is (startX, midY + 1) and the lower right index is (endX, endY) or in the lower submatrix of which the upper left index is (midX + 1, startY) and the lower right index is (endX, midY).
+     * Case3: mid point value is greater than target, which means that the target must be in the left submatrix of which the upper left index is (startX, startY) and the lower right index is (endX, midY - 1) or in the upper submatrix of which the upper left index is (startX, midY) and the lower right index is (midX - 1, endY).
+     * Appromixately O(log(m*n)) = O(logm + logn) time and O(1) space without considering the recursion stack. The recursion stack could be O(log(m*n)) in size. 
+     */
+    public boolean searchMatrix(int[][] matrix, int target) {
+        if (matrix == null || matrix.length == 0) return false;
+        if (matrix[0] == null || matrix[0].length == 0) return false;
+        
+        int m = matrix.length;
+        int n = matrix[0].length;
+        return searchHelper(matrix, target, 0, 0, m - 1, n - 1);
+    }
+    
+    private boolean searchHelper(int[][] matrix, int target, int startX, int startY, int endX, int endY) {
+        if (startX > endX || startY > endY) {
+            return false;
+        }
+        int midX = (startX + endX) / 2;
+        int midY = (startY + endY) / 2;
+        if (matrix[midX][midY] == target) { //Case1: found
+            return true; 
+        } else if (matrix[midX][midY] < target) { //Case2: less than target, search right or down submatrix
+            return searchHelper(matrix, target, startX, midY + 1, endX, endY) || searchHelper(matrix, target, midX + 1, startY, endX, midY);
+        } else { //Case3: greater than target, search left or up submatrix
+            return searchHelper(matrix, target, startX, startY, endX, midY - 1) || searchHelper(matrix, target, startX, midY, midX - 1, endY);
+        }
+    }
+    
+    
+    /**(2)
+     * How could we do it in a exactly binary search style? In order words, could we throw away half of the matrix each time?
+     * We need more certainty to determine where is the target.
+     * Move horizontally in the line of the midX and find the first value that is greater than or less than target depend in if it is case2 or case 3. 
+     * Thus we can shrink the possible submatrix in which contains the target and search in less than half of the original matrix. 
+     * T(n) = 2(T(n / 2) + cn = O(nlogn) time. O(1) space.
+     */
+    public boolean searchMatrix(int[][] matrix, int target) {
+        if (matrix == null || matrix.length == 0) return false;
+        if (matrix[0] == null || matrix[0].length == 0) return false;
+        
+        int m = matrix.length;
+        int n = matrix[0].length;
+        return searchHelper(matrix, target, 0, 0, m - 1, n - 1);
+    }
+    
+    private boolean searchHelper(int[][] matrix, int target, int startX, int startY, int endX, int endY) {
+        if (startX > endX || startY > endY) {
+            return false;
+        }
+        
+        int midX = (startX + endX) / 2;
+        int midY = (startY + endY) / 2;
+        if (matrix[midX][midY] == target) { //Case1
+            return true;
+        } else if (matrix[midX][midY] < target) { //Case2
+            while (midY <= endY && matrix[midX][midY] < target) {
+                midY++;
+            }
+            midY = midY == endY + 1 ? endY : midY;
+            if (matrix[midX][midY] == target) {
+                return true;
+            } else if (matrix[midX][midY] < target) {
+                return searchHelper(matrix, target, midX + 1, startY, endX, endY);
+            } else {
+                return searchHelper(matrix, target, startX, midY, midX - 1, endY) || searchHelper(matrix, target, midX + 1, startY, endX, midY - 1);
+            }
+        } else { //Case3
+            while (midY >= startY && matrix[midX][midY] > target) {
+                midY--;
+            }
+            midY = midY == startY - 1 ? startY : midY;
+            if (matrix[midX][midY] == target) {
+                return true;
+            } else if (matrix[midX][midY] > target) {
+                return searchHelper(matrix, target, startX, startY, midX - 1, endY);
+            } else {
+                return searchHelper(matrix, target, midX + 1, startY, endX, midY) || searchHelper(matrix, target, startX, midY + 1, midX - 1, endY);
+            }
+        }
+    }
+    
+    
+    
+    /**(3)
+     * Another method.
+     * Say good bye to the binary search. 
+     * Since we only want to know where is the target based on its comparison with current value, we would want this comparison result to be deterministic. 
+     * So we want to find the point in the matrix which has certainty relationship with its surrounding values. 
+     * Noticed that the upper right point and lower left point in the matrix have this kind of deterministic relationship with their surrounding points. 
+     * Say, the upper right point, points under it is guaranteed to be greater than it and points on the left side of it is guaranteed to be less than it. 
+     * So we can start search from upper right point. 
+     * 1. If the target is greater than current value, move down.
+     * 2. If the target is less than the current value, move left.
+     * 3. If equals, return true.
+     * O(m + n) time, O(1) space. 
+     */
+    public boolean searchMatrix(int[][] matrix, int target) {
+        if (matrix == null || matrix.length == 0) return false;
+        if (matrix[0] == null || matrix[0].length == 0) return false;
+        
+        int m = matrix.length - 1;
+        int n = matrix[0].length - 1;
+        int x = 0;
+        int y = n;
+        while (x <= m && y >= 0) {
+            if (matrix[x][y] == target) {
+                return true;
+            } else if (matrix[x][y] < target) {
+                x++;
+            } else {
+                y--;
+            }
+        }
+        
+        return false;
+    }
+}
