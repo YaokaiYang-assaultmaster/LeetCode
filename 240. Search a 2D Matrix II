@@ -39,6 +39,7 @@ public class Solution {
      * Move horizontally in the line of the midX and find the first value that is greater than or less than target depend in if it is case2 or case 3. 
      * Thus we can shrink the possible submatrix in which contains the target and search in less than half of the original matrix. 
      * T(n) = 2(T(n / 2) + cn = O(nlogn) time. O(1) space.
+     * This method can be optimized even more by using binary search during horizontal search, but that would be too much work so I just leave the thoughts here. Using binary search during horizontal search would decrease the time to T(n) = 2T(n / 2) + logn = logn*logn time. 
      */
     public boolean searchMatrix(int[][] matrix, int target) {
         if (matrix == null || matrix.length == 0) return false;
