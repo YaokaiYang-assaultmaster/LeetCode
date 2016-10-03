@@ -1,0 +1,51 @@
+public class Solution {
+    /**
+     * As a follow up question of search in rotated sorted array, it is highly possible that the algorithm in that question is still work with some minor changes. 
+     * In that question, we considered 3 scenario. target in the left monotonous part, in the right monotonous part or in the middle. 
+     * However, during comparison, we didn't take into account the condition that nums[mid] == nums[start] or nums[mid] == nums[end].
+     * So we need to consider it. 
+     * Since we are using nums[start] as the pivot, we need to decide what to do when nums[mid] == nums[start]. 
+     * Once this happens, we can just drop current start and make start = start + 1. Until we have find nums[mid] != nums[start].
+     * Since we have judge if nums[mid] == target at the beginning of the while loop, we don't have to worry about droping target value. 
+     * O(logn) time, O(n) worst case when all of the array are the same value. O(1) space. 
+     */
+    
+    public boolean search(int[] nums, int target) {
+        if (nums == null || nums.length == 0) {
+            return false;
+        }
+        
+        int start = 0;
+        int end = nums.length - 1;
+        while (start + 1 < end) {
+            int mid = (start + end) / 2;
+            
+            if (nums[mid] == target) return true;
+            
+            if (nums[mid] > nums[start]) {
+                if (target >= nums[start] && target < nums[mid]) {
+                    end = mid;
+                } else {
+                    start = mid;
+                }
+            } else if (nums[mid] < nums[start]) {
+                if (target > nums[mid] && target <= nums[end]) {
+                    start = mid;
+                } else {
+                    end = mid;
+                }
+            } else {
+                start++;
+            }
+        }
+        
+        if (nums[start] == target) {
+            return true;
+        }
+        if (nums[end] == target) {
+            return true;
+        }
+        
+        return false;
+    }
+}
