@@ -1,0 +1,160 @@
+public class Solution {
+    /**
+     * Assumption: k is always valid
+     * During the process of traversing the matrix, we always want to know the minimum value. A minHeap would be suitable for that purpose. 
+     * Since the rows and columns of the matrix is sorted in ascending order, we only have to traverse down or right. 
+     * Using a 2-d boolean array to store the visiting history, which is common in graph traversing question. 
+     * While traversing, store every new value we met as an int array with x, y and its corresponding value as 3 elements. 
+     * At the same time, poll one element from the heap and minus 1 from counter. 
+     * Since we are using a minimum heap, we are polling out the smallest value we have met so far. And by the time count reaches 0, we could get the value we want. 
+     * O(klog(max(m, n))) time, since we pop k elements from the minimum heap and each takes at most O(log(max(m, n))) time since the largest size of the heap is the same as the size of the diagonal of the matrix.
+     * O(m * n) space. 
+     * m and n is the length of the row and col of the matrix respectively.
+     */
+    
+    public int kthSmallest(int[][] matrix, int k) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) return Integer.MIN_VALUE;
+        
+        int row = matrix.length;
+        int col = matrix[0].length;
+        
+        boolean[][] visited = new boolean[row][col];
+        
+        //Initialize the priority with a anonymous inner class
+        //Custom the sorting method of priority using a class implementing the Comparator interface. 
+        PriorityQueue<int[]> minHeap = new PriorityQueue<>(k, new Comparator<int[]>() {
+                public int compare(int[] arr1, int[] arr2) {
+                    if (arr1[2] == arr2[2]) return 0;
+                    return arr1[2] - arr2[2];
+                }
+            });
+            
+        //Can also use Lambda expression to initialize a priority queue(new feature of Java 8)
+        //Since Comparator interface is a functional interface, it can be implementd by a lambda expression.
+        // PriorityQueue<int[]> minHeap = new PriorityQueue<>(k, (o1, o2) ->
+        //     {
+        //         int[] arr1 = (int[])o1;
+        //         int[] arr2 = (int[])o2;
+        //         if (arr1[2] == arr2[2]) return 0;
+        //         return arr1[2] - arr2[2];
+        //     }
+        // )
+        
+        minHeap.offer(new int[]{0, 0, matrix[0][0]});
+        visited[0][0] = true;
+        int count = k;
+        int ret = 0;
+        while (count > 0) {
+            int[] curr = minHeap.poll();
+            int x = curr[0];
+            int y = curr[1];
+            
+            if (x + 1 < row && !visited[x + 1][y]) {
+                minHeap.offer(new int[]{x + 1, y, matrix[x + 1][y]});
+                visited[x + 1][y] = true;
+            }
+            if (y + 1 < col && !visited[x][y + 1]) {
+                minHeap.offer(new int[]{x, y + 1, matrix[x][y + 1]});
+                visited[x][y + 1] = true;
+            }
+            
+            count--;
+            if (count == 0) {
+                ret = curr[2];    
+            }
+        }
+        
+        return ret;
+    }
+
+    
+    /**
+     * Without using the visited array?
+     * First add the whole first column into the heap.
+     * Thus we only need to go left. So we do not need to keep a 2-d array to store the nodes we have already visited. 
+     * O(klogm) time, O(m) space
+     */
+    public int kthSmallest(int[][] matrix, int k) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) return Integer.MIN_VALUE;
+        
+        int row = matrix.length;
+        int col = matrix[0].length;
+        int count = k;
+        int[] curr = null;
+        PriorityQueue<int[]> minHeap = new PriorityQueue<>(k, new Comparator<int[]>() {
+            public int compare(int[] arr1, int[] arr2) {
+                if (arr1[2] == arr2[2]) return 0;
+                return arr1[2] - arr2[2];
+            }
+        });
+        
+        for (int i = 0; i < row; i++) {
+            minHeap.offer(new int[]{i, 0, matrix[i][0]});
+        }
+        
+        while (count > 0) {
+            curr = minHeap.poll();
+            int x = curr[0];
+            int y = curr[1];
+            if (y + 1 < col) {
+                minHeap.offer(new int[]{x, y + 1, matrix[x][y + 1]});
+            }
+            count--;
+        }
+        
+        return curr[2];
+    }
+    
+    
+    
+        
+    /**
+     * Without a heap?
+     * Binary search
+     * How?
+     * We don't want to know the index, and search for mid indexes is meaningless for this question. 
+     * What should we search?
+     * Search the number scope determined by matrix[0][0] and matrix[row][col] and then count for the number of elements that is less than or equal to it.
+     * O(m * log(max - min)) time where max and min is the maximum and minimum value in the array.
+     * O(1) space
+     */
+    public int kthSmallest(int[][] matrix, int k) {
+        if (matrix == null || matrix.length == 0 || matrix[0] == null || matrix[0].length == 0) return Integer.MIN_VALUE;
+        
+        int row = matrix.length - 1;
+        int col = matrix[0].length - 1;
+        int start = matrix[0][0];
+        int end = matrix[row][col];
+        
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            int count = noLargerThan(matrix, mid);
+            if (count < k) {
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+        }
+        
+        return start;
+    }
+    
+    private int noLargerThan(int[][] matrix, int cur) {
+        //get the count of the elements not larget than mid value
+        int count = 0;
+        int row = matrix.length;
+        int col = matrix[0].length;
+        int i = 0;
+        int j = col - 1;
+        while (i < row && j >= 0) {
+            if (matrix[i][j] > cur) {
+                j--; //move to left column
+            } else {
+                count += j + 1; //All items on the left side of current row is added
+                i++;
+            }
+        }
+        
+        return count;
+    }
+}
