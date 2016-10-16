@@ -1,0 +1,67 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Recursive solution
+     */
+    public int sumNumbers(TreeNode root) {
+        
+        return sumTree(root, 0);
+    }
+    
+    private int sumTree(TreeNode root, int sum) {
+        if (root == null) return 0;
+        if (root.left == null && root.right == null) {
+            return sum * 10 + root.val;
+        }
+        return sumTree(root.left, sum * 10 + root.val) + sumTree(root.right, sum * 10 + root.val);
+    }
+    
+    
+    
+    
+    /**
+     * Typical DFS.
+     * Using 2 deque. 
+     * O(n) time, O(2m) space. n is the number of tree nodes, m is the height of the tree. 
+     */
+    public int sumNumbers(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        
+        int sum = 0;
+        
+        //Construct 2 deque, one stores the nodes and used to perform DFS
+        //The other stores corresponding value of nodes and is always changed in consistent with nodes deque. 
+        Deque<TreeNode> nodes = new ArrayDeque<>();
+        nodes.offerFirst(root);
+        Deque<Integer> values = new ArrayDeque<>();
+        values.offerFirst(root.val);
+        while (!nodes.isEmpty()) {
+            TreeNode curr = nodes.pollFirst();
+            int digit = values.pollFirst(); //number corresponding to current node constructed from root to current node
+            if (curr.left != null) {
+                values.offerFirst(digit * 10 + curr.left.val);
+                nodes.offerFirst(curr.left);
+            }
+            if (curr.right != null) {
+                values.offerFirst(digit * 10 + curr.right.val);
+                nodes.offerFirst(curr.right);
+            }
+            
+            if (curr.left == null && curr.right == null) {
+                sum += digit;
+            }
+        }
+        
+        return sum;
+    }
+}
