@@ -1,0 +1,134 @@
+public class Solution {
+    
+    /**(1)
+     * Walk throught each sequence. 
+     * Since the array is unsorted, we have to be able to check if a given number is in the input in O(1) anyway. 
+     * So using a hash is reasonable. 
+     * Construct a HashSet of the numbers in nums array. 
+     * For each number n in nums, check if m = n + 1, n + 2, ... n + i is in the hash set. And m - n would be the length of current consecutive sequence. 
+     * Also keep a global maximum to store the maximum length we encountered. 
+     * O(n) time, O(n) space, n is the length of nums. 
+     */
+     
+    public int longestConsecutive(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        
+        int maxLen = 0;
+        Set<Integer> set = new HashSet<>();
+        for (int i = 0; i < nums.length; i++) {
+            if (set.add(nums[i])) {
+                continue;
+            }
+        }
+        
+        for (int i = 0; i < nums.length; i++) {
+            if (!set.contains(nums[i] - 1)) { 
+                //Only start the while iteration when current number when current is the start of consecutive sequence
+                //This step ensures that each number is only test once, which guarantees a O(n) runtime in finding consecutive sequence. 
+                int m = nums[i] + 1;
+                while (set.contains(m)) {
+                    m++;
+                }
+                
+                maxLen = Math.max(maxLen, m - nums[i]);
+            }
+        }
+        
+        return maxLen;
+    }
+    
+    
+    
+    
+    
+    
+    
+    /**(2)
+     * Union Find
+     * Weighed Union Find. Union the labels based on their count, which is used as the weight of a label. 
+     * Since the array is unsorted, if we want to know the index of a given value in O(1) time, we have to use a HashMap to store the values and its corresponding index. 
+     * At the same time, we set up a UnionFind class to perform the union find process. 
+     * In the union find class, we have list array which stores the label of each corresponding index of the nums array. 
+     * There is also a count array stores the length of consecutive sequence corresponding to that index. 
+     * The maxLen is used to store the length of the longest consecutive sequence we have seen. So we can return the maximum length in O(1) time. 
+     * We perform quick union in the union function. And we also updates the maxLen value in the union solution. 
+     * The union is performed in a weighed style, which is, we union values based on their count value. We union the one with the less count value to the one with greater count value. 
+     * Both union and find have a time complexity near O(1).
+     * O(n) space. 
+     * n is the length of nums. 
+     */
+    public int longestConsecutive(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        
+        Map<Integer, Integer> indexMap = new HashMap<>();  //<value, index>
+        UnionFind uf = new UnionFind(nums.length);
+        for (int i = 0; i < nums.length; i++) {
+            if (indexMap.containsKey(nums[i])) {
+                continue;
+            }
+            
+            indexMap.put(nums[i], i);
+            if (indexMap.containsKey(nums[i] + 1)) {
+                uf.union(i, indexMap.get(nums[i] + 1));
+            }
+            if (indexMap.containsKey(nums[i] - 1)) {
+                uf.union(i, indexMap.get(nums[i] - 1));
+            }
+        }
+        
+        return uf.getMaxLen();
+        
+    }
+    
+    private class UnionFind {
+        int[] list;
+        int[] count;
+        int maxLen = 1;
+        UnionFind (int length) {
+            list = new int[length];
+            count = new int[length];
+            for (int i = 0; i < length; i++) {
+                list[i] = i;
+                count[i] = 1;
+            }
+        }
+        
+        void union(int p, int q) {
+            int pId = find(p);
+            int qId = find(q);
+            
+            if (pId == qId) {
+                return;
+            }
+            
+            int currLen = 1;
+            if (count[pId] > count[qId]) {
+                list[qId] = pId;
+                count[pId] += count[qId];
+                currLen = Math.max(currLen, count[pId]);
+            } else {
+                list[pId] = qId;
+                count[qId] += count[pId];
+                currLen = Math.max(currLen, count[qId]);
+            }
+            
+            maxLen = Math.max(currLen, maxLen);
+        }
+        
+        int find(int p) {
+            while (p != list[p]) {
+                list[p] = list[list[p]];
+                p = list[p];
+            }
+            return p;
+        }
+        
+        int getMaxLen() {
+            return maxLen;
+        }
+    }
+}
