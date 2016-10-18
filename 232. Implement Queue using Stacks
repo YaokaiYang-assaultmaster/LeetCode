@@ -1,0 +1,75 @@
+class MyQueue {
+    //Amortized O(1) solution
+    //The idea is to store all elements into out once the peek or pop function is called. 
+    //So we only store 1 copy of the elements, either in input, or in output. 
+    
+    private Deque<Integer> input;
+    private Deque<Integer> output;
+    
+    public MyQueue() {
+        input = new ArrayDeque<>();
+        output = new ArrayDeque<>();
+    }
+    
+    // Push element x to the back of queue.
+    public void push(int x) {
+        input.push(x);
+    }
+
+    // Removes the element from in front of queue.
+    public void pop() {
+        peek();
+        output.pop();
+    }
+
+    // Get the front element.
+    public int peek() {
+        if (output.isEmpty()) {
+            while (!input.isEmpty()) {
+                output.push(input.pop());
+            }
+        }
+        return output.peek();
+    }
+
+    // Return whether the queue is empty.
+    public boolean empty() {
+        return input.isEmpty() && output.isEmpty();
+    }
+}
+
+
+class MyQueue {
+    private Deque<Integer> stack;
+    
+    public MyQueue() {
+        stack = new ArrayDeque<>();
+    }
+    
+    // Push element x to the back of queue.
+    public void push(int x) {
+        Deque<Integer> tmp = new ArrayDeque<>();
+        while (!stack.isEmpty()) {
+            tmp.push(stack.pop());
+        }
+        stack.push(x);
+        while (!tmp.isEmpty()) {
+            stack.push(tmp.pop());
+        }
+    }
+
+    // Removes the element from in front of queue.
+    public void pop() {
+        stack.pop();
+    }
+
+    // Get the front element.
+    public int peek() {
+        return stack.peek();
+    }
+
+    // Return whether the queue is empty.
+    public boolean empty() {
+        return stack.isEmpty();
+    }
+}
