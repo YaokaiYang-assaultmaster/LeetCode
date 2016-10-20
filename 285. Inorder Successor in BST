@@ -1,0 +1,58 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+ 
+ /**
+  * Assumption
+  * Duplicates?
+  */
+  
+public class Solution {
+    
+    public TreeNode inorderSuccessor(TreeNode root, TreeNode p) {
+        if (root == null || p == null) return null;
+        
+        TreeNode ret = null;
+        //Case1: p have no right subtree. Search for its  first right parent. 
+        if (p.right == null) {
+            ret = findGrand(root, p);
+            return ret;
+        } else { //Case2: p have right subtree
+            ret = findSucc(p, p.right);
+            return ret;
+        }
+    }
+    
+    private TreeNode findGrand(TreeNode root, TreeNode p) {
+        TreeNode successor = null;
+        TreeNode curr = root;
+        while (curr != null && curr.val != p.val) {
+            if (curr.val > p.val) {
+                successor = curr;
+                curr = curr.left;
+            } else {
+                curr = curr.right;
+            }
+        }
+        
+        //curr == null indicating that there is no node p in the BST, return null
+        return curr == null ? null : successor; 
+    }
+    
+    private TreeNode findSucc(TreeNode n1, TreeNode n2) {
+        if (n2.left == null) {
+            return n2;
+        } else {
+            while (n2.left != null) {
+                n2 = n2.left;
+            }
+            return n2;
+        }
+    }
+}
