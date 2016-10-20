@@ -1,0 +1,46 @@
+/**
+ * Definition for binary tree
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+
+public class BSTIterator {
+    
+    Deque<TreeNode> deque;
+    TreeNode curr;
+    public BSTIterator(TreeNode root) {
+        curr = root;
+        deque = new ArrayDeque<>();
+        if (root != null) {
+            deque.push(root);
+            while (curr.left != null) {
+                deque.push(curr.left);
+                curr = curr.left;
+            }
+        }
+    }
+
+    /** @return whether we have a next smallest number */
+    public boolean hasNext() {
+        return (!deque.isEmpty());
+    }
+
+    /** @return the next smallest number */
+    public int next() {
+        TreeNode ret = deque.pop();
+        if (ret.right != null) {
+            curr = ret.right;
+            deque.push(curr);
+            while (curr.left != null) {
+                deque.push(curr.left);
+                curr = curr.left;
+            }
+        }
+        
+        return ret.val;
+    }
+}
