@@ -13,7 +13,7 @@ public class Solution {
      * Base case would be matched[0][0] = true
      * The corner case would be s1.length() + s2.length() != s3.length(), which is obviously false. 
      * O(m * n) time and space where m and n are length of s1 and s2 respectively
-     * The space may be further optimized to O(max{m, n})
+     * The space may be further optimized to O(n)
      */
     
     public boolean isInterleave(String s1, String s2, String s3) {
@@ -51,7 +51,8 @@ public class Solution {
     
     
     /**
-     * Further optimized to O(n) space where n is the length of s2
+     * Further optimized to O(m*n) time and O(n) space where m and n are the length of s1 and s2 respectively
+     * Since a matched flag is only related to the flag on the right and above it, we can drop every flag else and only keep a 1-dimension array.
      */
     public boolean isInterleave(String s1, String s2, String s3) {
         if (s1 == null || s2 == null || s3 == null) {
