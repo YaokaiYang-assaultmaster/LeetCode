@@ -1,0 +1,88 @@
+public class Solution {
+    
+    /**
+     * How to think?
+     * Be naive first
+     * Maybe backtrack first?
+     * We have n balloons, so we have n steps to got to the final step, in the ith step we have n-i balloons to burst, i = 0~n-1, therefore we are using an algorithm of O(n!). This is not the optimal solution. So we have to look for the redundant work we have done. 
+     * We can find out that the balloons left to burst are not affected by the balloons already been bursted. This indicate that we can cache the results of the subproblems until we reach the number n. For k balloons there are C(n, k) cases in total and in each case it need to scan the k balloons to compare. It is better than O(n!) but worse than O(2^n)
+     * Better idea?
+     * We may use divide and conquer. After all there may be many self-similar cases from the previous analysis. 
+     * The natural way to divide the problem is burst one balloon and sepearate the balloons into 2 subsets one on the left and one on the right. However, in this problem the left and right part become adjacent and could influence the maxCoins in the future. 
+     * Then another idea come up, which is quite common in dynamic programming. That is reverse thinking. The coins you get from a balloon does not depend on the balloons already bursted. So we could divide the problem by the last balloon bursted. 
+     * Why? Because only the first and last balloons we are sure of their adjacent balloons before and after hand. 
+     * So for the first we have nums[i] = nums[i - 1] * nums[i] * nums[i + 1], for the last we have nums[i] = nums[-1] * nums[i] * nums[n].
+     * Now think about n balloons if i is the last one to burst. 
+     * We can see that the balloons is again separated into 2 subsets, but this time since the balloon i is the last one get bursted, the left and right subsection now have well-defined boundary and do not affect each other. This way we can do either bottom-up or top-down dp. 
+     * Final:
+     * Now we come to a final solution. Note we put 2 balloons with 1 at the beginning and end of nums as the boundary and we also burst all the balloons with 0 in the first round since they won't give any coins. 
+     * The algorithm runs in O(n^3) since there are 3 for loops. 
+     */
+    
+    
+    /** 
+     * Dynamic programming
+     */
+    
+    public int maxCoins(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        
+        int len = nums.length;
+        //Assign the 2 boundary into nums array to make solving boundary cases more easily
+        int[] extendNums = new int[len + 2];
+        extendNums[0] = 1;
+        extendNums[len + 1] = 1;
+        for (int i = 0; i < len; i++) {
+            extendNums[i + 1] = nums[i];
+        }
+        
+        int n = len + 2;
+        int[][] dp = new int[n][n];
+        for (int i = 2; i < n; i++) {
+            for (int left = 0; left < n - i; left++) {
+                int right = left + i;
+                for (int j = left + 1; j < right; j++) {
+                    dp[left][right] = Math.max(dp[left][right], extendNums[left] * extendNums[j] * extendNums[right] + dp[left][j] + dp[j][right]);
+                }
+            }
+        }
+        
+        return dp[0][n - 1];
+    }
+    
+    /**
+     * Divide and conquer with memorization
+     */
+    public int maxCoins(int[] iNums) {
+        if (iNums == null || iNums.length == 0) {
+            return 0;
+        }
+        
+        int[] nums = new int[iNums.length + 2];
+        int n = 1;
+        for (int x : iNums) {
+            if (x > 0) {
+                nums[n++] = x;
+            }
+        }
+        nums[0] = nums[n++] = 1;
+        
+        int[][] memo = new int[n][n];
+        return burst(nums, memo, 0, n - 1);
+    }
+    
+    private int burst(int[] nums, int[][] memo, int left, int right) {
+        if (left == right - 1) return 0;
+        if (memo[left][right] > 0) return memo[left][right];
+        int ans = 0;
+        for (int i = left + 1; i < right; i++) {
+            ans = Math.max(ans, nums[left] * nums[i] * nums[right] + burst(nums, memo, left, i) + burst(nums, memo, i, right));
+        }
+        
+        memo[left][right] = ans;
+        return ans;
+    }
+    
+}
