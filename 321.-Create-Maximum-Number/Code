@@ -1,0 +1,48 @@
+public class Solution {
+	public int[] maxNumber(int[] nums1, int[] nums2, int k) {
+		int[] max = new int[k];
+	    int n = nums1.length;
+	    int m = nums2.length;
+	    for (int i = Math.max(0, k - m); i <= k && i <= n; i++) { 
+	        //if k >m, there will be at least k - m elements chosen from nums1
+	        int[] candidate = merge(maxArray(nums1, i), maxArray(nums2, k - i), k);
+	        if (greater(candidate, 0, max, 0)) {
+	            max = candidate;
+	        }
+	    }
+	    
+	    return max;
+	}
+	
+	private int[] maxArray(int[] nums, int k) {
+	    int n = nums.length;
+	    int[] ret = new int[k];
+	    for (int i = 0, j = 0; i < n; i++) {
+	        while (n - i + j > k && j > 0 && ret[j - 1] < nums[i]) {
+	            j--;
+	        }
+	        if (j < k) {
+	            ret[j++] = nums[i];
+	        }
+	    }
+	    
+	    return ret;
+	}
+	
+	private boolean greater(int[] a1, int i, int[] a2, int j) {
+	    while(i < a1.length && j < a2.length && a1[i] == a2[j]) {
+	        i++;
+	        j++;
+	    }
+	    return (j == a2.length || (i < a1.length && a1[i] > a2[j]));
+	}
+	
+	private int[] merge(int[] nums1, int[] nums2, int k) {
+	    int[] ret = new int[k];
+	    for (int i = 0, j = 0, r = 0; r < k; r++) {
+	        ret[r] = greater(nums1, i, nums2, j) ? nums1[i++] : nums2[j++];
+	    }
+	    
+	    return ret;
+	}
+}
