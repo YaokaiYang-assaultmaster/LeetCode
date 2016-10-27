@@ -1,1 +1,0 @@
-## Card Washing Algorithm
