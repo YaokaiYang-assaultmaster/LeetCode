@@ -1,0 +1,51 @@
+/**
+ * Describe a data structure for which getValue(int index), setValue(int index, int value), and setAllValues(int value) are all O(1).
+ * It's not hard to get O(1) in getValue and setValue using a HashSet.However, perform setAllValues in O(1) seems unreasonable since we have to 
+   change each value at least once. 
+ * Actually this can be achieved by amortized the operation through all the process. We keep a system time for the global value which can be set
+   through setAllValues. Then each time we call getValue, we check this system time and current time of the index. If current time is less than system, 
+   which means setAllValues have been called since we set the value of current index, we set the value of current index to systemValue. Otherwise,
+   return current value. 
+ */
+
+public class All1DataStruct {
+  private class Node {
+    long time;
+    int value;
+    Node(long time, int value) {
+      this.time = time;
+      this.value = value;
+    }
+  }
+  
+  private HashMap<Integer, Node> map;
+  private long systemTime;
+  private int systemValue;
+  
+  public All1DataStruct() {
+    map = new HashMap<>();
+    systemTime = 0L;
+    systemValue = 0;
+  }
+  
+  public int getValue(int index) {
+    Node curr = map.get(index);
+    if (curr != null) {
+      if (curr.time < systemTime) {
+        curr.value = systemValue;
+      }
+      return curr.value;
+    }
+    return Integer.MIN_VALUE; //indicate no such index;
+  }
+  
+  public void setValue(int index, int value) {
+    Node tmp = new Node(System.currentTimeMillis(), value);
+    map.put(index, tmp);
+  }
+  
+  public void setAllValues(int value) {
+    systemTime = System.currentTimeMillis();
+    systemValue = value;
+  }
+}
