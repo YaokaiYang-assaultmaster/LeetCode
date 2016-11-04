@@ -1,0 +1,130 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * DFS
+     * Recursive DFS
+     * Traverse the tree, add the leaf nodes into a ArrayList. 
+     * And delete the node and return the new root
+     * O(n) time, O(n) space, where n is the number of nodes in the tree.
+     */
+    public List<List<Integer>> findLeaves(TreeNode root) {
+        List<List<Integer>> ret = new ArrayList<>();
+        while (root != null) {
+            List<Integer> tmp = new ArrayList<>();
+            root = dfs(root, tmp);
+            ret.add(new ArrayList<Integer>(tmp));
+        }
+        
+        return ret;
+    }
+    
+    private TreeNode dfs(TreeNode root, List<Integer> tmp) {
+        if (root == null) {
+            return root;
+        }
+        if (root.left == null && root.right == null) {
+            tmp.add(root.val);
+            return null;
+        }
+        root.left = dfs(root.left, tmp);
+        root.right = dfs(root.right, tmp);
+        return root;
+    }
+    
+    /**
+     * Preorder traverse the tree, store the result into a arraylist.
+     * For null nodes, add them in the arraylist as Integer.MIN_VLAUE
+     * The number previous to 2 Integer.MIN_VALUE must be  leaf node, take out this number and store it into current list. And combine this three element into 1 Integer.MIN_VALUE
+     * Continue until there is only 1 Integer.MIN_VALUE left in the preorder traverse list
+     */
+    public List<List<Integer>> findLeaves(TreeNode root) {
+        List<List<Integer>> ret = new ArrayList<>();
+        List<Integer> tree = new ArrayList<>();
+        if (root == null) {
+            return ret;
+        }
+        preorderTraverse(root, tree);
+        
+        while (tree.size() > 2) {
+            List<Integer> tmp = new ArrayList<>();
+            List<Integer> newTree = new ArrayList<>();
+            for (int i = 0; i < tree.size(); i++) {
+                if (tree.get(i) != Integer.MIN_VALUE) {
+                    if (tree.get(i + 1)  == Integer.MIN_VALUE && tree.get(i + 2) == Integer.MIN_VALUE) {
+                        newTree.add(Integer.MIN_VALUE);
+                        tmp.add(tree.get(i));
+                        i = i + 2;
+                        continue;
+                    } else {
+                        newTree.add(tree.get(i));
+                    }
+                } else {
+                    newTree.add(tree.get(i));
+                }
+            }
+            ret.add(new ArrayList<>(tmp));
+            tree = newTree;
+        }
+        
+        return ret;
+    }
+    
+    private void preorderTraverse(TreeNode root, List<Integer> tree) {
+        tree.add(root.val);
+        if (root.left != null) {
+            preorderTraverse(root.left, tree);
+        } else {
+            tree.add(Integer.MIN_VALUE);
+        }
+        if (root.right != null) {
+            preorderTraverse(root.right, tree);
+        } else {
+            tree.add(Integer.MIN_VALUE);
+        }
+    }
+    
+    
+    /**
+     * Bottom-up approach, transmit the height of lower-level nodes into current node
+     * Then the height of current node is the List index it should be stored in in the 2-dimensional list result
+     * O(n) time, O(n) space where n is the number of nodes in the tree
+     */
+    public List<List<Integer>> findLeaves(TreeNode root) {
+        Map<Integer, List<Integer>> result = new HashMap<>();
+        getLeaves(root, result);
+        return new ArrayList(result.values());
+    }
+    
+    private int getLeaves(TreeNode root, Map<Integer, List<Integer>> result) {
+        if (root == null) {
+            return -1;
+        }
+        int left = getLeaves(root.left, result);
+        int right = getLeaves(root.right, result);
+        if (root.left == null && root.right == null) {
+            addToResult(result, 0, root.val);
+            return 1;
+        } else {
+            int height = Math.max(left, right);
+            addToResult(result, height, root.val);
+            return height + 1;
+        }
+    }
+    
+    private void addToResult(Map<Integer, List<Integer>> result, int height, int val) {
+        List<Integer> curr = result.get(height);
+        if (curr == null) {
+            curr = new ArrayList<Integer>();
+            result.put(height, curr);
+        }
+        curr.add(val);
+    }
+}
