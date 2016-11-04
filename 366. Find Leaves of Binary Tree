@@ -8,7 +8,7 @@
  * }
  */
 public class Solution {
-    /**
+    /**(1)
      * DFS
      * Recursive DFS
      * Traverse the tree, add the leaf nodes into a ArrayList. 
@@ -39,7 +39,7 @@ public class Solution {
         return root;
     }
     
-    /**
+    /**(2)
      * Preorder traverse the tree, store the result into a arraylist.
      * For null nodes, add them in the arraylist as Integer.MIN_VLAUE
      * The number previous to 2 Integer.MIN_VALUE must be  leaf node, take out this number and store it into current list. And combine this three element into 1 Integer.MIN_VALUE
@@ -92,7 +92,7 @@ public class Solution {
     }
     
     
-    /**
+    /**(3)
      * Bottom-up approach, transmit the height of lower-level nodes into current node
      * Then the height of current node is the List index it should be stored in in the 2-dimensional list result
      * O(n) time, O(n) space where n is the number of nodes in the tree
@@ -126,5 +126,73 @@ public class Solution {
             result.put(height, curr);
         }
         curr.add(val);
+    }
+    
+    
+    /**(4)
+     * Utilize the idea of Topological sort
+     * Delete the nodes layer by layer, for each round, we delete the node with outdegree == 0(i.e. nodes without children) and update their
+        parent's outdegree. Once the outdegree of a parent is 0, add this node into the queue for next round.
+     * Use 2 HashMap, one for recording the outdegree of each node, the other for recording the parent of each node. First traverse the tree to 
+        construct the 2 maps, then put those whose outdegree == 0 into a queue and iterate until running out of nodes. 
+     * O(n) time, O(n) space. 
+     */
+    public List<List<Integer>> findLeaves(TreeNode root) {
+        List<List<Integer>> ret = new ArrayList<>();
+        Map<TreeNode, Integer> outdegree = new HashMap<>();
+        Map<TreeNode, TreeNode> parent = new HashMap<>();
+        loadMap(root, outdegree, parent);
+        
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        for (TreeNode node : outdegree.keySet()) {
+            if (outdegree.get(node) == 0) {
+                deque.offer(node);
+            }
+        }
+        
+        while (!deque.isEmpty()) {
+            int size = deque.size();
+            List<Integer> tmp = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                TreeNode curr = deque.poll();
+                tmp.add(curr.val);
+                //root have no parent, prevent NullPointer exception
+                if (curr != root) {
+                    outdegree.put(parent.get(curr), outdegree.get(parent.get(curr)) - 1);
+                    if (outdegree.get(parent.get(curr)) == 0) {
+                        deque.offer(parent.get(curr));
+                    }
+                }
+            }
+            
+            ret.add(new ArrayList<Integer>(tmp));
+        }
+        
+        return ret;
+    }
+    
+    private void loadMap(TreeNode root, Map<TreeNode, Integer> outdegree, Map<TreeNode, TreeNode> parent) {
+        if (root == null) {
+            return;
+        }
+        
+        if (root.left == null && root.right == null) {
+            outdegree.put(root, 0);
+            return;
+        }
+        
+        int degree = 0;
+        if (root.left != null) {
+            degree++;
+            parent.put(root.left, root);
+        }
+        if (root.right != null) {
+            degree++;
+            parent.put(root.right, root);
+        }
+        outdegree.put(root, degree);
+        
+        loadMap(root.left, outdegree, parent);
+        loadMap(root.right, outdegree, parent);
     }
 }
