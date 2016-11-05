@@ -1,0 +1,89 @@
+public class Solution {
+    
+    private int[][] direction = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    
+    public List<Integer> numIslands2(int m, int n, int[][] positions) {
+        UnionFind2D islands = new UnionFind2D(m, n);
+        List<Integer> ret = new ArrayList<>();
+        for (int[] position : positions) {
+            int x = position[0];
+            int y = position[1];
+            int p = islands.add(x, y);
+            for (int[] dir : direction) {
+                int q = islands.getID(x + dir[0], y + dir[1]);
+                if (q > 0 && !islands.find(p, q)) {
+                    islands.union(p, q);
+                }
+            }
+            
+            ret.add(islands.size());
+        }
+        
+        return ret;
+    }
+}
+
+class UnionFind2D {
+    int[] id;
+    int[] weight;
+    int m, n, count;
+    
+    public UnionFind2D (int m, int n) {
+        this.id = new int[m * n + 1];
+        this.weight = new int[m * n + 1];
+        this.m = m;
+        this.n = n;
+        this.count = 0;
+    }
+    
+    public int index(int x, int y) {
+        return x * n + y + 1;
+    }
+    
+    public int size() {
+        return this.count;
+    }
+    
+    public int getID(int x, int y) {
+        if (x >= 0 && x < m && y >= 0 && y < n) {
+            return id[index(x, y)];
+        }
+        
+        return 0;
+    }
+    
+    public int add(int x, int y) {
+        int i = index(x, y);
+        id[i] = i;
+        weight[i] = 1;
+        count++;
+        return i;
+    }
+    
+    public boolean find(int p, int q) {
+        return root(p) == root(q);
+    }
+    
+    public void union(int p, int q) {
+        int i = root(p);
+        int j = root(q);
+        //weighed quick union
+        if (weight[i] < weight[j]) {
+            id[i] = j;
+            weight[j] += weight[i];
+        } else {
+            id[j] = id[i];
+            weight[i] += weight[j];
+        }
+        count--;
+    }
+    
+    public int root(int i) {
+        for (; i != id[i]; i = id[i]) {
+            id[i] = id[id[i]];  //path compression
+        }
+        
+        return i;
+    }
+    
+}
