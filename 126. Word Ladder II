@@ -1,0 +1,95 @@
+public class Solution {
+    
+    
+    /**
+     * This solution contains 2 steps:
+     * 1. use BFS to construct a graph
+     * 2. use DFS/BackTrack to search for a path from endWord to beginWord
+     * 
+     * In the first step of BFS
+     * 1. Use a HashMap ladder to store the minimal ladder length of each word. 
+     * 2. Use a HashMap map to store the previous word used to derive each word. 
+     * 3. Use character iteration to find all possible paths. This is constant time. 
+     * 4. every word is allowed to store in the queue once. 
+     */
+    Map<String, List<String>> map;
+    List<List<String>> ret;
+    public List<List<String>> findLadders(String beginWord, String endWord, Set<String> wordList) {
+        ret = new ArrayList<>();
+        if (wordList.isEmpty()) {  //deal with boundary conditon
+            return ret;
+        }
+        
+        int min = Integer.MAX_VALUE;
+        
+        Queue<String> queue = new ArrayDeque<>();
+        queue.offer(beginWord);
+        
+        map = new HashMap<>(); //<word, previous word that is used to derive this word>
+        Map<String, Integer> ladder = new HashMap<>(); //<word, shortest path from beginWord to this word>
+        for (String s : wordList) {
+            ladder.put(s, Integer.MAX_VALUE);
+        }
+        ladder.put(beginWord, 0);
+        
+        //BFS, Dijisktra search, or best first search.
+        while (!queue.isEmpty()) {
+            String word = queue.poll();
+            int step = ladder.get(word) + 1;
+            //step indicates how many steps from beginWord to current word. 
+            
+            if (step > min) break;
+            
+            for (int i = 0; i < word.length(); i++) {
+                StringBuilder sb = new StringBuilder(word);
+                for (char ch = 'a'; ch <= 'z'; ch++) {
+                    sb.setCharAt(i, ch);
+                    String new_word = sb.toString();
+                    if (ladder.containsKey(new_word)) {
+                        if(step > ladder.get(new_word)) { 
+                            //if this is not the shortest path, do nothing.
+                            continue;
+                        } else if (step < ladder.get(new_word)) {
+                            ladder.put(new_word, step);
+                            queue.offer(new_word);
+                        } else;  
+                        //this else prevent from adding one word with the same step again and again into the queue, otherwise got TLE.
+                        
+                        if (map.containsKey(new_word)) {
+                            map.get(new_word).add(word);
+                        } else {
+                            map.put(new_word, new ArrayList<String>(Arrays.asList(new String[]{word})));
+                        }
+                        
+                        if(new_word.equals(endWord)) {
+                            min = step;
+                        }
+                    }//end if, wordList contains new_word
+                }//end for, try replace ith character from 'a' to 'z'
+            }//end for, iterate from first character to last character in word
+        }//end while
+        
+        backTrack(endWord, beginWord, new ArrayList<String>());
+        return ret;
+    }
+    
+    private void backTrack(String word, String start, List<String> list) {
+        if (word.equals(start)) {
+            list.add(0, start);
+            ret.add(new ArrayList<String>(list));
+            list.remove(0);
+            return;
+        }
+        
+        list.add(0, word);
+        if (map.get(word) != null) { 
+            //if the map is empty, then this if would prevent NullPointerException
+            //the map would be empty if there exists no path to endWord. 
+        
+            for (String s : map.get(word)) {
+                backTrack(s, start, list);
+            }
+        }
+        list.remove(0);
+    }
+}
