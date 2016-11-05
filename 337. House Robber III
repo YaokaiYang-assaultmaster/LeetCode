@@ -1,0 +1,84 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * The original thought of brute-force method would be traverse the tree and try each possible combination. Since each node only have 2 possibilities, get robbed and not get robbed, so its easy to deal with this question through recursion. Once a node get robbed, its children cannot be robbed. Otherwise its children can be robbed. 
+     * However, we are doing quite a lot duplicate works here since we calculate the possible money for each node again and again. 
+     * It is obvious that this kind of question has dynamic programming properties:1. optimal subproblem and 2. overlapping substructure. So we could optimize this question by caching. 
+     * O(n) time and O(n) space where n is the number of nodes. The reason is that we visit each node once, and we store the maximum amout of money we can get for each subtree constructed with current node as the root. 
+     * That is, we store the money we get for the possibility of robbing current node as well as this subtree into a hashmap.
+     */
+     
+    Map<TreeNode, Integer> cache = new HashMap<TreeNode, Integer>();
+    
+    public int rob(TreeNode root) {
+        if (root == null) return 0;
+        return dfs(root);
+    }
+    
+    private int dfs(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        
+        if (cache.containsKey(root)) {
+            return cache.get(root);
+        }
+        
+        int notRob = dfs(root.left) + dfs(root.right);
+        int rob = root.val;
+        if (root.left != null) {
+            rob += dfs(root.left.left) + dfs(root.left.right);
+        }
+        if (root.right != null) {
+            rob += dfs(root.right.left) + dfs(root.right.right);
+        }
+        int max = Math.max(notRob, rob);
+        cache.put(root, max);
+        return max;
+    }
+    
+    
+    
+    
+    
+    
+    /**
+     * Bottom up DFS
+     * Since each node only have 2 possibilities: get robbed and not get robbed.
+     * So during the recursion each node return to its parent 2 value: One for the max money of not robbing current node and one for robbing current node. 
+     * Then for its parent node, there are 2 conditions:
+     * 1. the parent get robbed, then its left and right child cannot be robbed, then we only use the maximum value of not robbing its children puls the value of parent node. 
+     * 2. the parent don't get robbed, then its left and right child can be either robbed or not robbed. Then we return the maximum value constructed by combining all 4 possible conditions (i.e.rob left and rob right, rob left and not rob right, not rob left and rob right, not rob left and not rob right).
+     * Finally we return the greater one among the money of robbing and not robbing root. 
+     * O(n) time since only visit each node once, in which n is the number of nodes. 
+     * O(1) sapce without considering the recursion stack. If consider that, there will be at most O(h) space where h is the height of the tree.
+     */
+    
+    public int rob(TreeNode root) {
+         if (root == null) return 0;
+         int[] money = bottomUpDfs(root);
+         return Math.max(money[0], money[1]);
+    }
+    
+    private int[] bottomUpDfs(TreeNode root) {
+        //Use a length-2 array to store the result
+        //money[0] for result of not robbing current node, money[1] for robbing current node
+        int[] money = new int[2];
+        if (root == null) {
+            return money;
+        }
+        int[] left = bottomUpDfs(root.left);
+        int[] right = bottomUpDfs(root.right);
+        money[0] = Math.max(left[0], left[1]) + Math.max(right[0], right[1]);
+        money[1] = left[0] + right[0] + root.val; //Once current node got robbed, its left and right child cannot be robbed
+        return money;
+    }
+}
