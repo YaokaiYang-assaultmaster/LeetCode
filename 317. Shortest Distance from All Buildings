@@ -1,0 +1,205 @@
+public class Solution {
+    /**(1)
+     * Brute-force method
+     * From each empty position, BFS to each building and calculate the distance. Choose the least one. 
+     * O((m * n)^2) time in the worst case. O(m * n) space since the visited array. 
+     * m and n is the number of row and column of grid, respectively. 
+     */
+    public int shortestDistance(int[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return -1;
+        }
+        
+        int buildingNum = 0;
+        int min = Integer.MAX_VALUE;
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == 1) buildingNum++;
+            }
+        }
+        
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] == 0) {
+                    int dist = bfs(grid, i, j, buildingNum);
+                    if (dist < min && dist != -1) {
+                        min = dist;
+                    }
+                }
+            }
+        }
+        
+        return min == Integer.MAX_VALUE ? -1 : min;
+    }
+    
+    private int bfs(int[][] grid, int x, int y, int count) {
+        int[][] dirs = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        
+        Deque<int[]> deque = new ArrayDeque<>();
+        deque.offer(new int[]{x, y});
+        int ret = 0;
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] visited = new int[m][n];
+        visited[x][y] = 1; //label the original start point;
+        while (!deque.isEmpty()) {
+            int[] curr = deque.poll();
+            int row = curr[0];
+            int col = curr[1];
+            for (int[] dir : dirs) {
+                int newRow = row + dir[0];
+                int newCol = col + dir[1];
+                if (newRow >= 0 && newRow < m && newCol >= 0 && newCol < n && visited[newRow][newCol] == 0) {
+                    //Make sure there is no circle during traversal
+                    visited[newRow][newCol] = visited[row][col] + 1;
+                    if (grid[newRow][newCol] == 0) { //encountering an empty position
+                        deque.offer(new int[]{newRow, newCol});
+                    } else if (grid[newRow][newCol] == 1) { //encountering a building
+                        //building cannot be passed, don't add it into the deque.
+                        ret += visited[newRow][newCol] - 1;
+                        count--;
+                        if (count == 0) {
+                            return ret;
+                        }
+                    } else; //encountering a obstacle, do nothing. 
+                }
+            }
+        }
+        
+        return -1;
+    }
+    
+    
+    
+    
+    
+    /**(2)
+     * Can we optimize the brute force algorithm?
+     * Probably we can. Since we have done some duplicate work here. 
+     * Once we start from each empty position and perfome BFS search, we are actually checking a lot of useless points. Can we avoid those useless and duplicate work?
+     * Yes. This can be prevent by start from buildings. 
+     * By perform BFS from buildings, we will only get the point we want, which is the intersection point of BFS from every building. 
+     * However, the worst case runtime is still O(m^2 * n^2) and the space is still O(m * n)
+     */
+    public int shortestDistance(int[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return -1;
+        }
+        
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] distance = new int[m][n];
+        int[][] reached = new int[m][n];
+        int buildingNum = 0;
+        int[][] dirs = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1) {
+                    buildingNum++;
+                    
+                    Deque<int[]> deque = new ArrayDeque<>();
+                    deque.offer(new int[]{i, j});
+                    boolean[][] visited = new boolean[m][n];
+                    visited[i][j] = true;
+                    int step = 1;
+                    
+                    while (!deque.isEmpty()) {
+                        int size = deque.size();
+                        
+                        for (int k = 0; k < size; k++) {
+                            int[] curr = deque.poll();
+                            int x = curr[0];
+                            int y = curr[1];
+                            
+                            for (int[] dir : dirs) {
+                                int newX = x + dir[0];
+                                int newY = y + dir[1];
+                                if (newX >= 0 && newX < m && newY >= 0 && newY < n && !visited[newX][newY] && grid[newX][newY] == 0) {
+                                    visited[newX][newY] = true;
+                                    reached[newX][newY]++;
+                                    distance[newX][newY] += step;
+                                    deque.offer(new int[]{newX, newY});
+                                }
+                            }
+                        }
+                        step++;
+                    }
+                }
+            }
+        }
+        
+        int min = Integer.MAX_VALUE;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (reached[i][j] == buildingNum) {
+                    min = Math.min(min, distance[i][j]);
+                }
+            }
+        }
+        
+        return min == Integer.MAX_VALUE ? -1 : min;
+    }
+    
+    
+    
+    /**(3)
+     * Further optimization?
+     * We do not go into a land, if it is not accessible by all of the previous buildings!
+     * For example, for the first building, I only walk onto the cells where grid == 0 and make them -1, for the second building I only walk onto the cells where grid == -1 and make them -2 etc. 
+     * In this way, only need 1 visited array during all the BFS and avoid visiting useless points. 
+     */
+    public int shortestDistance(int[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return -1;
+        }
+        
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] distance = new int[m][n];
+        int[][] visited = new int[m][n];
+        int[][] dirs = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        int walk = 1;
+        int min = Integer.MAX_VALUE;
+        
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1) {
+                    walk--;
+                    min = Integer.MAX_VALUE;
+                    Deque<int[]> deque = new ArrayDeque<>();
+                    deque.offer(new int[]{i, j});
+                    int step = 1;
+                    
+                    while (!deque.isEmpty()) {
+                        int size = deque.size();
+                        
+                        for (int k = 0; k < size; k++) {
+                            int[] curr = deque.poll();
+                            int x = curr[0];
+                            int y = curr[1];
+                            
+                            for (int[] dir : dirs) {
+                                int newX = x + dir[0];
+                                int newY = y + dir[1];
+                                if (newX >= 0 && newX < m && newY >= 0 && newY < n && visited[newX][newY] == walk && grid[newX][newY] == 0) {
+                                    visited[newX][newY]--;
+                                    distance[newX][newY] += step;
+                                    deque.offer(new int[]{newX, newY});
+                                    min = Math.min(min, distance[newX][newY]);
+                                    
+                                }
+                            }
+                        }
+                        step++;
+                    }
+                    //some pointes are unreachable, stop the algorithm.
+                    if (min == Integer.MAX_VALUE) return -1;
+                }
+
+            }
+        }
+        
+        return min == Integer.MAX_VALUE ? -1 : min;
+    }
+}
