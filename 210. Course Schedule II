@@ -1,0 +1,48 @@
+public class Solution {
+    /**
+     * Typical topological sort question
+     */
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        int[] ret = new int[numCourses];
+        if(prerequisites == null) {
+            return new int[]{};
+        }
+        
+        int[] indegree = new int[numCourses];
+        Map<Integer, List<Integer>> parents = new HashMap<>();
+        
+        //Construct the indegree table and Adjacency table
+        for (int i = 0; i < prerequisites.length; i++) {
+            int[] courses = prerequisites[i];
+            indegree[courses[0]]++;
+            if (parents.get(courses[1]) == null) {
+                parents.put(courses[1], new ArrayList<Integer>());
+            }
+            parents.get(courses[1]).add(courses[0]);
+        }
+        
+        Deque<Integer> deque = new ArrayDeque<>();
+        for (int i = 0; i< numCourses; i++) {
+            if(indegree[i] == 0) {
+                deque.offer(i);
+            }
+        }
+        
+        int count = 0;
+        while (!deque.isEmpty()) {
+            int course = deque.poll();
+            ret[count++] = course;
+            
+            if (parents.get(course) != null) {
+                for(int nextCourse : parents.get(course)) {
+                    indegree[nextCourse]--;
+                    if (indegree[nextCourse] == 0) {
+                        deque.offer(nextCourse);
+                    }
+                }
+            }
+        }
+        
+        return count == numCourses ? ret : new int[]{};
+    }
+}
