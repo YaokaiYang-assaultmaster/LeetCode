@@ -2,6 +2,9 @@ public class Solution {
     /**
      * Sounds like a topological sort problem. However, we neeed to derive the graph of all characters given first. 
      * Since the words are sorted lexicographically, the only thing we know about them is based on consecutive words's characters. For example, wtf, wtr can only show that f is prior to r. So basically we want to examine the first different character of 2 consecutive words, which is the only information we can gain from these 2 words. 
+     * Then we use this information to construct a graph and perform topological sort. 
+     * Once finished, add all remaining characters undetermined into the returned string. 
+     * Remember to check for illegal case like "wrtf", "wrt", which should "".
      */
     
     public String alienOrder(String[] words) {
