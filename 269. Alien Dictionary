@@ -1,0 +1,97 @@
+public class Solution {
+    /**
+     * Sounds like a topological sort problem. However, we neeed to derive the graph of all characters given first. 
+     * Since the words are sorted lexicographically, the only thing we know about them is based on consecutive words's characters. For example, wtf, wtr can only show that f is prior to r. So basically we want to examine the first different character of 2 consecutive words, which is the only information we can gain from these 2 words. 
+     */
+    
+    public String alienOrder(String[] words) {
+        if (words == null || words.length == 0) {
+            return new String();
+        }
+        
+        List<char[]> adjacency = new ArrayList<>();
+        for (int i = 0; i < words.length - 1; i++) {
+            char[] pair = getPair(words[i], words[i + 1]);
+            if (pair == null) {
+                return "";
+            }
+            if (pair.length == 2) {
+                adjacency.add(pair);
+            }
+        }
+        
+        //get all the characters
+        Set<Character> chars = new HashSet<>();
+        for (String word : words) {
+            for (int i = 0; i < word.length(); i++) {
+                chars.add(word.charAt(i));
+            }
+        }
+        
+        //initialize the indegree map and adjacency list
+        Map<Character, Integer> indegree = new HashMap<>();
+        Map<Character, List<Character>> adjacencyList = new HashMap<>();
+        for (char ch : chars) {
+            indegree.put(ch, 0);
+            adjacencyList.put(ch, new ArrayList<Character>());
+        }
+        for (char[] pair : adjacency) {
+            if (adjacencyList.get(pair[0]) == null) {
+                adjacencyList.put(pair[0], new ArrayList<Character>());
+            }
+            adjacencyList.get(pair[0]).add(pair[1]);
+            
+            if (indegree.get(pair[1]) == null) {
+                indegree.put(pair[1], 1);
+            } else {
+                indegree.put(pair[1], indegree.get(pair[1]) + 1);
+            }
+            
+            if (indegree.get(pair[0]) == null) {
+                indegree.put(pair[0], 0);
+            }
+        }
+        
+        //perform topological sort
+        Deque<Character> deque = new ArrayDeque<>();
+        for (char ch : indegree.keySet()) {
+            if (indegree.get(ch) == 0) {
+                deque.offer(ch);
+            }
+        }
+        
+        StringBuilder ret = new StringBuilder();
+        while (!deque.isEmpty()) {
+            char curr = deque.poll();
+            ret.append(curr);
+            if (adjacencyList.get(curr) !=  null) {
+                for (char ch : adjacencyList.get(curr)) {
+                    indegree.put(ch, indegree.get(ch) - 1);
+                    if (indegree.get(ch) == 0) {
+                        deque.offer(ch);
+                    }
+                }
+            }
+        }
+        
+        return ret.length() != chars.size() ? "" : ret.toString();
+    }
+    
+    private char[] getPair(String s1, String s2) {
+        char[] ch1 = s1.toCharArray();
+        char[] ch2 = s2.toCharArray();
+        
+        int i = 0, j = 0;
+        while (i < ch1.length && j < ch2.length) {
+            if (ch1[i] == ch2[j]) {
+                i++;
+                j++;
+            } else {
+                return new char[]{ch1[i], ch2[j]};
+            }
+        }
+        
+        //return a null when encounter an illegal case, e.g. wrtj and wrt. 
+        return j == ch2.length && i < ch1.length ? null : new char[]{};
+    }
+}
