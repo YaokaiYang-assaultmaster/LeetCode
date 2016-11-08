@@ -22,6 +22,7 @@ public class Solution {
      * Bit manipulation method
      * Decide the bit value of each poisition from the most significant bit to the least significant of the result
      * Since the sqrt of a int is at most 15-bits long besides the symbol, the running time can be O(15) = O(1)
+     * Actually is also a binary search, since every position has 2 possible number, 0 and 1,so actually perform binary search on each position. 
     **/
     public int mySqrt(int x) {
         if (x <= 1) return x;
