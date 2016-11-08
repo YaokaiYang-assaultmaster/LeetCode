@@ -5,6 +5,7 @@ public class Solution {
      * Then we use this information to construct a graph and perform topological sort. 
      * Once finished, add all remaining characters undetermined into the returned string. 
      * Remember to check for illegal case like "wrtf", "wrt", which should "".
+     * O(n*l) time, where n is the length of words array and l is the average length of word.
      */
     
     public String alienOrder(String[] words) {
