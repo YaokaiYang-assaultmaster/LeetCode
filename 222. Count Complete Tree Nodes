@@ -1,0 +1,72 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**(1)
+     * A brute force algorithm would be traverse the whole tree and count nodes. However, this is possibly not an optimal solution. 
+     * We may look for any information that we didn't make use of in the question. 
+     * Noticed that this tree is a complete tree. Complete tree has nice features:
+     * 1. The tree is full except for the last level
+     * 2. The last level is filled from left to right. 
+     * This can lead to a binary-search like solution as following:
+     * 1. Count the height of left subtree and right subtree. 
+     * 2. If the left height is equal to right height, then the left subtree is perfect. If the left height is greater than right height, then the right subtree is perfect. And the nodes number of a perfect binary tree can be calculated by the height.
+     * 3. Recursively execute this algorithm for the unperfect subtree. 
+     * O(logn * logn) time where n is the number of nodes since we perform n steps of height(), each height() need logn time. 
+     * Take care of the calculating priority of bit shifting operator. 
+     */
+    public int countNodes(TreeNode root) {
+        int h = height(root);
+        if (h < 0) return 0;
+        
+        int ret = 0;
+        int hRight = height(root.right);
+        if (hRight == h - 1) { //left tree if full
+            ret += (1 << h) + countNodes(root.right); 
+        } else { //right tree is full
+            ret += (1 << (h - 1)) + countNodes(root.left);
+        }
+        
+        return ret;
+    } 
+    
+    private int height(TreeNode root) {
+        if (root == null) return -1;
+        return height(root.left) + 1;
+    }
+    
+    
+    
+    
+    
+    /**(2)
+     * Yet another solution. 
+     * First walks to left and right to determine if the tree is a full tree, which is showed by the last row is full. 
+     * If so, then the number of nodes can be calculated directly. 
+     * Otherwise, calculate the left and right subtree. 
+     * However, since we are dealing with a complete tree, at least one of the subtree is a full tree, so at least one of the recursive calls return directly. 
+     * So the runtime is still O(logn * logn)
+     */
+    public int countNodes(TreeNode root) {
+        if (root == null) return 0;
+        
+        TreeNode left = root;
+        TreeNode right = root;
+        int height = 0;
+        while (right != null) {
+            left = left.left;
+            right = right.right;
+            height++;
+        }
+        if (left == null) { //the tree is a full tree
+            return (1 << height) - 1;
+        }
+        return 1 + countNodes(root.left) + countNodes(root.right);
+    }
+}
