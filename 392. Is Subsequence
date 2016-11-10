@@ -1,0 +1,45 @@
+public class Solution {
+    /**
+     * O(n) straightforward solution where n is the length of t. 
+     * Compare each character of s to substring of t. 
+     * Each time we get a position for a character from s in t, we only need to consider the remaining part of s and t. 
+     */
+    public boolean isSubsequence(String s, String t) {
+        if (s == null || t == null) return false;
+        
+        char[] chs = s.toCharArray();
+        char[] cht = t.toCharArray();
+        int start = 0;
+        for (int i = 0; i < chs.length; i++) {
+            start = search(chs[i], cht, start, cht.length);
+            if (start == -1) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private int search(char s, char[] t, int start, int end) {
+        for (; start < end; start++) {
+            if (s == t[start]) {
+                return start + 1;
+            }
+        }
+        
+        return -1;
+    }
+    
+    /**
+     * A more concise solution
+     */
+    public boolean isSubsequence(String s, String t) {
+        if (s.length() > t.length()) return false;
+        int i = 0, j = 0;
+        while (i < s.length() && j < t.length()) {
+            if (s.charAt(i) == t.charAt(j++)) i++;
+        }
+        
+        return i == s.length() ? true : false;
+    }
+}
