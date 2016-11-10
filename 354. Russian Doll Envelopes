@@ -1,0 +1,81 @@
+public class Solution {
+    /**
+     * A brute force algorithm would be to search the original array from left to right, then check for what if the max number of envelopes you can Russian doll. However, this is O(n^n) time, which is super inefficient. Obviously we did redundant works, which is checking a envelop again and again. 
+     * A slight improvement would be sort the envelopes first and in this case we only have to check for envelops behind current one. This is O(n!) time. Still have redundant works. 
+     * Since actually the maximum number of envelopes that can be Russian doll is actually fixed given a specific envelop as the first one. So we could cache this information for each envelope, leading to a dynamic programming solution. 
+     * In this case, by using extra O(n) sapce, we can reduce the runtime to O(n^2). Since we sort the array first, we only have to check for caches with index less than current one. So it is 1 + 2 + ... + n = O(n^2) time. 
+     */
+    public int maxEnvelopes(int[][] envelopes) {
+        if (envelopes == null || envelopes.length == 0 || envelopes[0].length == 0) return 0;
+        
+        Arrays.sort(envelopes, new Comparator<int[]>() {
+           @Override
+           public int compare(int[] a1, int[] a2) {
+               return a1[0] - a2[0];
+           }
+        });
+        
+        int[] dp = new int[envelopes.length];
+        int ret = 0;
+        for (int i = 0; i < envelopes.length; i++) {
+            dp[i] = 1;
+            for (int j = 0; j < i; j++) {
+                if (envelopes[i][0] > envelopes[j][0] && envelopes[i][1] > envelopes[j][1]) {
+                    dp[i] = Math.max(dp[i], 1 + dp[j]);
+                }
+            }
+            ret = Math.max(ret, dp[i]);
+        }
+        
+        return ret;
+    }
+    
+    
+    
+    
+    
+    /**
+     * More improvements? Can we do this in less than O(n^2) time?
+     * Notice there is still redundant work done in the sorted array, which is that we checked the envelopes with the same width for several times. 
+     * So how do we avoid this?
+     * May be one more sort for height. 
+     * So the algorithm works like following:
+     * 1. Sort the array, ascend in width and descend on height.
+     * 2. Find the longest consecutive sequence based on height.
+     * The reason is that we already sort the width in ascending order, so we do not have to worry about it. 
+     * So we only consider about the height, in this case, what we should do is to find out the longest consecutive subsequence regarding height, which is the maximum number of envelopes we can Russian doll. 
+     * In this case, the sort need O(logn) time, and find out the longest consecutive subsequence takes O(nlogn) time by using binary search. 
+     * So the total time is O(nlogn), space is O(n), n is the length of envelopes. 
+     */
+    public int maxEnvelopes(int[][] envelopes) {
+        if (envelopes == null || envelopes.length == 0 || envelopes[0] == null || envelopes[0].length != 2) {
+            return 0;
+        }
+        
+        Arrays.sort(envelopes, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] a1, int[] a2) {
+                if (a1[0] == a2[0]) {
+                    return a2[1] - a1[1];
+                } else {
+                    return a1[0] - a2[0];
+                }
+            }
+        });
+        
+        int[] sequence = new int[envelopes.length];
+        int len = 0;
+        for (int i = 0; i < envelopes.length; i++) {
+            int index = Arrays.binarySearch(sequence, 0, len, envelopes[i][1]);
+            if (index < 0) {
+                index = -(index + 1);
+            }
+            sequence[index] = envelopes[i][1];
+            if (index == len) {
+                len++;
+            }
+        }
+        
+        return len;
+    }
+}
