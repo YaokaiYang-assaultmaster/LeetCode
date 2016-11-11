@@ -1,0 +1,199 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    
+    /**(1)
+     * A brute-force algorithm
+     * Inorder traverse the tree, get the difference from tre node to target, store corresponding value and difference.
+     * Finally sort it by difference and get the first k value.
+     * This is O(nlogn + k) time, since we sort the length-n list by difference. Then we take out the first k value
+     */
+    public List<Integer> closestKValues(TreeNode root, double target, int k) {
+        List<Integer> ret = new ArrayList<>();
+        if (root == null) return ret;
+        
+        List<double[]> pairs = new ArrayList<>();
+        inorderSearch(root, target, pairs);
+        
+        Collections.sort(pairs, new Comparator<double[]>() {
+            @Override
+            public int compare(double[] p1, double[] p2) {
+                //convert this result from double to int directly would cause 2 number with difference less than 1 to be always equal. i.e. this is wrong: return (int)(p1[1] - p2[1])
+                return p1[1] - p2[1] > 0.0 ? 1 : p1[1] - p2[1] < 0 ? -1 : 0;
+            }
+        });
+
+        for (int i = 0; i < k; i++) {
+            ret.add((int)pairs.get(i)[0]);
+        }
+        
+        return ret;
+    }
+    
+    private void inorderSearch(TreeNode root, double target, List<double[]> pairs) {
+        if (root.left != null) {
+            inorderSearch(root.left, target, pairs);
+        }
+        
+        double[] pair = new double[2]; //[value, difference]
+        pair[0] = (double)root.val;
+        pair[1] = Math.abs(target - root.val);
+        pairs.add(pair);
+        
+        if (root.right != null) {
+            inorderSearch(root.right, target, pairs);
+        }
+    }
+    
+    
+    
+    
+    /**(2)
+     * Can we do better than brute-force?
+     * Perhaps yes. 
+     * We did some redundant work in brute-force algorithm, since we checked n element and sort them all while we only need k values. 
+     * How do we avoid this?
+     * Noticed that we are focused on the absolute difference from a BST value and the target, they can lies on 2 sides of the target. 
+     * And we didn't make use of the fact that this is a BST, which has the nice property of all nodes in the left subtree is less than the nodes in the right subtree. 
+     * So it would be reasonable to locate where the target value should be in the tree and look for its precessors and decessors. 
+     * This would be the 2 sides of the target value mentioned above. 
+     * Then we could just use 2 stack to store values in the 2 part and peek out what we need for k times. 
+     * The peek process would look like the merge process of merge sort. 
+     * This is O(n + k) since we first scan the whole tree, which is O(n), then we take out k values from stack, which is O(k)
+     */
+    public List<Integer> closestKValues(TreeNode root, double target, int k) {
+        List<Integer> ret = new ArrayList<>();
+        
+        if (root == null) return ret;
+        
+        Deque<Integer> pre = new ArrayDeque<>();
+        Deque<Integer> suc = new ArrayDeque<>();
+        
+        traverse(target, root, pre, true);
+        traverse(target, root, suc, false);
+        
+        System.out.println(pre);
+        System.out.println(suc);
+        
+        while (k-- > 0) {
+            if (pre.isEmpty()) {
+                ret.add(suc.pop());
+            } else if (suc.isEmpty()) {
+                ret.add(pre.pop());
+            } else if (Math.abs(target - pre.peek()) > Math.abs(target - suc.peek())) {
+                ret.add(suc.pop());
+            } else {
+                ret.add(pre.pop());
+            }
+        }
+        
+        return ret;
+    }
+    
+    private void traverse(double target, TreeNode root, Deque<Integer> deque, boolean reverse) {
+        //reverse == false, inorder traverse
+        //reverse == true, reverseorder traverse
+        if (root == null) return;
+        traverse(target, !reverse ? root.left : root.right, deque, reverse);
+        
+        //preterminate, no need to traverse the whole tree
+        if (!reverse && root.val > target || reverse && root.val <= target) return;
+        deque.push(root.val);
+        
+        traverse(target, !reverse ? root.right : root.left, deque, reverse);
+        
+    }
+    
+    
+    
+    
+    /**(3)
+     * More improvement?
+     * Don't need to use inorder and reverseorder traversal, useless nodes have been added into the stack. 
+     * Only add need nodes, then add more during the process of take our nodes from stack.
+     * O(klogn)
+     */
+    public List<Integer> closestKValues(TreeNode root, double target, int k) {
+        List<Integer> ret = new LinkedList<>();
+        Stack<TreeNode> succ = new Stack<>();
+        Stack<TreeNode> pred = new Stack<>();
+        initializePredecessorStack(root, target, pred);
+        initializeSuccessorStack(root, target, succ);
+        if(!succ.isEmpty() && !pred.isEmpty() && succ.peek().val == pred.peek().val) {
+            getNextPredecessor(pred);
+        }
+        while(k-- > 0) {
+            if(succ.isEmpty()) {
+                ret.add(getNextPredecessor(pred));
+            } else if(pred.isEmpty()) {
+                ret.add(getNextSuccessor(succ));
+            } else {
+                double succ_diff = Math.abs((double)succ.peek().val - target);
+                double pred_diff = Math.abs((double)pred.peek().val - target);
+                if(succ_diff < pred_diff) {
+                    ret.add(getNextSuccessor(succ));
+                } else {
+                    ret.add(getNextPredecessor(pred));
+                }
+            }
+        }
+        return ret;
+    }
+
+    private void initializeSuccessorStack(TreeNode root, double target, Stack<TreeNode> succ) {
+        while(root != null) {
+            if(root.val == target) {
+                succ.push(root);
+                break;
+            } else if(root.val > target) {
+                succ.push(root);
+                root = root.left;
+            } else {
+                root = root.right;
+            }
+        }
+    }
+
+    private void initializePredecessorStack(TreeNode root, double target, Stack<TreeNode> pred) {
+        while(root != null){
+            if(root.val == target){
+                pred.push(root);
+                break;
+            } else if(root.val < target){
+                pred.push(root);
+                root = root.right;
+            } else{
+                root = root.left;
+            }
+        }
+    }
+    
+    private int getNextSuccessor(Stack<TreeNode> succ) {
+        TreeNode curr = succ.pop();
+        int ret = curr.val;
+        curr = curr.right;
+        while(curr != null) {
+            succ.push(curr);
+            curr = curr.left;
+        }
+        return ret;
+    }
+
+    private int getNextPredecessor(Stack<TreeNode> pred) {
+        TreeNode curr = pred.pop();
+        int ret = curr.val;
+        curr = curr.left;
+        while(curr != null) {
+            pred.push(curr);
+            curr = curr.right;
+        }
+        return ret;
+    }
+}
