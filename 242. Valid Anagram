@@ -1,0 +1,45 @@
+public class Solution {
+    /**
+     * Sort 2 string and compare
+     */
+    public boolean isAnagram(String s, String t) {
+        if (s == null || t == null || s.length() != t.length()) return false;
+        
+        char[] chs = s.toCharArray();
+        char[] cht = t.toCharArray();
+        
+        Arrays.sort(chs);
+        Arrays.sort(cht);
+        
+        for (int i = 0; i < chs.length; i++) {
+            if (chs[i] != cht[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Use a int char map to store the number of each character. 
+     * Increase the number for characters in s, decrease the number for characters in t. 
+     * If all numbers are zero, then s and t are anagrams. 
+     * If it is Unicode, then int array of length 256 is not enough, we may consider using a HashMap to store them. 
+     */
+    public boolean isAnagram(String s, String t) {
+        if (s == null || t == null || s.length() != t.length()) return false;
+        
+        int[] charMap = new int[256];
+        
+        for (int i = 0; i < s.length(); i++) {
+            charMap[s.charAt(i)]++;
+            charMap[t.charAt(i)]--;
+        }
+        
+        for (int i = 0; i < 256; i++) {
+            if (charMap[i] != 0) return false;
+        }
+        
+        return true;
+    }
+}
