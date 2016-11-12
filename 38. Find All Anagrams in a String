@@ -1,0 +1,41 @@
+public class Solution {
+    /**
+     * O(n) time
+     */
+    public List<Integer> findAnagrams(String s, String p) {
+        List<Integer> ret =new ArrayList<>();
+        
+        if (s == null || p == null || s.length() < p.length()) return ret;
+        
+        int[] charMap = new int[256];
+        //record each character in p to the charMap
+        for (char c : p.toCharArray()) {
+            charMap[c]++;
+        }
+        
+        //2 pointers, initilize count to p's length
+        int left = 0;
+        int right = 0;
+        int count = p.length();
+        
+        char[] chs = s.toCharArray();
+        while (right < s.length()) {
+            //Move the right pointer, if the character exists in the p's charMap, decrease count
+            //current hash value >=1 means that the character exists in p and has not been matched b character in s. 
+            if (charMap[chs[right++]]-- >= 1) count--;
+            
+            
+            //When the count is 0, we have matched all characters of p.
+            //Add left to list
+            if (count == 0) ret.add(left);
+            
+            
+            //If we find the window size equal to p, then we have to move left (narrow the window) to find new match window
+            //++ to reset the hash since we throw out left
+            //Only increase the count when the character is in p, which means the current value in hash must be >= 0
+            if ((right - left) == p.length() && charMap[chs[left++]]++ >= 0) count++;
+        }
+        
+        return ret;
+    }
+}
