@@ -57,29 +57,23 @@ public class Solution {
     
     /**
      * Iteration method
-     * Use 2 pointers curr and then
-     * What we want to do is simple, just let every next pointer in listnode pointing to its previous node in the original linkedlist. 
-     * And use a dummy node pointed to the head to keep track of the new head.
-     * In each iteration, we let dummy.next pointed to the right most node we have iterated, which is then, and let then.next point to the previous right most node, which is dummy.next. And let then become the next node following it, which is kept by curr.next at the beginning of the iteration. 
-     * By the time then reaches the last node of the linkedlist(indicated by then == null), we end the iteration and return dummy.next
-     * O(n) time, O(1) space.
+     * Use a newHead to keep track of the previous node, each time let head.next = newHead while still keep next to record the next node we need to visit before we changing the next pointer of current node. 
+     * Then simple let head = next to continue the traverse process. 
+     * O(n) time, O(1) space
     **/
     public ListNode reverseList(ListNode head) {
         if (head == null || head.next == null) {
             return head;
         }
         
-        ListNode dummy = new ListNode(0);
-        dummy.next = head;
-        ListNode curr = head;
-        ListNode then = curr.next;
-        while (then != null) {
-            curr.next = then.next;
-            then.next = dummy.next;
-            dummy.next = then;
-            then = curr.next;
+        ListNode newHead = null;
+        while (head != null) {
+            ListNode next = head.next;
+            head.next = newHead;
+            newHead = head;
+            head = next;
         }
         
-        return dummy.next;
+        return newHead;
     }
 }
