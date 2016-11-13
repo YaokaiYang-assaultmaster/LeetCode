@@ -1,0 +1,62 @@
+# problem 375. Guess Number Higher or Lower II
+
+[题目链接](https://leetcode.com/problems/guess-number-higher-or-lower-ii/)
+
+## 方法
+
+MinMax，游戏策略，在人工智能课里讲过，还考过，然而当时真的学得太渣了，一点不会。
+
+看了题解，再看了维基百科，强行解释一下吧。
+
+minMax对应的每次选择就是完整的一轮博弈过程：
+
+1. 我走一步，然后你走一步
+
+2. 然后我假设我走A，然后在A下我猜测你所有可能的应对方法，设这些方法中每个方法对我的伤害构成的集合B_A，我应该相信你的智商，所以我得去 `B_A`中最大的，即我走A后，带来的伤害是 `max B_A` 。 然后我考虑每种走法，`A_I`， 其对应的伤害为`max B_A_I` , 因此我最后应该选择的走法是 `min_{I} max B_A_I` 。 这样一解释就算是清楚了。
+
+再总结一下，我有K种走法，每种走法你又会有M_i种对应的手段。我非常尊重对手，认为我选择`K_i`方法，你就会选择对我又最大伤害的对应手段（即MAX），然后我就应该在这K中走法中选择最大伤害最小的（MIN）。
+
+OK，上面就是MinMax过程了。我知道下象棋是可以这么做的。然而换到这个猜数该怎么做呢？
+
+看了题解，是这么一个递推：
+
+```C++
+R[i][j] = min_{k} { k + max(R[i][k-1] , R[k+1][j]) } , i <= k <= j
+R[x][x] = 0
+```
+
+解释一下，`R[i][j]`就表示i到j中猜数的minMax代价。我有 j - i + 1中可能的猜法，对每个猜测k，首先付出代价k（这是题设），然后轮到你说这个K对不对。你有三种对应，一种是小了，一种是大了，一种是等于。我们做最坏打算，取三种最大的代价，等于的代价是0，故直接在公式中忽略了。初始条件，对只含一个数的区间，代价为0。因为我必然猜对。
+
+## 代码
+
+```C++
+class Solution {
+public:
+    int getMoneyAmount(int n) {
+        vector<vector<int>> R(n+1, vector<int>(n+1));
+        // init 
+        for(int i = 1; i <= n; ++i){ R[i][i] = 0; }
+        // dp
+        for(int step = 1; step < n; ++step)
+        {
+            for(int start = 1; start <= n - step; ++start)
+            {
+                // calc R[start][start+step]
+                int end = start + step;
+                // guess start
+                int minMaxVal = start + R[start+1][end];
+                // guesss end
+                minMaxVal = min(minMaxVal, end + R[start][end-1]);
+                // guess (start, end)
+                for(int g = start + 1; g < end; ++g)
+                {
+                    minMaxVal = min(minMaxVal , 
+                                    g + max( R[start][g-1], R[g+1][end] ));
+                }
+                R[start][end] = minMaxVal;
+            }
+        }
+        return R[1][n];
+    }
+};
+```
