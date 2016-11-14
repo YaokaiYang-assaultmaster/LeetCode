@@ -1,0 +1,128 @@
+public class Solution {
+
+    /**
+     * Since we are only looking for the longest common prefix, the logic is pretty simple. 
+     * We choose each character from strs[0] and compare it with every character at the same position in other strings. 
+     * Once a difference is found, return. Otherwise, add this character to the prefix.
+     * O(kl) runtime, where k is the average length of the string, l is the length of the strs array. 
+     */
+    public String longestCommonPrefix(String[] strs) {
+        if (strs == null || strs.length == 0) return "";
+        
+        String result = "";
+        for (int i = 0; i < strs[0].length(); i++) {
+            char pivot = strs[0].charAt(i);
+            for (String str : strs) {
+                //Note: str.length() >= i+1 must be put at the first since otherwise there can be a index out of boundary exception for str.charAt(i)
+                if (!(str.length() >= i + 1 && str.charAt(i) == pivot)) {
+                    return result;
+                }
+            }
+            result += String.valueOf(pivot);
+        }
+        return result;
+    }
+    
+    
+    
+    
+    /**
+     * Use a Trie to store all the strings. And this data structure is naturelly suited to find common prefix since it uses common prefix to store and search the strings. 
+     * All we have to do is print out the TrieNodes with only 1 child, indicating they are the common prefix of all the strings. 
+    **/
+    
+    public String longestCommonPrefix(String[] strs) {
+        Trie trie = new Trie();
+        for (String str : strs) {
+            trie.insert(str);
+        }
+        TrieNode current = trie.root;
+        String result = "";
+        while (current.isEnd != true) {
+            int count = 0;
+            int index = 0;
+            for (int i = 0; i < 26; i++) {
+                if (current.childs[i] != null) {
+                    count += 1;
+                    index = i;
+                }
+            }
+            if (count != 1) return result;  //Once we find a node whose childs number is not 1, say, either 0 or more than 1, common prefix have been found
+            current = current.childs[index];
+            result += String.valueOf(current.value);
+        }
+        return result;
+        
+    }
+    
+    class TrieNode {
+        static final int numAlpha = 26;
+        char value;
+        int count;
+        TrieNode[] childs;
+        boolean isEnd;
+        public TrieNode(char c) {
+            value = c;
+            count = 0;
+            childs = new TrieNode[numAlpha];
+            isEnd = false;
+        }
+    }
+    
+    class Trie {
+        TrieNode root;
+        public Trie() {
+            root = new TrieNode(' ');
+            //root is only a nominal node with no information in it
+            //all words start with childs in root.
+        }
+        
+        public void insert(String word) {
+            if (this.search(word) == true) return;
+            
+            TrieNode current = root;
+            for (int i = 0; i < word.length(); i++) {
+                char c = word.charAt(i);
+                if (c >= 'A' && c <= 'Z') {
+                    c = (char)(c + 'a' - 'A');
+                }
+                if (current.childs[c - 'a'] != null) {
+                    current = current.childs[c - 'a'];
+                }
+                else {
+                    current.childs[c - 'a'] = new TrieNode(c);
+                    current = current.childs[c - 'a'];
+                }
+                current.count++;
+            }
+            current.isEnd = true;
+        }
+        
+        public boolean search(String word) {
+            TrieNode current = root;
+            
+            for (int i = 0; i < word.length(); i++) {
+                char c = word.charAt(i);
+                int index = 0;
+                if (c >= 'A' && c <= 'Z') {
+                    index = c - 'A';
+                }
+                else {
+                    index = c - 'a';
+                }
+                if (current.childs[index] == null) {
+                    return false;
+                }
+                else {
+                    current = current.childs[index];
+                }
+            }
+            if (current.isEnd == true) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+}
