@@ -34,4 +34,63 @@ public class Solution {
         
         return ret;
     }
+    
+    
+    
+    /**
+     * This O(n^3) solution could be further optimized into a best case O(n^2) solution by considering the pair sum of each pair in the nums array and record them in a HashMap. Hence we reduce the problem to a 2 sum problem. 
+     * In the HashMap we record each subsum with the index of the pairs. 
+     * For each pair sum, we check if the left part of the sum has already existed in the HashMap. If so, further check if that pair has overlapping with current pairs. If not, store them in HashMap. 
+     * The complexity to get all the pairs is O(n^2) (i.e. C(n, n-2)). For each pair, if the sum has already been visited, the time complexity would be O(k), where is is the size of the list containing the pairs add up to this sum. 
+     * Thus the total time would be O(k*n^2). Now we need to consider about the range of k. Basically, the more distinct sums we get, the smaller k will be. If all the pair sums are different from each other, k would be 1. 
+     * However, in the extreme case, if all of the pair sums are the same, k could be in the order of n (strictly speaking, k could be as large as n^2, but we would do some check during storing process and get rid of them). 
+     * Normally, k would be between 1 to n in the case where the original array is normally distributed.
+     * As a result, the complexity of the algorithm would be O(n^2) and worst case O(n^3).
+     * n is the length of the original array. 
+     * Space complexity is O(n^2)
+     */
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        List<List<Integer>> ret = new ArrayList<>();
+        if (nums == null || nums.length < 4) return ret;
+        
+        Map<Integer, List<int[]>> pairSum = new HashMap<>();
+        Set<List<Integer>> pairs = new HashSet<>();
+        Arrays.sort(nums);
+        
+        for (int i = 0; i < nums.length - 1; i++) {
+            //get rid of duplicates
+            if (i > 1 && nums[i] == nums[i - 2]) continue;
+            
+            for (int j = i + 1; j < nums.length; j++) {
+                //get rid of duplicates
+                if (j > i + 2 && nums[j] == nums[j - 2]) continue;
+                
+                //for each pair sum, check if the needed pair sum is already visited
+                if (pairSum.containsKey(target - (nums[i] + nums[j]))) {
+                    List<int[]> curr = pairSum.get(target- (nums[i] + nums[j]));
+                    
+                    //we get 2 pairs, one is (pair[0], pair[1]) and the other one is (i, j)
+                    //first check if they are overlapping
+                    for (int[] pair : curr) {
+                        int m1 = Math.min(pair[0], i);
+                        int m2 = Math.min(pair[1], j);
+                        int m3 = Math.max(pair[0], i);
+                        int m4 = Math.max(pair[1], j);
+                        
+                        if (m1 == m2 || m1 == m3 || m2 == m3 || m2 == m4) continue; // get rid of overlapping pairs.
+                        
+                        //else recording the results with sorted order
+                        //thus HashSet could help us avoid duplicates
+                        pairs.add(Arrays.asList(nums[m1], nums[Math.min(m2, m3)], nums[Math.max(m2,m3)], nums[m4]));
+                    }
+                }
+                
+                //store the current pair and their indexes into the HashMap. 
+                pairSum.computeIfAbsent(nums[i] + nums[j], key -> new ArrayList<>()).add(new int[]{i, j});
+            }
+        }
+        
+        ret.addAll(pairs);
+        return ret;
+    }
 } 
