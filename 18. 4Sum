@@ -1,0 +1,37 @@
+public class Solution {
+    /**
+     * Like the idea of 3 sum, pivoting 2 numbers and decide the left 2 numbers using method similar to 2 sum. 
+     * O(n^3) solution
+     */
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        List<List<Integer>> ret = new ArrayList<>();
+        if (nums == null || nums.length < 4) return ret;
+        
+        Arrays.sort(nums);
+        
+        for (int i = 0; i < nums.length - 3; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) continue;
+            for (int j = i + 1; j < nums.length - 2; j++) {
+                if (j > i + 1 && nums[j] == nums[j - 1]) continue;
+                int low = j + 1;
+                int hi = nums.length - 1;
+                int subsum = nums[i] + nums[j];
+                while (low < hi) {
+                    if (nums[low] + nums[hi] + subsum == target) {
+                        ret.add(Arrays.asList(nums[i], nums[j], nums[low], nums[hi]));
+                        while (low < hi && nums[low] == nums[low + 1]) low++;
+                        low++;
+                        while (low < hi && nums[hi] == nums[hi - 1]) hi--;
+                        hi--;
+                    } else if (nums[low] + nums[hi] + subsum < target) {
+                        low++;
+                    } else {
+                        hi--;
+                    }
+                }
+            }
+        }
+        
+        return ret;
+    }
+} 
