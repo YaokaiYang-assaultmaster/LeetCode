@@ -1,0 +1,82 @@
+public class Solution {
+    /**
+     * It is obvious that in order to solve this question, we need to at least scan the whole array once to get the frequency of each number. 
+     * We could either store this feqeuency-number relationship pari into a wrapper class or into a array of length 2. 
+     * I would use length-2 array because it is more efficient than a wrapper class. 
+     * Then we could use several different approach to solve this question based on the frequency information we get. 
+     * The most easy thought would be sorting the array based on frequency with algorithms like bubble sort, which would use O(k * n) time, or specifically, O(n^2) time in the worst case. We could also sort the array using quick sort, which would use O(nlogn) time. 
+     * Moreover, would further optimize the time complexity into O(n) time, O(n) space with a minheap of size 2. We scan the whole frequency-number array once and only store the 2 number with the largest feqeuency and throw out everything else during comparision. 
+     * In addition, Quick search would also reduce the time complexity into amortized O(n) time. 
+     * Bucket sort could also be used to solve this quesiton with O(n) time. 
+     */
+     
+    /**
+     * First let's consider the heap method since the O(nlogn) algorithm is pretty trival and easy to implement. 
+     */
+    public List<Integer> topKFrequent(int[] nums, int k) {
+        if (nums == null || nums.length == 0) return new ArrayList<Integer>();
+        
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int num : nums) {
+            if (!map.containsKey(num)) {
+                map.put(num, 1);
+            } else {
+                map.put(num, map.get(num) + 1);
+            }
+        }
+        
+        Queue<Map.Entry<Integer, Integer>> maxHeap = new PriorityQueue<>(k, new Comparator<Map.Entry<Integer, Integer>>() {
+            @Override
+            public int compare(Map.Entry<Integer, Integer> e1, Map.Entry<Integer, Integer> e2) {
+                return e2.getValue() - e1.getValue();
+            }
+        });
+        
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            maxHeap.add(entry);
+        }
+        
+        List<Integer> ret = new ArrayList<>();
+        for (int i = 0; i < k; i++) {
+            ret.add(maxHeap.poll().getKey());
+        }
+        
+        return ret;
+    }
+    
+    
+    /**
+     * Bucket sort
+     * Using idea similar to a bucket sort. 
+     * In a bucket sort we need to know the range of the numbers we are sorting. 
+     * However, in this question, we don't know the range of the numbers, but we know the range of the frequencies of each number, which is 1 through nums.length
+     * Thus we use this frequency information as bucket index and construct an array of ArrayList to store numbers corresponding to each frequency. 
+     * Then we just take out k element with top k frequency and return them. 
+     */
+    public List<Integer> topKFrequent(int[] nums, int k) {
+        if (nums == null || nums.length < k) return new ArrayList<Integer>();
+        
+        List<Integer>[] bucket = new List[nums.length + 1];
+        Map<Integer, Integer> frequency = new HashMap<>();
+        for (int num : nums) {
+            frequency.put(num, frequency.getOrDefault(num, 0) + 1);
+        }
+        
+        for (int key : frequency.keySet()) {
+            int freq = frequency.get(key);
+            if (bucket[freq] == null) {
+                bucket[freq] = new ArrayList<Integer>();
+            }
+            bucket[freq].add(key);
+        }
+        
+        List<Integer> ret = new ArrayList<>();
+        for (int pos = bucket.length - 1; pos >= 0 && ret.size() < k; pos--) {
+            if (bucket[pos] != null) {
+                ret.addAll(bucket[pos]);
+            }
+        }
+        
+        return ret;
+    }
+}
