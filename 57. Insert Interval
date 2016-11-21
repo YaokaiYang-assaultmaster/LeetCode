@@ -1,0 +1,45 @@
+/**
+ * Definition for an interval.
+ * public class Interval {
+ *     int start;
+ *     int end;
+ *     Interval() { start = 0; end = 0; }
+ *     Interval(int s, int e) { start = s; end = e; }
+ * }
+ */
+public class Solution {
+    /**
+     * Straight forward O(n) solution
+     * Scan the whole intervals list. 
+     * There are 3 conditions:
+     * 1. the start point of the newInterval is greater than the end point of a interval in the list. In this condition, just add the original intervals into the new interval list. 
+     * 2. the end point of the newInterval is less than the start point of a interval in the list. In this condition, just add the original intervals into the new interval list. 
+     * 3. newInterval is overlapping with the original interval in the list, in this case, we would update the newInterval with a start that is the smaller one among the 2 start points and an end that is the larget one among the 2 end points. Keep updating the newInterval until we meet condition 2 next interval in intervals list. Then we add this new interval into the new interval list. 
+     * O(n) time, O(1) space where n is the size of the intervals list, since we have to scan each interval once. 
+     */
+    public List<Interval> insert(List<Interval> intervals, Interval newInterval) {
+        List<Interval> ret = new ArrayList<>();
+        if (intervals == null || intervals.size() == 0) {
+            ret.add(newInterval);
+            return ret;
+        }
+        
+        int i = 0;
+        while (i < intervals.size() && intervals.get(i).end < newInterval.start) {
+            ret.add(intervals.get(i++));
+        }
+        while (i < intervals.size() && intervals.get(i).start <= newInterval.end) {
+            newInterval = new Interval(
+                Math.min(intervals.get(i).start, newInterval.start), 
+                Math.max(intervals.get(i).end, newInterval.end));
+            i++;
+        }
+        
+        ret.add(newInterval);
+        while (i < intervals.size()) {
+            ret.add(intervals.get(i++));
+        }
+        
+        return ret;
+    }
+}
