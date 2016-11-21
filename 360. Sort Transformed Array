@@ -1,0 +1,47 @@
+public class Solution {
+    /**
+     * The tricky part of this question is that the graph of the function is different when a > 0 and a < 0.
+     * We start consider the question using 2 pointers pointing to the start and end of the nums array since they are the extremums of the functions. 
+     * When a > 0, there are 3 conditions:
+     * 1. the symmetry axis is within the range of nums, then 2 ends of the nums is the largest numbers.
+     * 2. the symmetry axis is on the left of all the numbers in nums, the graph where the numbers in nums on are monotonically increasing. 
+     * 3. the symmetry axis is on the right of all the numbers in the nums, the graph where the numbers in nums on are monotonically decreasing. 
+     * In both 3 conditions we can start fill the ret array from end to beginning since we always has at least one of the end of nums having the maximum value. 
+     * 
+     * When a < 0, there are 3 conditions similar to above ones. 
+     * When a = 0, it is always monotonically increasing or decreasing based on the value of b, but we don't have to worry it since we can deal with it like a > 0 or a < 0. 
+     * Thus we get following solution:
+     * O(n) time, O(1) space where n is the length of nums array.
+     */
+    public int[] sortTransformedArray(int[] nums, int a, int b, int c) {
+        if (nums == null || nums.length == 0) return new int[0];
+        
+        int[] ret = new int[nums.length];
+        int index = a >= 0 ? nums.length - 1 : 0;
+        int p1 = 0;
+        int p2 = nums.length - 1;
+        while (p1 <= p2) {
+            int num1 = a * (int)(Math.pow(nums[p1], 2)) + b * nums[p1] + c;
+            int num2 = a * (int)(Math.pow(nums[p2], 2)) + b * nums[p2] + c;
+            if (num1 > num2) {
+                if (a >= 0) {
+                    ret[index--] = num1;
+                    p1++;
+                } else {
+                    ret[index++] = num2;
+                    p2--;
+                }
+            } else {
+                if (a >= 0) {
+                    ret[index--] = num2;
+                    p2--;
+                } else {
+                    ret[index++] = num1;
+                    p1++;
+                }
+            }
+        }
+        
+        return ret;
+    }
+}
