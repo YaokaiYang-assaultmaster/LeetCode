@@ -1,0 +1,38 @@
+/**
+ * Definition for an interval.
+ * public class Interval {
+ *     int start;
+ *     int end;
+ *     Interval() { start = 0; end = 0; }
+ *     Interval(int s, int e) { start = s; end = e; }
+ * }
+ */
+public class Solution {
+    /**
+     * Using idea just like merge intervals
+     * Using a minimum heap to store all the intervals based on the start point. 
+     * Take the top element and compare its end time with the start time of next one. 
+     * If there exists overlapping, return false. 
+     * O(n) time, O(n) space where n is the length of the intervals array. 
+     */
+    public boolean canAttendMeetings(Interval[] intervals) {
+        if (intervals == null || intervals.length == 0) return true;
+        
+        Queue<Interval> minHeap = new PriorityQueue<>((i1, i2) -> {
+            return i1.start - i2.start;
+        });
+        
+        for (Interval i : intervals) {
+            minHeap.add(i);
+        }
+        
+        while (!minHeap.isEmpty()) {
+            Interval curr = minHeap.poll();
+            if (minHeap.peek() != null && curr.end > minHeap.peek().start) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+}
