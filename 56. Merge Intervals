@@ -1,0 +1,77 @@
+/**
+ * Definition for an interval.
+ * public class Interval {
+ *     int start;
+ *     int end;
+ *     Interval() { start = 0; end = 0; }
+ *     Interval(int s, int e) { start = s; end = e; }
+ * }
+ */
+public class Solution {
+    /**
+     * First sort the intervals list based on start time using a anonymous comparator. 
+     * Then scan the whole list, and compare the end point of current interval with its next one's start point. 
+     * As long as there is an overlapping, we set the end point to the larger one, that is to say, we extend current interval by enlarging its end point. 
+     * Sort takes O(nlogn) time, merge takes O(n) time. 
+     * So it's a O(nlogn) algorithm.
+     */
+    public List<Interval> merge(List<Interval> intervals) {
+        List<Interval> ret = new ArrayList<>();
+        if (intervals == null || intervals.size() == 0) return ret;
+        
+        Collections.sort(intervals, new Comparator<Interval>() {
+          @Override
+          public int compare(Interval i1, Interval i2) {
+              return i1.start - i2.start;
+          }
+        });
+        
+        int start = intervals.get(0).start;
+        int end = intervals.get(0).end;
+        for (int i = 0; i < intervals.size(); i++) {
+            if (intervals.get(i).start <= end) {
+                end = Math.max(end, intervals.get(i).end);
+            } else {
+                ret.add(new Interval(start, end));
+                start = intervals.get(i).start;
+                end = intervals.get(i).end;
+            }
+        }
+        
+        ret.add(new Interval(start, end));
+        
+        return ret;
+    }
+    
+    
+    /**
+     * However, if we don't want to sort the input list and do this in O(n) time, we need to think of some special data structure. 
+     * By sorting, we actually want the interval in intervals list with the smallest start time
+     * Minimum heap can just do this in armortized O(n) time. 
+     * So we construct a minimum heap with all the intervals in armortized O(n) time and take out the one with the smallest start time in O(1) time and merge it with the current interval we are considering until the minimum heap is empty. 
+     * O(n) time, O(n) space where n is the size of the intervals list.
+     */
+    public List<Interval> merge(List<Interval> intervals) {
+        List<Interval> ret = new ArrayList<>();
+        if (intervals == null || intervals.size() == 0) {
+            return ret;
+        }
+        
+        Queue<Interval> minHeap = new PriorityQueue<>(intervals.size(), (i1, i2) -> {
+            return i1.start - i2.start;
+        });
+        
+        minHeap.addAll(intervals);
+        while (!minHeap.isEmpty()) {
+            Interval interval = minHeap.poll();
+            int start = interval.start;
+            int end = interval.end;
+            while (minHeap.peek() != null && minHeap.peek().start <= end) {
+                end = Math.max(end, minHeap.poll().end);
+            }
+            ret.add(new Interval(start, end));
+        }
+        
+        return ret;
+    }
+}
