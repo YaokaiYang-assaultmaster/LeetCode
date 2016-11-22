@@ -1,0 +1,80 @@
+/**
+ * Definition for an interval.
+ * public class Interval {
+ *     int start;
+ *     int end;
+ *     Interval() { start = 0; end = 0; }
+ *     Interval(int s, int e) { start = s; end = e; }
+ * }
+ */
+public class Solution {
+    /**
+     * If we want to know how many meeting rooms we need, we must know how many meetings are happened with overlapping time slot. 
+     * This can be done by checking the start time and end time of 2 meetings. 
+     * In this way, we need to keep some status for the end time of currently used meeting rooms. 
+     * Since we always only want the meeting room whose meeting ends earliest, we could use a minimum heap to keep all the end time of the meetings. 
+     * Each time we want to set up a new meeting, we just check if there is any meeting room with a finishing time earlier than the start time of a meeting. If no, we open a new meeting room and put the end time into the minimum heap. If yes, use that room and update the end time. 
+     * We have to also sort the input array based on start time in order to make the look up correctly. 
+     * O(nlogn) time, O(n) space. n is the length of intervals array. 
+     * We could also use a miniheap to store the intervals to avoid sorting and thus reduce the time to O(n).
+     */
+    public int minMeetingRooms(Interval[] intervals) {
+        if (intervals == null || intervals.length == 0) return 0;
+        
+        int count = 0;
+        Arrays.sort(intervals, new Comparator<Interval>() {
+            @Override
+            public int compare(Interval i1, Interval i2) {
+                return i1.start - i2.start;
+            }
+        });
+        Queue<Integer> minHeap = new PriorityQueue<>();
+        for (int i = 0; i < intervals.length; i++) {
+            if (minHeap.isEmpty() || intervals[i].start < minHeap.peek()) {
+                count++;
+                minHeap.add(intervals[i].end);
+            } else {
+                minHeap.poll();
+                minHeap.add(intervals[i].end);
+            }
+        }
+        
+        return count;
+    }
+    
+    
+    /**
+     * Another idea.
+     * Sort the start time and end time respectively. 
+     * For each end time, add 1 to room number if the start time is less than this end time.
+     * Because this indicates a overlapping of intervals. 
+     * For each start time greater than current time, increase the end index by 1, since current start > current end indicates that previous meeting is already finished (remember we have sorted the start and end time array).
+     * Once we reached the end of start array, return room count since all the meetings have already finished or being executed at this point. 
+     * O(nlogn) time, O(n) space, n is the length of the intervals array. 
+     */
+    public int minMeetingRooms(Interval[] intervals) {
+        if (intervals == null || intervals.length == 0) return 0;
+        
+        int count = 0;
+        int[] starts = new int[intervals.length];
+        int[] ends = new int[intervals.length];
+        for (int i = 0; i < intervals.length; i++) {
+            starts[i] = intervals[i].start;
+            ends[i] = intervals[i].end;
+        }
+        
+        Arrays.sort(starts);
+        Arrays.sort(ends);
+        
+        int endIndex = 0;
+        for (int i = 0; i < starts.length; i++) {
+            if (starts[i] < ends[endIndex]) {
+                count++;
+            } else {
+                endIndex++;
+            }
+        }
+        
+        return count;
+    }
+}
