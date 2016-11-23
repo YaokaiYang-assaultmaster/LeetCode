@@ -1,0 +1,74 @@
+public class Solution {
+    /**
+     * O(n) time, O(n) space solution. 
+     * Keep each exists number of one array in a HashSet.
+     * Then check for if each number in another array is in this HashSet. 
+     * Once a match is found, remove this number since the requirement is each element in the result should be unique.
+     */
+    public int[] intersection(int[] nums1, int[] nums2) {
+        if (nums1 == null || nums2 == null || nums1.length == 0 || nums2.length == 0) return new int[]{};
+        
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums1) {
+            set.add(num);
+        }
+        List<Integer> list = new ArrayList<>();
+        for (int num : nums2) {
+            if (set.contains(num)) {
+                list.add(num);
+                set.remove(num);
+            }
+        }
+        
+        int[] ret = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            ret[i] = list.get(i);
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Optimization? 
+     * BCT is O(n), can we reduce the space into O(1)?
+     * No we can't. Since 2 arrays are both unsorted. 
+     * We at least have to keep some status of one array.
+     * We could do it in O(nlogn) time and O(1) space by sorting both arrays. 
+     * 2 pointers
+     */
+    public int[] intersection(int[] nums1, int[] nums2) {
+        if (nums1 == null || nums2 == null || nums1.length == 0 || nums2.length == 0) return new int[]{};
+        
+        Arrays.sort(nums1);
+        Arrays.sort(nums2);
+        int i = 0;
+        int j = 0;
+        
+        List<Integer> list = new ArrayList<>();
+        while (i < nums1.length && j < nums2.length) {
+            //We could avoid using so much if statement for these conditions by simply useing a Hashset to store the intersections via utilizing Set's feature that it does not allow duplicate elements. 
+             if (i > 0 && nums1[i] == nums1[i - 1]) {
+                 i++;
+             } else if (j > 0 && nums2[j] == nums2[j - 1]) {
+                 j++;
+             } else {
+                 if(nums1[i] == nums2[j]) {
+                    list.add(nums1[i]);
+                    i++;
+                    j++;
+                 } else if (nums1[i] > nums2[j]) {
+                     j++;
+                 } else {
+                     i++;
+                 }
+             }
+        }
+        
+        int[] ret = new int[list.size()];
+        for (int k = 0; k < list.size(); k++) {
+            ret[k] = list.get(k);
+        }
+        
+        return ret;
+    }
+}
