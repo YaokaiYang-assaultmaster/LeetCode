@@ -1,0 +1,69 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * This question ask us to traverse a tree in vertical order from top to bottom and from left to right. 
+     * Since traverse a tree is either BFS or DFS essentially, and noticed that we are required to traverse from top to bottom, it is reasonable to use BFS. 
+     * However, during the BFS, we need to add the value of nodes into the corresponding list of this column. 
+     * Thus we have to keep another stack to store the corresponding column of each node. 
+     * Meanwhile, we have to keep a hashmap of <Integer, List<Integer>> to record each list of a given column. 
+     * Here comes a question. What information should we use as the key?
+     * It should be the column index. We could minus 1 to the index each time we go left and add 1 to the index each time we go right. In this way we get the unique key of the map. 
+     * However, we have to also keep the order of the key-value pairs in order to return them as required. 
+     * We could make use of the tree map which is sorted based on key values. 
+     * Thus we got our algorithm like following:
+     * 1. Construct a treemap
+     * 2. BFS the tree, keep 2 stack, one for tree nodes, the other for column indexes. Store values in the lists corresponding to a given column index. 
+     * 3. Return all the lists corresponding to column indexes in the treemap. 
+     * O(n) time since we have to traverse each node in the tree. 
+     * O(n) space since we have to store the intermediate information in the treemap. 
+     * n is the number of nodes in the tree. 
+     * 
+     * Optimization:
+     * TreeMap is a little slow since it uses a red-black implementation and have to perform balancing and sorting. 
+     * We could get the minimum and maximum column index during traversal, and then use a for loop to get each list in the hashmap and store them in a list of list. 
+     */
+    public List<List<Integer>> verticalOrder(TreeNode root) {
+        List<List<Integer>> ret = new ArrayList<>();
+        if (root == null) return ret;
+        
+        Map<Integer, List<Integer>> levels = new TreeMap<>();
+        verticalTraverse(root, levels);
+        ret.addAll(levels.values());
+        return ret;
+    }
+    
+    private void verticalTraverse(TreeNode root, Map<Integer, List<Integer>> levels) {
+        if (root == null) return;
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        deque.offer(root);
+        Deque<Integer> colIndex = new ArrayDeque<>();
+        colIndex.offer(0);
+        while (!deque.isEmpty()) {
+            int size = deque.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode curr = deque.poll();
+                int level = colIndex.poll();
+                if (!levels.containsKey(level)) {
+                    levels.put(level, new ArrayList<Integer>());
+                }
+                levels.get(level).add(curr.val);
+                if (curr.left != null) {
+                    deque.offer(curr.left);
+                    colIndex.offer(level - 1);
+                }
+                if (curr.right != null) {
+                    deque.offer(curr.right);
+                    colIndex.offer(level + 1);
+                }
+            }
+        }
+    }
+}
