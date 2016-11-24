@@ -1,0 +1,35 @@
+public class Solution {
+    
+    /**
+     * First reverse the whole char array
+     * Then reverse each word back.
+     * O(n) space, O(1) time
+     */
+    public void reverseWords(char[] s) {
+        if (s == null || s.length == 0) return;
+        
+        reverse(s, 0, s.length - 1);
+        reverseWord(s);
+    }
+    
+    private void reverse(char[] s, int start, int end) {
+        int i = start, j = end;
+        while (i < j) {
+            char c = s[i];
+            s[i] = s[j];
+            s[j] = c;
+            i++;
+            j--;
+        }
+    }
+    
+    private void reverseWord(char[] s) {
+        int i = 0, j = 0;
+        
+        while (i < s.length) {
+            while (i < j || (i < s.length && s[i] == ' ')) i++;
+            while (j < i || (j < s.length && s[j] != ' ')) j++;
+            reverse(s, i, j - 1);
+        }
+    }
+}
