@@ -3,7 +3,7 @@ public class Solution {
     /**
      * First reverse the whole char array
      * Then reverse each word back.
-     * O(n) space, O(1) time
+     * O(n) time, O(1) space
      */
     public void reverseWords(char[] s) {
         if (s == null || s.length == 0) return;
