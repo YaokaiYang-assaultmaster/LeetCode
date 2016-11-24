@@ -1,0 +1,69 @@
+public class Solution {
+    /**
+     * O(n) time, O(n) space
+     * Split the whole string by one or more spaces
+     * construct them back from end to beginning.
+     */
+    public String reverseWords(String s) {
+        String[] words = s.trim().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+        for (int i = words.length - 1; i > 0; i--) {
+            sb.append(words[i]).append(" ");
+        }
+        sb.append(words[0]);
+        
+        return sb.toString();
+    }
+    
+    /**
+     * O(n) time, O(1) space solution
+     * First reverse the whole string
+     * Then reverse each word.
+     * Finally get rid of all unneeded spaces
+     */
+    public String reverseWords(String s) {
+        if (s == null || s.length() == 0) return new String();
+        char[] chs = s.toCharArray();
+        
+        reverse(chs, 0, chs.length - 1); //reverse the whole string
+        reverseWords(chs, chs.length - 1); //reverse each word in the string
+        
+        return cleanSpaces(chs, chs.length - 1); //get rid of unneeded spaces
+    }
+    
+    private void reverse(char[] chs, int start, int end) {
+        while (start < end) {
+            char c = chs[start];
+            chs[start] = chs[end];
+            chs[end] = c;
+            start++;
+            end--;
+        }
+    }
+    
+    private void reverseWords(char[] chs, int length) {
+        int i = 0, j = 0;
+        while (i <= length) {
+            //skip all spaces to find the start of a word
+            //i < j is the start point of this loop, which is to start from the start character of previous word and end at the start character of current word
+            while (i < j || (i <= length && chs[i] == ' ')) i++; 
+            //skip all characters to find the end of a word
+            //j < i is the start point of this loop, which is to start from the end character of previous word and end at the end character of current word
+            while (j < i || (j <= length && chs[j] != ' ')) j++;
+            reverse(chs, i, j - 1);
+        }
+    }
+    
+    private String cleanSpaces(char[] chs, int length) {
+        int i = 0, j = 0;
+        
+        while (j <= length) {
+            while (j <= length && chs[j] == ' ') j++; //skip all spaces
+            while (j <= length && chs[j] != ' ') chs[i++] = chs[j++]; //move words forward to take place of spaces
+            while (j <= length && chs[j] == ' ') j++; //skip all spaces, avoid adding extra spaces if it the end of the string
+            if (j <= length) chs[i++] = ' ';
+        }
+        
+        return new String(chs).substring(0, i);
+    }
+}
