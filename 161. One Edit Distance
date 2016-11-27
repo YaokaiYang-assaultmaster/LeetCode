@@ -42,7 +42,8 @@ public class Solution {
     
     /**
      * Following iterative solution seems to using substring function and generate new strings. 
-     * However, since we only do so at most once when there is a mismatch for characters in given position, it is pretty efficient. 
+     * However, since we only do so at most once when there is a mismatch for characters in given position, it is pretty efficient.
+     * O(n) time, O(1) space. n is the smaller length of the 2 strings. 
      */
     public boolean isOneEditDistance(String s, String t) {
         int len = Math.min(s.length(), t.length());
