@@ -1,0 +1,47 @@
+public class Solution {
+    
+    /**
+     * Simple reservior sampling question. 
+     * Proof: https://github.com/YaokaiYang-assaultmaster/LeetCode/blob/master/Select-random-number-from-stream-with-O-1-space/Select%20random%20number%20from%20stream%20with%20O(1)%20space.md
+     * However, it depends on the situation to decide if we should pre-process the input array during initialization or we should just scan the whole input array when the pick function is called. 
+     * If the pick method is called for a lot of times, we should prepocess the input array and store indexes of a given number into a hashmap. 
+     * If the pick method is called for only a small number of times, we probably won't want to spend an extra O(n) space to store the indexes of given numbers. 
+     * O(n) time, O(n)/O(1) space. n is the length of the input array. 
+     */
+    
+    private Map<Integer, List<Integer>> indexMap;
+    private Random rand;
+    
+    public Solution(int[] nums) {
+        indexMap = new HashMap<>();
+        rand = new Random();
+        for (int i = 0; i < nums.length; i++) {
+            if (!indexMap.containsKey(nums[i])) {
+                indexMap.put(nums[i], new ArrayList<Integer>());
+            }
+            indexMap.get(nums[i]).add(i);
+        }
+    }
+    
+    public int pick(int target) {
+        if (indexMap.get(target) == null) {
+            return -1;
+        }
+        
+        List<Integer> index = indexMap.get(target);
+        int ret = -1;
+        for (int i = 0; i < index.size(); i++) {
+            if (rand.nextInt(i + 1) == 0) {
+                ret = index.get(i);
+            }
+        }
+        
+        return ret;
+    }
+}
+
+/**
+ * Your Solution object will be instantiated and called as such:
+ * Solution obj = new Solution(nums);
+ * int param_1 = obj.pick(target);
+ */
