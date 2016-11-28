@@ -1,0 +1,48 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * In the question of Merge 2 sorted Lists, we use the same strategy like merge sort. 
+     * That is, in each iteration, we take out the current element from the 2 list and compare them. Then we store the smaller one into our merged list. 
+     * However, in order to merge k list, take our each current element and compare them to get the smallest one is still workable, but it is inefficient, because each rounds of comparison takes O(k) time. And suppose the total number of nodes in the lists are n, then we need O(kn) time in total. 
+     * Can we do better?
+     * Yes. 
+     * We did some redundant work here by comparing each k elements in each interation. Could be just keep some status and get the smallest element each time in O(1) time? Yes we could do this with a Minimum Heap. 
+     * In this way we reduce the total time complexity to O(nlogk). In detail, we neeed O(k) time to construct the heap, O(logk) time to insert an element which is executed for n times, thus the total time is O(nlogk). 
+     */
+    public ListNode mergeKLists(ListNode[] lists) {
+        ListNode dummy = new ListNode(0);
+        if (lists == null || lists.length == 0) return dummy.next;
+        
+        Queue<ListNode> minHeap = new PriorityQueue<>(lists.length, new Comparator<ListNode>() {
+            @Override
+            public int compare(ListNode l1, ListNode l2) {
+                return l1.val - l2.val;
+            }
+        });
+        
+        for (ListNode node : lists) {
+            if (node != null) {
+                minHeap.offer(node);
+            }
+        }
+        
+        ListNode curr = dummy;
+        while (!minHeap.isEmpty()) {
+            ListNode tmp = minHeap.poll();
+            curr.next = tmp;
+            curr = curr.next;
+            if (tmp.next != null) {
+                minHeap.offer(tmp.next);
+            }
+        }
+        
+        return dummy.next;
+    }
+}
