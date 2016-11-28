@@ -45,4 +45,49 @@ public class Solution {
         
         return dummy.next;
     }
+    
+    
+    /**
+     * Divide and conquer solution
+     * Recursion level is O(logk) and in each level we are comparing n numbers
+     * Thus the run time would be O(nlogk) where n is the total number of ListNodes. 
+     * The same complexity with the priority queue solution 
+     */
+    public ListNode mergeKLists(ListNode[] lists) {
+        if (lists == null || lists.length == 0) return null;
+        
+        return partition(lists, 0, lists.length - 1);
+    }
+    
+    private ListNode partition(ListNode[] lists, int start, int end) {
+        if (start == end) return lists[start];
+        
+        if (start < end) {
+            int mid = start + (end - start) / 2;
+            
+            ListNode left = partition(lists, start, mid);
+            ListNode right = partition(lists, mid + 1, end);
+            
+            return merge(left, right);
+        } else {
+            return null;
+        }
+    }
+    
+    private ListNode merge(ListNode left, ListNode right) {
+        if (left == null) {
+            return right;
+        }
+        if (right == null) {
+            return left;
+        }
+        
+        if (left.val > right.val) {
+            right.next = merge(left, right.next);
+            return right;
+        } else {
+            left.next = merge(left.next, right);
+            return left;
+        }
+    }
 }
