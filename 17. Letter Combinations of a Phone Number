@@ -1,0 +1,65 @@
+public class Solution {
+    /**
+     * A backtracking method
+     * Using recursion
+     * A DFS method. We go as far as we can to reach a result, then we remove the last character of the temporary result and try another characters that is possible on this index.
+     * O(n) time, O(1) space without considering the space of the recursion stack. 
+     * n is the total number of combinations. 
+     * The recursion stack is at most l level in depth where l is the length of digits. 
+     */
+    public List<String> letterCombinations(String digits) {
+        LinkedList<String> res = new LinkedList<String>();
+        if (digits == null || digits.length() == 0) return res;
+        String[] map = new String[]{" ", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+        String tmpRes = "";
+        letterHelper(digits, 0, tmpRes, res, map);
+        return res;
+    }
+    
+    private void letterHelper(String digits, int index, String tmpRes, LinkedList<String> res, String[] map) {
+        if (index == digits.length()) { //while the temporary result has reached to the end of the digits, a result is got and it should be stored to the result list. 
+            res.add(tmpRes);
+            return;
+        }
+        char[] currChars = map[digits.charAt(index) - '0'].toCharArray();
+        for (char c : currChars) {
+            tmpRes += String.valueOf(c);
+            letterHelper(digits, index + 1, tmpRes, res, map); 
+            //If the helper method returns, it means a result has been found and we should backtrack to the previous poistion and try another possible character of this digit. So we remove the last character of the temporary result(BackTracking) and re-enter the loop.
+            tmpRes = tmpRes.substring(0, tmpRes.length() - 1);
+        }
+    }
+    
+    
+    
+    
+    
+    /**
+     * Use a LinkedList as a FIFO queue to store the results. 
+     * See below for more details.
+     * A BFS method. We iterate all possibilities of this digit before we go to any further digits.
+     * O(n) time, O(n) space.
+     * n is the total number of combinations. 
+     */
+    public List<String> letterCombinations(String digits) {
+        LinkedList<String> res = new LinkedList<String>();
+        if (digits == null || digits.length() == 0) {
+            return res;
+        }
+        res.add("");
+        String[] charMap = new String[]{" ", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"}; //stores the corresponding  characters of each digit
+        for (int i = 0; i < digits.length(); i++) { //iterate through all the digits
+            char[] currChars = charMap[digits.charAt(i) - '0'].toCharArray();
+            while (res.peek().length() == i) { 
+                //While the strings in the queue has the same length as the index i, we need to append the new characters corresponding to the digit to the end of them. Cause the length of the string should be i+1 if it has already added current characters
+                //Head element of the queue is taken out every time
+                //Element that has already been appended with the new characters is added to the end of the queue.
+                String tmp = res.remove(); //remove the head element of the queue 
+                for (char c : currChars) {
+                    res.add(tmp + String.valueOf(c)); //add every possible combination strings to the end of the queue
+                }
+            }
+        }
+        return res;
+    }
+}
