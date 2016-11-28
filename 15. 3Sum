@@ -1,0 +1,94 @@
+public class Solution {
+    /**
+     * O(n^2) solution. 
+     * Make use of the process of 2Sum.
+     * In order to solve 3Sum, we just need to assign a pivot and solve the subproblem of 2Sum. 
+     * So we iterate through the whole array, let each number be the pivot once and solve the subproblem of 2Sum with the sum being 0 - pivot. 
+     * Also, during iteration, skip all duplicate numbers to avoid duplicates. 
+     */
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> result = new ArrayList<List<Integer>>();
+        if (nums == null || nums.length <= 2) {
+            return result;
+        }
+        Arrays.sort(nums);
+        if (nums[0] > 0 || nums[nums.length - 1] < 0) { 
+            // if the first element is greater than 0 or the last element is less than 0, which means that every element in the array is greater than 0 or less than 0, respectively, indicating that we definitely cannot find a triplet whose sum is 0.
+            return result;
+        }
+        for (int i = 0; i < nums.length - 2; i++) {
+            if (nums[i] > 0) return result; 
+            //Once we reached a element whose value is greater than 0, we know we cannot find any more triplets after it since they are all greater than 0
+            if (i == 0 || (i > 0 && nums[i] != nums[i - 1])) {
+                //if the first elemnt we chose is the same as its previous one, it will lead to duplicate results. So we skip this case. 
+                //we start from the 2 sides of the remaining array
+                //since the array is already been sorted, starts from 2 sides is going to find what we need
+                int lo = i + 1;
+                int hi = nums.length - 1;
+                int sum = 0 - nums[i];
+                while (lo < hi) {
+                    if (nums[lo] + nums[hi] == sum) {
+                        result.add(Arrays.asList(nums[i], nums[lo], nums[hi]));
+                        //Following code is used to avoid dupilicates
+                        //Once we find a triplet, we skip all the elements that is the same with the existing one and start a new loop.
+                        while (lo < hi && nums[lo] == nums[lo + 1]) lo++;
+                        while (lo < hi && nums[hi] == nums[hi - 1]) hi--;
+                        lo++;
+                        hi--;
+                    }else if (nums[lo] + nums[hi] < sum) {
+                        while (lo < hi && nums[lo] == nums[lo + 1]) lo++;
+                        lo++;
+                    }
+                    else {
+                        while (lo < hi && nums[hi] == nums[hi - 1]) hi--;
+                        hi--;
+                    }
+                }
+                
+            }
+        }
+        return result;
+    }
+    
+    
+    /**
+     * We could also make use of the property of a HashSet in Java, which is that it does not allow duplicate elements in it, to store the results. 
+     * In this way we can avoid the codes of comparing nums[i], nums[lo] and nums[hi] with its adjacent element to prevent duplicates. 
+     */
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> ret = new ArrayList<>();
+        
+        if (nums == null || nums.length == 0) return ret;
+
+        Arrays.sort(nums);
+        if (nums[0] > 0 || nums[nums.length - 1] < 0) {
+            return ret;
+        }
+
+        Set<List<Integer>> set = new HashSet<>();
+        for (int i = 0; i < nums.length - 2; i++) {
+            if (nums[i] > 0) break;
+
+            if (i == 0 || nums[i] != nums[i - 1]) {
+                int sum = 0 - nums[i];
+                int lo = i + 1;
+                int hi = nums.length - 1;
+                while (lo < hi) {
+                    if (nums[lo] + nums[hi] == sum) {
+                    set.add(Arrays.asList(nums[i], nums[lo], nums[hi]));
+                    lo++;
+                    hi--;
+                    } else if (nums[lo] + nums[hi] < sum) {
+                        lo++;
+                    } else {
+                        hi--;
+                    }
+                }
+            }
+        } 
+
+        ret.addAll(set);
+
+        return ret;
+    }
+}
