@@ -1,0 +1,26 @@
+public class Solution {
+    
+    /**
+     * One thought would be counting sort, in which we counts the number of zeros. 
+     * Another thought would be keeping 2 pointers, one from start and one from end. Each time we encounter a 0, switch it to the end. 
+     * However, in this question we need to maintain the relative order of non-zero elements. 
+     * We may need to think in another diretion, which we keep 2 pointers both from the beginning of the array with one of the them pointing to the end of current non-zero subsequence. 
+     * So each time we encounter a non-zero element, put it to the position pointed by that pointer. 
+     * One pass solution.
+     * O(n) time, O(1) space. 
+     */
+    public void moveZeroes(int[] nums) {
+        if (nums == null || nums.length == 0) return;
+        
+        int i = 0, j = 0;
+        for (; i < nums.length; i++) {
+            if (nums[i] != 0) {
+                nums[j++] = nums[i];
+            }
+        }
+        
+        for (; j < nums.length; j++) {
+            nums[j] = 0;
+        }
+    }
+}
