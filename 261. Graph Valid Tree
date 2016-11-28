@@ -1,0 +1,181 @@
+public class Solution {
+    /**
+     * In order to solve this question, we need to know what is a tree
+     * A tree is a connected acyclic graph.
+     * Thus we need to make sure:
+     * 1. the graph is connected
+     * 2. the graph is acyclic
+     * Note we only need n - 1 edges for n nodes to be connected and acyclic. 
+     */
+     
+     
+    /**
+     * Obviously we can see if there is a cycle by BFS or DFS.
+     * We need to first construct the adjacency list for either method. 
+     * And as is normal in a graph traversal problem, we need to keep a visited array to prevent or detect cycle. 
+     * Since in this question we need to detect cycle and the edges are undirected, it would be much easier to implement the algorithm by removing the same edge from corresponding node of current node. 
+     * O(n + e) time where n is the number of nodes and e is the number of edges
+     */
+     
+     
+    /**
+     * BFS solution
+     */
+    public boolean validTree(int n, int[][] edges) {
+        //need at least n - 1 edges to make n nodes connected.
+        //need only n - 1 edges to be connected acyclic
+        if (edges == null || edges.length != n - 1) return false;
+        
+        boolean[] visited = new boolean[n];
+        List<List<Integer>> adjacency = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            adjacency.add(new ArrayList<>());
+        }
+        
+        for (int[] edge : edges) {
+            adjacency.get(edge[0]).add(edge[1]);
+            adjacency.get(edge[1]).add(edge[0]);
+        }
+        
+        Deque<Integer> deque = new ArrayDeque<>();
+        deque.offer(0);
+        
+        while (!deque.isEmpty()) {
+            int curr = deque.poll();
+            if (visited[curr]) {
+                return false;
+            }
+            
+            visited[curr] = true;
+            for (int i : adjacency.get(curr)) {
+                deque.offer(i);
+                
+                //Note we have to transform the type of curr from int to Integer.
+                //if curr is an int, a list will try to remove element on index curr
+                //if curr is an object, a list will try to remove this specific object in the list
+                adjacency.get(i).remove((Integer)curr);
+            }
+        }
+        
+        //check if the graph is connected
+        for (boolean j : visited) {
+            if (j == false) return false;
+        }
+        
+        return true;
+    }
+    
+    
+    /**
+     * DFS solution
+     */
+    public boolean validTree(int n, int[][] edges) {
+        if (edges == null || edges.length != n - 1) return false;
+        
+        List<Set<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            adj.add(new HashSet<>());
+        }
+        
+        for (int[] edge : edges) {
+            adj.get(edge[0]).add(edge[1]);
+            adj.get(edge[1]).add(edge[0]);
+        }
+        
+        Deque<Integer> stack = new ArrayDeque<>();
+        boolean[] visited = new boolean[n];
+        stack.push(0);
+        
+        while (!stack.isEmpty()) {
+            int curr = stack.pop();
+            if (visited[curr]) {
+                return false;
+            }
+            
+            visited[curr] = true;
+            
+            for (int neighbor : adj.get(curr)) {
+                stack.push(neighbor);
+                adj.get(neighbor).remove(curr);
+            }
+        }
+        
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    
+    
+    /**
+     * Union Find with weighed union and path compression
+     */
+    public boolean validTree(int n, int[][] edges) {
+        if (edges == null || edges.length != n - 1) return false;
+        
+        class UnionFind {
+
+            int[] parent;
+            int[] rank;
+            int count;
+            
+            UnionFind (int n) {
+                parent = new int[n];
+                rank = new int[n];
+                count = n;
+                for (int i = 0; i < n; i++) {
+                    parent[i] = i;
+                }
+            }
+            
+            int find(int x) {
+                if (x != parent[x]) {
+                    parent[x] = parent[parent[x]];
+                    x = parent[x];
+                }
+                return parent[x];
+            }
+            
+            boolean union(int x, int y) {
+                int rootX = find(x);
+                int rootY = find(y);
+                
+                //already connected
+                //cycle detected
+                if (rootX == rootY) {
+                    return false;
+                }
+                
+                if (rank[rootX] > rank[rootY]) {
+                    parent[rootY] = rootX;
+                    rank[rootX] += rank[rootY];
+                } else {
+                    parent[rootX] = rootY;
+                    rank[rootY] += rank[rootX];
+                }
+                
+                --count;
+                return true;
+            }
+            
+            boolean isConnected() {
+                //all nodes are connected iff count == 1
+                return count == 1;
+            }
+        }
+        
+        UnionFind uf = new UnionFind(n);
+        
+        for (int[] edge : edges) {
+            if (!uf.union(edge[0], edge[1])) {
+                return false;
+            }
+        }
+        
+        return uf.isConnected();
+    }
+}
