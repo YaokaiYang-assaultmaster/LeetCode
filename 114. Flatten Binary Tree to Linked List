@@ -1,0 +1,142 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * A O(1) space solution
+     * Using Morris traversal in which we keep needed pointer information at the leaf nodes' null pointers.
+     * That is, in each step, we put the right subtree(i.e. actually right child) of current node to the predecessor of its right child. 
+     * Thus we still preserve the visiting sequence of the tree while aviodiing using extra space to store the position information. 
+     * O(n) time, n is the number of nodes in the tree since each node is visited by curr once and by prev at most once.
+     */
+    public void flatten(TreeNode root) {
+        if (root == null) return;
+        
+        TreeNode curr = root;
+        while (curr != null) {
+            if (curr.left != null) {
+                TreeNode prev = curr.left;
+                
+                while (prev.right != null) {
+                    prev = prev.right; 
+                    //find the previous node in preorder traversal and store curr.right to this pointer since this is when the curr.right is gonna be visited in preorder traversal
+                }
+                prev.right = curr.right;
+                
+                //flatten the node here
+                curr.right = curr.left;
+                curr.left = null;
+            }
+            
+            //go to next node that we need to flatten
+            curr = curr.right;
+        }
+    }
+    /**
+     * Simple iterative idea
+     * Preorder traversal
+     * While in each step, set the left pointer of a node to null and set the right pointer to its successor in preorder traversal. 
+     * O(n) time, O(h) space where n is the number of nodes in the tree and h is the height of the tree
+     */
+    public void flatten(TreeNode root) {
+        if (root == null) return;
+        
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        deque.push(root);
+        while (!deque.isEmpty()) {
+            TreeNode curr = deque.pop();
+            if (curr.right != null) {
+                deque.push(curr.right);
+            }
+            if (curr.left != null) {
+                deque.push(curr.left);
+            }
+            
+            curr.left = null;
+            curr.right = deque.peek();
+        }
+    }
+	
+
+	/**
+	 * Flatten left subtree
+	 * Flatten right subtree
+	 * Concatenate 2 parts
+	 */
+    public void flatten(TreeNode root) {
+        flattenfunction(root);
+    }
+    
+    /*
+    This method flattens a binary tree and constructs it into a linked list in the right subtree
+    @param current root used for the flatten function
+    @return the tree node that is the last one in the right subtree
+    */
+    private TreeNode flattenfunction(TreeNode root){
+        if (root == null){
+            return root;
+        }
+        if (root.left != null){
+            //since we have to construct the binary tree in the order of pre-order traversal and we know that the left most nodes in the tree are always the nodes that are visited firstly (as the pre-order traversal algorithm like), so we just switch the left subtree of every level in the left subtree of the original root into the right side and recurse this process.
+            //after this process, we have move every left most nodes into the right place of the linked list 
+            //switch left and right subtree
+            TreeNode temp = root.right;
+            root.right = root.left;
+            root.left = temp;
+        }
+        if (root.right != null){
+            //While there are nodes in the right subtree(after switch), we'll recurse the process with the right child as the root parameter. 
+            //While there is no left child on this node, we can return the last node safely because without left subtree there can't be any nodes that can be switched to right subtree which make the right subtree deeper
+            //If there still is left subtree, we switch it to the right subtree of the last node and recurse the process. At the same time, we let the left subtree of the root to be null
+            //Node last stores the last node in the right subtree
+            TreeNode last = flattenfunction(root.right);
+            if (root.left == null){
+                return last;
+            }
+            
+            last.right = root.left;
+            root.left = null;
+            
+            return flattenfunction(last.right);
+        }
+        //if both left and right are null, then current root should be the last one.
+        return root;
+    }
+    
+    /*
+    this method returns a linked list that is constructed on the left subtree of every node.
+    */
+    private TreeNode leftflatten(TreeNode root){
+        if (root == null){
+            return root;
+        }
+        if (root.left != null){
+            //we return the last node by recursion
+            TreeNode last = leftflatten(root.left);
+            if (root.right != null){
+                //if there still exists a right subtree, we make it to be the left child of the last node and make the right child of the to be null
+                last.left = root.right;
+                root.right = null;
+                return leftflatten(last.left);
+            }
+            else {
+                return last;
+            }
+        }
+        if (root.right != null ){
+            //while root.left == null and root.right != null, we just switch the right subtree to the left subtree and execute the process.
+            root.left = root.right;
+            root.right = null;
+            return leftflatten(root.left);
+        }
+        
+        //while both left and right child of the root is null, we know it should be the leaf node(last node) and return it
+        return root;
+    }
+}
