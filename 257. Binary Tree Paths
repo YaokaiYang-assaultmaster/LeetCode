@@ -1,0 +1,67 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Iterative DFS
+     * The trick is to not only keep a stack to store tree nodes, but also keep a stack to store their corresponding intermediate paths. 
+     * Once we encounter a leaf node, store the path into the return list. 
+     * O(n) time, O(h) space since we keeps at most h status in the stack, h is the height of the tree. n is the number of tree nodes
+     */
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> ret = new ArrayList<>();
+        if (root == null) return ret;
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        deque.push(root);
+        Deque<String> paths = new ArrayDeque<>();
+        paths.push(String.valueOf(root.val));
+        while (!deque.isEmpty()) {
+            TreeNode curr = deque.pop();
+            String tmp = paths.pop();
+            if (curr.left == null && curr.right == null) {
+                ret.add(tmp);
+            }
+            if (curr.left != null) {
+                deque.push(curr.left);
+                paths.push(tmp + "->" + String.valueOf(curr.left.val));
+            }
+            if (curr.right != null) {
+                deque.push(curr.right);
+                paths.push(tmp + "->" +  String.valueOf(curr.right.val));
+            }
+        }
+        
+        return ret;
+    }
+    
+    
+    /**
+     * Recursive DFS
+     */
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> ret = new ArrayList<>();
+        if (root == null) return ret;
+        
+        DFS(root, String.valueOf(root.val), ret);
+        
+        return ret;
+    }
+    
+    private void DFS(TreeNode root, String path, List<String> ret) {
+        if (root.left == null && root.right == null) {
+            ret.add(path);
+        }
+        if (root.left != null) {
+            DFS(root.left, path + "->" + String.valueOf(root.left.val), ret);
+        }
+        if (root.right != null) {
+            DFS(root.right, path + "->" + String.valueOf(root.right.val), ret);
+        }
+    }
+}
