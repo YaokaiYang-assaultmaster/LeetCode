@@ -1,0 +1,68 @@
+public class Solution {
+    
+    /**
+     * 2 pointers sliding window solution
+     * In order to make it a O(n) solution, we need to move 2 pointers both in one round. 
+     * Sliding window templete. 
+     * O(n) time
+     * O(1) space
+     */
+    public int minSubArrayLen(int s, int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        
+        int i = 0, j = 0;
+        int sum = 0;
+        int ret = Integer.MAX_VALUE;
+        while (j < nums.length) {
+            while (sum < s && j < nums.length) {
+                sum += nums[j++];
+            }
+            
+            while (sum >= s && i < nums.length) {
+                ret = Math.min(ret, j - i);
+                sum -= nums[i++];
+            }
+        }
+        
+        return ret == Integer.MAX_VALUE ? 0 : ret;
+    }
+    
+    
+    /**
+     * O(nlogn) solution?
+     * Cumulative sum + binary search
+     * Since we cannot sort the original array because the order matters, we have to find out a way to make the array become ordered to perform binary search.
+     * Since all the numbers are positive, then their cumulative sum must be in the increasing order. Thus we can perform a binary on the cumulative sum array. 
+     */
+    public int minSubArrayLen(int s, int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        
+        int[] sums = new int[nums.length + 1];
+        
+        for (int i = 1; i < sums.length; i++) {
+            sums[i] = sums[i - 1] + nums[i - 1];
+        }
+        
+        int min = Integer.MAX_VALUE;
+        for (int i = 0; i < sums.length; i++) {
+            int end = binarySearch(i + 1, sums.length - 1, sums[i] + s, sums);
+            if (end == sums.length) break;
+            min = Math.min(min, end - i);
+        }
+        
+        return min == Integer.MAX_VALUE ? 0 : min;
+    }
+    
+    private int binarySearch(int lo, int hi, int target, int[] sums) {
+        while (lo <= hi) {
+            int mid = lo + (hi - lo) / 2;
+            if (sums[mid] >= target) {
+                hi = mid - 1;
+            } else {
+                lo = mid + 1;
+            }
+        }
+        
+        return lo;
+    }
+}
