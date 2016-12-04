@@ -1,0 +1,39 @@
+public class Solution {
+    /**
+     * O(nlogn) solution 
+     * First sort the array, then traverse the arrray to see if there is any duplicates.
+     */
+    public boolean containsDuplicate(int[] nums) {
+        if (nums == null || nums.length == 0) return false;
+        
+        Arrays.sort(nums);
+        
+        for (int i = 0; i < nums.length - 1; i++) {
+            if (nums[i] == nums[i + 1]) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * O(n) solution
+     * Use a HashSet to store existed numbers.
+     * Once we find a number has already been added into the hashset, return true. 
+     * O(n) time, O(n) space, n is the length of the input array.
+     */
+    public boolean containsDuplicate(int[] nums) {
+        if (nums == null || nums.length == 0) return false;
+        
+        Set<Integer> existed = new HashSet<>();
+        
+        for (int num : nums) {
+            if (!existed.add(num)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+}
