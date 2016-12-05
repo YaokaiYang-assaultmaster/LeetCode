@@ -1,0 +1,67 @@
+/**
+ * Given an array of Points on a 2-D space, find k nearest points of a given point target. 
+ * Every point has x and y indexes. 
+ */
+
+
+public class Point implements Comparable<Point>{
+	int x;
+	int y;
+	public Point(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+}
+public class Solution {
+	/**
+	 * Using a heap to store the points. Either max heap or min heap. Points are compared based on their distance with the target point. 
+	 * For a min heap, store all the points in it, and retrive k points from the top of the heap. 
+	 * For a max heap, there are 2 conditions:
+	 * 1. if the size of the heap is less than k, store points into it directly.
+	 * 2. if the size of the heap is equal to k, compare the distance of top element of the heap with distance of current point. And keep
+	 	the one with smaller distance, throw another away. 
+	 * 3. At last, there is k points left in the heap, which is the required k nearest points of a given target.
+	 * For a max heap, it is O(nlogk) time, O(k) space. 
+	 * For a min heap, it is O(nlogn) time, O(n) space. 
+	 */
+	public Point[] findKClosestPoints(Point[] points, int k, Point target) {
+		if (points == null || points.length == 0 || k < 1 || k > points.length) {
+			return points;
+		}
+		
+		Comparator<Point> distComparator = new Comparator<Point>() {
+			@Override
+			public int compare(Point a, Point b) {
+				int d1 = (a.x - target.x) * (a.x - target.x) + (a.y - target.y) * (a.y - target.y);
+				int d2 = (b.x - target.x) * (b.x - target.x) + (b.y - target.y) * (b.y - target.y);
+				return d2 - d1;
+			}
+		}
+		
+		Queue<Point> maxHeap = new PriorityQueue<>(k, distComparator);
+		for (Point point : points) {
+			if (maxHeap.size() < k) {
+				maxHeap.offer(point);
+				continue;
+			}  
+			if (distComparator.compare(maxHeap.peek(), point) < 0){
+				maxHeap.poll();
+				maxHeap.offer(point);
+			}
+		}
+		
+		Points[] ret = new Point[k];
+		for (int i = k - 1; i >= 0; i--) {
+			ret[i] = maxHeap.poll(); //This is a maxHeap, so we assign the value to the array reversely to keep them in order
+		}
+		
+		return ret;
+	}
+	
+	
+	/**
+	 * Quick Select
+	 * Average O(n) time, (O(n + klogk) is the output should be sorted), O(n^2) time worst case, O(1) space.
+	 */
+	
+}
