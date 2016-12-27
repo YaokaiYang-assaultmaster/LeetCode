@@ -8,6 +8,7 @@ An more efficient solution would be to use a __Max-heap of size k__ for maintain
 >3. Once all elements have been traversed, the top element in the heap is what we want. (Or all the elements if we want the first k >closest points)
 The algorithm has a total of `O(nlogk)` time and `O(k)` space. 
 Below is the code for the implementation using Java. 
+
 ```
 public class Point implements Comparable<Point> {
 	double x;
@@ -54,6 +55,7 @@ public class Solution {
 ```
 
 
+
 However, this is still not the optimal solution. The extra work we are doing is offering and popping the points into and out of the heap. The heapify process takes $O(logk)$ time each. We could do better without it. In this case, we need to use __QuickSelect__, which could makes us accomplish the goal in `O(n)` time, `O(1)` space. The algorithm is showed in the following:
 >1. Partition the points array using a random pivot into 2 parts. 
 >2. If the partition pivot index is less than k, partition the second part again. 
@@ -61,6 +63,7 @@ However, this is still not the optimal solution. The extra work we are doing is 
 >4. If the partition pivot index is k, the first half is what we want. 
 
 The implementation using Java is showed as following. 
+
 ```
 public class Point {
 	double x;
@@ -133,4 +136,5 @@ public class Solution {
 	}
 }
 ```
+
 
