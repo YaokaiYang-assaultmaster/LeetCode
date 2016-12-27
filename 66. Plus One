@@ -1,0 +1,34 @@
+public class Solution {
+	/**
+	 * This questions seems to be very easy. Simply add one to a given number. 
+	 * However, there is several corner cases need to be considered. 
+	 * 1. The number is longer after the addition. E.g. 99 + 1 = 100. In this case, we need to construct a new array to store the result. 
+	 * 2. The carry becomes 0 during the adding process. In this case, the program doesn't need to be executed any more. We could break to
+	 	save some time. 
+	 * And the addition could be classified into 2 different cases:
+	 * 1. Current digit is less than 9, simply add 1 to it and break. (carry is 0)
+	 * 2. Current digit is 9, make it 0 and add 1 to its next higher significant digit. In this case, we are simply repeat the above plus
+	 	one process. 
+	 * After this analysis, we could write our code. 
+	 */
+	public int[] plusOne(int[] digits) {
+		if (digits == null || digits.length == 0) {
+			return new int[]{};
+		}
+		
+		int n = digits.length;
+		for (int i = n -1; i >= 0; i--) {
+			if (digits[i] < 9) {
+				digits[i]++;
+				return digits;
+			}
+			
+			digits[i] = 0;
+		}
+		
+		//If the program haven't return in the previous step, that means the number after plusing one is one digit longer the original one.
+		int[] ret = new int[n + 1];
+		ret[0] = 1;
+		return ret;
+	}
+}
