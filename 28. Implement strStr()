@@ -1,0 +1,73 @@
+public class Solution {
+    
+    public int strStr(String haystack, String needle) {
+        if (needle == null || needle.length() == 0) return 0;
+        for (int i = 0; i <= haystack.length() - needle.length(); i++) {
+            for (int j = 0; j < needle.length() && haystack.charAt(i + j) == needle.charAt(j); j++) {
+                if (j == needle.length() - 1) return i;
+            }
+        }
+        
+        return -1;
+    }
+    
+    
+    public int strStr(String haystack, String needle) {
+        /**
+         * This method will implement KMP algorithm in String Matching
+         * Basic approach: first let the needle to compare with itself to get the prefix array, then use this prefix array in comparing the needle with the haystack
+         */
+        if (needle.isEmpty() || needle == null){
+            return 0;
+        }
+        
+        int[] pai = computePrefix(needle); //compute the prefix array as array pai
+        char[] hstack = haystack.toCharArray();
+        char[] P = needle.toCharArray();
+        int m = needle.length();
+        int n = haystack.length();
+        int q = -1;
+        int startindex = -1;
+        for (int i = 0; i < n; i++){
+            //System.out.println("q: " + q);
+            //System.out.println("i: " + i);
+            while (q >=0 && P[q+1] != hstack[i]){
+                q = pai[q];
+            }
+            if (P[q+1] == hstack[i]){
+                q = q + 1;
+            }
+            if (q == (m - 1)){
+                //q = pai[q];
+                startindex = i - m + 1;
+                break;
+            }
+        }
+        return startindex;
+        
+    }
+    
+    public int[] computePrefix(String needle){
+        /**
+         * function to compute prefix array
+         * @param: needle
+         * @return: prefix int array
+        */
+        
+        int m = needle.length();
+        char[] P = needle.toCharArray();
+        int[] prefixArray = new int[m];
+        prefixArray[0] = -1;
+        int k = -1;
+        for (int q = 1; q <= m-1; q++){
+            while (k >= 0 && P[k+1] != P[q]){
+                k = prefixArray[k];
+            }
+            if (P[k+1] == P[q]){
+                k = k + 1;
+            }
+            prefixArray[q] = k;
+        }
+        return prefixArray;
+    }
+}
