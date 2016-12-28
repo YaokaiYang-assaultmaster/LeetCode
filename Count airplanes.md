@@ -9,13 +9,17 @@ In this case, we need to construct a wrapper class to store the point, in which 
 point or an end point. 
 
 So the algorithm is following:
+
 1. Store all the start and end points into a list. 
 2. Sort the list based on time. End point has priority in case of same time based on the requirement. 
 3. Count the number of lines existing simultaneously. 
+
+<br>
 Suppose the size of the airplanes list is n. 
 The time complexity of this code is `O(nlogn)`. For adding the points into the list, it is `O(2n)`. Sorting the Point list is `O(2nlog(2n))` = `O(nlogn)`.
 Then traverst the point list need `O(2n)`. So the total time would be `O(nlogn)`. 
 The space complexity of this code is `O(2n)` = `O(n)`. Since we need to store all the start and end points into the list. 
+
 
 The implementation in Java is showed as following:
 
