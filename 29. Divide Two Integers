@@ -53,6 +53,8 @@ public class Solution {
         long tmp = dvs;
         long mult = 1;
         while ((tmp + tmp) < dvd) { //This step can be implemented in bit manipulation as well.
+            //In this step, we are multiple 2 to the divisor each time. 
+            //Thus we need to do this recursively to get the right result. i.e. each time start with the original divisor. 
             tmp += tmp;
             mult += mult;
         }
