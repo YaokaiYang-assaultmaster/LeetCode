@@ -35,31 +35,47 @@ public class Solution {
      
     /** (1) */
     public int divide(int dividend, int divisor) {
-        if (divisor == 0 ) return Integer.MAX_VALUE;
-        if (dividend == 0) return 0;
-        int symbol = 1; //stores the symbol of the result then we can treat the 2 values as positive values
-        if ((dividend < 0 && divisor > 0) || (dividend > 0 && divisor < 0)) symbol = -1;
-        long lDvd = Math.abs((long)dividend); //Pay attention to first convert the type of dividend and divisor
-        long lDvs = Math.abs((long)divisor); //Otherwise dividend like -2147483648 would be abs to 0.
-        long lans = longDivide(lDvd, lDvs);
-        int ans;
-        if (lans > Integer.MAX_VALUE) ans = (symbol == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE);
-        else ans = (int) (symbol == 1 ? lans : -lans);
-        return ans;
+        if(divisor == 0 || dividend == Integer.MIN_VALUE && divisor == -1) return Integer.MAX_VALUE;
+        int sign = 1;
+        if(dividend > 0 && divisor < 0 || dividend < 0 && divisor > 0) sign = -1;
+        long lDivisor = Math.abs((long)divisor);
+        long lDividend = Math.abs((long)dividend);
+        long lRet;
+        lRet = longDivide(lDividend, lDivisor);
+        if(lRet > Integer.MAX_VALUE) return sign == 1 ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+        lRet = sign == 1 ? lRet : -lRet;
+        return (int)lRet;
     }
     
-    private long longDivide(long dvd, long dvs) {
-        if (dvd < dvs) return (long)0;
-        long tmp = dvs;
-        long mult = 1;
-        while ((tmp + tmp) < dvd) { //This step can be implemented in bit manipulation as well.
-            //In this step, we are multiple 2 to the divisor each time. 
-            //Thus we need to do this recursively to get the right result. i.e. each time start with the original divisor. 
+    public long longDivide(long dividend, long divisor) {
+        if (dividend < divisor) return (long)0;
+        long ret = 1;
+        long tmp = divisor;
+        while (tmp + tmp < dividend) {
             tmp += tmp;
-            mult += mult;
+            ret += ret;
         }
-        return mult + longDivide(dvd - tmp, dvs);
+        
+        return ret + longDivide(dividend - tmp, divisor);
     }
+    
+    //An iterative way to write the longDivide function
+    // public long longDivide(long dividend, long divisor) {
+    //     long ret = 0;
+ 
+    //     while(divisor <= dividend) {
+    //         long tmp = divisor;
+    //         long mult = 1;
+    //         while(tmp + tmp < dividend) {
+    //             tmp += tmp;
+    //             mult += mult;
+    //         }
+    //         dividend -= tmp;
+    //         ret += mult;
+    //     }
+        
+    //     return ret;
+    // }
       
       
     
