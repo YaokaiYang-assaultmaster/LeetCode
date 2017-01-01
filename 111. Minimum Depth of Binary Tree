@@ -1,0 +1,81 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+
+    /**
+     * The difference between BFS and DFS is that BFS doesn't need to traverse the whole tree to get the result. 
+     * For DFS, because it traverse as deep as it can to the leaf node to get the depth, we have to traverse every branch of the tree to get the minimum depth. 
+     */
+
+
+    /**
+     * BFS
+     */
+    public int minDepth(TreeNode root) {
+        if (root ==  null) return 0;
+        
+        Deque<TreeNode> queue = new ArrayDeque<>();
+        queue.offer(root);
+        int depth = 0;
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            depth++;
+            for (int i = 0; i < size; i++) {
+                TreeNode curr = queue.poll();
+                if (curr.left == null && curr.right == null) {
+                    return depth;
+                }
+                if (curr.left != null) {
+                    queue.offer(curr.left);
+                }
+                if (curr.right != null) {
+                    queue.offer(curr.right);
+                }
+            }
+        }
+        
+        return depth;
+    }
+    
+    
+    
+    /**
+     * DFS
+     */
+    public int minDepth(TreeNode root) {
+        if (root == null) return 0;
+        
+        Deque<TreeNode> stack = new ArrayDeque<>();
+        Deque<Integer> depth = new ArrayDeque<>();
+        int ret = Integer.MAX_VALUE;
+        
+        stack.push(root);
+        depth.push(1);
+        
+        while (!stack.isEmpty()) {
+            TreeNode curr = stack.pop();
+            int currDepth = depth.pop();
+            if (curr.left == null && curr.right == null) {
+                ret = Math.min(ret, currDepth);
+            }
+            
+            if (curr.left != null) {
+                stack.push(curr.left);
+                depth.push(currDepth + 1);
+            }
+            if (curr.right != null) {
+                stack.push(curr.right);
+                depth.push(currDepth + 1);
+            }
+        }
+        
+        return ret;
+    }
+}
