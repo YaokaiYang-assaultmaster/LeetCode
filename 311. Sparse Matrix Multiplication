@@ -1,0 +1,55 @@
+public class Solution {
+    /**
+     * Scan and multiply on the fly
+     */
+    public int[][] multiply(int[][] A, int[][] B) {
+        if(A == null || A[0] == null || B == null || B[0] == null) return null;
+        
+        int m = A.length, n = A[0].length, l = B[0].length;
+        int[][] ret = new int[m][l];
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                if(A[i][j] != 0) {
+                    for(int k = 0; k < l; k++) {
+                        ret[i][k] += A[i][j] * B[j][k];
+                    }
+                }
+            }
+        }
+        
+        return ret;
+    }
+    
+    /**
+     * Use a HashMap to store non-zero elements
+     * Thus we avoid scanning the zero-elements and non-zero elements in B again and again.
+     * We only scan the non-zero elements stored in hashmap in this case. 
+     */
+    public int[][] multiply(int[][] A, int[][] B) {
+        if(A == null || A[0] == null || B == null || B[0] == null) return null;
+        
+        int m = A.length, n = A[0].length, l = B[0].length;
+        int[][] ret = new int[m][l];
+        Map<Integer, HashMap<Integer, Integer>> tableB = new HashMap<>();
+        for(int i = 0; i < n; i++) {
+            tableB.put(i, new HashMap<>());
+            for(int j = 0; j < l; j++) {
+                if(B[i][j] != 0) {
+                    tableB.get(i).put(j, B[i][j]);
+                }
+            }
+        }
+        
+        for(int i = 0; i < m; i++) {
+            for(int j = 0; j < n; j++) {
+                if(A[i][j] != 0) {
+                    for(int k : tableB.get(j).keySet()) {
+                        ret[i][k] += A[i][j] * tableB.get(j).get(k);
+                    }
+                }
+            }
+        }
+        
+        return ret;
+    }
+}
