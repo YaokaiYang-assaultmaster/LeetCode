@@ -1,0 +1,71 @@
+public class Solution {
+    /**
+     * What we want is the result that is the smallest in lexicographical order among all possible results. Thus we have to find the first smallest element s[i] s.t. s[i] to s[n - 1] contains all the unique letters. In order to find this letter, we need to count for the appearance of each letter and find minimum letter until one of the counter reaches 0. E.g. for "bacda" the smallest element s[i] is the first letter "b". 
+     * Then we need to generate a new s` from s by 1. removing all letters before s[i] since any letter before s[i] would result in a lexicographically greater result. 2. removing all s[i] since s[i] has been already added to the result. 
+     * Do this recursively w.r.t s`. 
+     * Because there is only 26 letters in total, the run time is O(26*n) = O(n). 
+     */
+    public String removeDuplicateLetters(String s) {
+        if (s == null || s.length() == 0) return "";
+        int[] cMap = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            cMap[s.charAt(i) - 'a']++;
+        }
+        int minPos = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) < s.charAt(minPos)) minPos = i;
+            if (--cMap[s.charAt(i) - 'a'] == 0) break;
+        }
+        
+        return s.charAt(minPos) + removeDuplicateLetters(s.substring(minPos + 1).replaceAll("" + s.charAt(minPos), ""));
+    }
+    
+    
+    /**
+     * The idea is still like the previous one. 
+     * Find the first minimum character where the substring after it still contains all the unique characters. 
+     * Then we update the begin index of the substring. 
+     * Add this character to the result and delete it from the hashmap. 
+     * After that find the next minimum character that is consistent with the above criterion and iterate until find all the unique characters. 
+     * O(26 * n) = O(n) time and O(n) space in the worst case. 
+     */
+    public String removeDuplicateLetters(String s) {
+        if (s == null || s.length() == 0) return "";
+        
+        Map<Character, Integer> cMap = new HashMap<>();
+        for (int i = 0; i < s.length(); i++) {
+            cMap.put(s.charAt(i), i);
+        }
+        
+        int start = 0;
+        int end = findLastMinPos(cMap);
+        char[] result = new char[cMap.size()];
+        
+        
+        for (int i = 0; i < result.length; i++) {
+            char minChar = 'z' + 1;
+            for (int j = start; j <= end; j++) {
+                if (cMap.containsKey(s.charAt(j)) && s.charAt(j) < minChar) {
+                    minChar = s.charAt(j);
+                    start = j + 1;
+                }
+            }
+            
+            result[i] = minChar;
+            
+            cMap.remove(minChar);
+            if (s.charAt(end) == minChar) end = findLastMinPos(cMap);
+        }
+        
+        return new String(result);
+    }
+    
+    public int findLastMinPos(Map<Character, Integer> cMap) {
+        if (cMap == null || cMap.isEmpty()) return -1;
+        int ret = Integer.MAX_VALUE;
+        for (int i : cMap.values()) {
+            ret = Math.min(i, ret);
+        }
+        return ret;
+    }
+}
