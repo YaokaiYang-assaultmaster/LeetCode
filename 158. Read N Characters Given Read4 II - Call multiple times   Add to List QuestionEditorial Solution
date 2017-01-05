@@ -1,0 +1,37 @@
+/* The read4 API is defined in the parent class Reader4.
+      int read4(char[] buf); */
+
+public class Solution extends Reader4 {
+    /**
+     * @param buf Destination buffer
+     * @param n   Maximum number of characters to read
+     * @return    The number of characters read
+     */
+    
+    /**
+     * The main difference of this question from Read N Characters Given Read4 and read for only 1 time is that if we call read() function for multiple time, we have to store the intermediate characters during reading process. For example, for input stream "abcd", if we call read(buf, 1) and read(buf, 3), all of the 4 characters will be read into the memory at the first time since read4() read 4 characters a time. Thus we have to store "bcd" during the reading process for later use. 
+     * As a result, we use 2 int variable buffer pointer and buffer counter to store the intermediate buffer's number of characters and of which index we are in. 
+     * During the calling of read() function, we have to put the characters in the buffer into the result before we read any new characters. 
+     */
+    int buffPointer = 0;
+    int buffCounter = 0;
+    char[] buf4 = new char[4];
+    public int read(char[] buf, int n) {
+        int pointer = 0;
+        
+        while (pointer < n) {
+            if (buffPointer == 0) {
+                buffCounter = read4(buf4);
+            }
+            
+            if (buffCounter == 0) break;
+            while (pointer < n && buffPointer < buffCounter) {
+                buf[pointer++] = buf4[buffPointer++];
+            }
+            
+            if (buffPointer == buffCounter) buffPointer = 0;
+        }
+        
+        return pointer;
+    }
+}
