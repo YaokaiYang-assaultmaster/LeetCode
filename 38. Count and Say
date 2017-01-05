@@ -1,1 +1,59 @@
+public class Solution {
+   /**
+    * Recursive solution
+    */
+   public String countAndSay(int n) {
+        if (n <= 1) return "1";
+        
+        String prev = countAndSay(n - 1);
+        StringBuilder sb = new StringBuilder();
+        int index = 0;
+        int count = 0;
+        while (index < prev.length()) {
+            char c = prev.charAt(index);
+            while (index < prev.length() && c == prev.charAt(index)) {
+                index++;
+                count++;
+            }
+            sb.append(String.valueOf(count)).append(String.valueOf(c));
+            count = 0;
+        }
+        
+        return sb.toString();
+    }
 
+  
+    /**
+     * Iteration
+     * Append a "1" to the stringbuilder as the initial case.
+     * Use a tmp stringbuilder to store the temporary result of each for loop. 
+     * Traverse the sb builder for each i, and cound for the same and consecutive numbers. 
+     * Then append corresponding cound and say number into tmp string until reaching the end of tmp.
+     * Set sb to tmp and iterate.
+     * O(n ^ n) time since we have to calculate every result from 1 to n, O(n) space 
+     */
+    public String countAndSay(int n) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("1");
+        if (n <= 1) return sb.toString();
+        
+        for (int i = 2; i <= n; i++) {
+            StringBuilder tmp = new StringBuilder();
+            int index = 0, count = 0;
+            while (index < sb.length()) {
+                char curr = sb.charAt(index);
+                while (index < sb.length() && sb.charAt(index) == curr) {
+                    index++;
+                    count++;
+                }
+                tmp.append(String.valueOf(count)).append(String.valueOf(curr));
+                count = 0;
+            }
+            
+            sb = tmp;
+        }
+        
+        
+        return sb.toString();
+    }
+}
