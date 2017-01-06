@@ -1,0 +1,77 @@
+public class WordDictionary {
+    class TrieNode {
+        char val;
+        TrieNode[] children = new TrieNode[26];
+        boolean endFlag;
+        
+        public TrieNode() {
+            val = ' ';
+        }
+        
+        public TrieNode(char val) {
+            this.val = val;
+        }
+        
+        public void setFlag(boolean flag) {
+            this.endFlag = flag;
+        }
+        
+        public boolean getFlag() {
+            return this.endFlag;
+        }
+    }
+    
+    TrieNode root;
+    public WordDictionary() {
+        root = new TrieNode();
+    }
+
+    // Adds a word into the data structure.
+    public void addWord(String word) {
+        TrieNode curr = root;
+        for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            if (curr.children[c - 'a'] == null) {
+                curr.children[c - 'a'] = new TrieNode(c);
+            }
+            curr = curr.children[c - 'a'];
+        }
+        curr.setFlag(true);
+    }
+
+    // Returns if the word is in the data structure. A word could
+    // contain the dot character '.' to represent any one letter.
+    public boolean search(String word) {
+        return match(root, word.toCharArray(), 0);
+    }
+    
+    private boolean match(TrieNode node, char[] word, int index) {
+        if (index == word.length) {
+            return node.getFlag();
+        }
+        char c = word[index];
+        if (c == '.') {
+            for (int i = 0; i < node.children.length; i++) {
+                if (node.children[i] != null) {
+                    if (match(node.children[i], word, index + 1)) {
+                        return true;
+                    }
+                }
+            }
+        } else {
+            if (node.children[c - 'a'] == null) {
+                return false;
+            } else {
+                return match(node.children[c - 'a'], word, index + 1);
+            }
+        }
+        
+        return false;
+    }
+        
+}
+
+// Your WordDictionary object will be instantiated and called as such:
+// WordDictionary wordDictionary = new WordDictionary();
+// wordDictionary.addWord("word");
+// wordDictionary.search("pattern");
