@@ -1,0 +1,62 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+
+    /**
+     * Both algorithms run in O(n) time where n is the number of nodes. 
+     * Iterative solution runs in O(h) space where h is the height of the tree. 
+     * Recursive solution runs in O(1) space without considering the recursion stack. However, the recursion stack takes O(h) space because
+        it can be h level deep. 
+     */
+     
+    /**
+     * Iterative solition
+     * DFS indeed
+     * Just take care of the order we put nodes in the stack and the order we put node.val in the List<Integer>. 
+     */
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> ret = new ArrayList<>();
+        if (root == null) return ret;
+        
+        TreeNode curr = root;
+        Deque<TreeNode> stack = new ArrayDeque<>();
+        while (curr != null || !stack.isEmpty()) {
+            while (curr != null) {
+                stack.push(curr);
+                ret.add(curr.val);
+                curr = curr.left;
+            }
+            
+            curr = stack.pop();
+            curr = curr.right;
+        }
+        
+        return ret;
+    }
+    
+    
+    
+    
+    /** 
+     * Recursive solution
+     */
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> ret = new ArrayList<>();
+        preorderTraverse(root, ret);
+        return ret;
+    }
+    
+    private void preorderTraverse(TreeNode root, List<Integer> ret) {
+        if (root == null) return;
+        ret.add(root.val);
+        preorderTraverse(root.left, ret);
+        preorderTraverse(root.right, ret);
+    }
+}
