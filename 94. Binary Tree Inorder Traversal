@@ -12,7 +12,7 @@ public class Solution {
      * Iterative solution
      * Inorder traversal requires us to traverse the left subtree first, then the root, then the right subtree. 
      * Since we have to store the intermediate nodes whose left subtree is being visited and then traverse its right subtree and we have to do this in a bottom-up style in which the node being stored eraly is being visited late, it's natural to use a stack.
-    **/
+     */
     
     public List<Integer> inorderTraversal(TreeNode root) {
         List<Integer> ret = new ArrayList<>();
@@ -44,7 +44,7 @@ public class Solution {
      * Pretty simple idea, first recurse the left subtree of the root, then add the value of the root to the ret list, then recurse the right subtree of the root.
      * Stop and return when root is null
      * O(n) time in which n is the number of nodes in the tree
-    **/
+     */
     public List<Integer> inorderTraversal(TreeNode root) {
         List<Integer> ret = new ArrayList<>();
         if (root == null) return ret;
