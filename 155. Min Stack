@@ -1,0 +1,120 @@
+public class MinStack {
+    
+    /**
+     * Do push(), pop() and top() in O(1) is easy. However, we need to think of how to do getMin() in O(1).
+     * Use the idea from cumulative sum, we could do getMin() in O(1) with cumulative minimum list. 
+     * Thus we use a list to store the minimum until every position. 
+     * And each time we push() an element in the stack, enlarge the list and update the minimum until current position. 
+     * Each time we pop() an element, remove the last minimum from the list. 
+     * In this we we could do all operation in O(1) time. 
+     */
+    
+    Deque<Integer> stack;
+    List<Integer> list;
+    int count;
+    
+    /** initialize your data structure here. */
+    public MinStack() {
+        stack = new ArrayDeque<>();
+        list = new ArrayList<>();
+        count = 0;
+    }
+    
+    public void push(int x) {
+        stack.push(x);
+        if (list.isEmpty()) {
+            list.add(x);
+        } else {
+            list.add(Math.min(list.get(count - 1), x));
+        }
+        count++;
+    }
+    
+    public void pop() {
+        stack.pop();
+        count--;
+        list.remove(count);
+    }
+    
+    public int top() {
+        return stack.peek();
+    }
+    
+    public int getMin() {
+        return list.get(count - 1);
+    }
+    
+    
+    
+    
+    /**
+     * However, we could save the extra O(n) place used for the list of minimum. 
+     * The idea is to store the gap between every value and current minimum. 
+     * For push(), there are 2 conditions:
+     * 1. the gap is positive. In this case current value is greater than minimum until now. We don't have to update minimum. 
+     * 2. the gap is negative. In this case current value is less than minimum. Thus we have to update the minimum. 
+     * 
+     * For pop(), there are 2 conditions as well.
+     * 1. Gap is positive, remove the element directly without changing minimum. 
+     * 2. Gap is negative, minimum is current element. once pop it out, we have to update the minimum to be minimum + gap. 
+     * 
+     * Top() is similar to pop(). 
+     * 
+     * getMin() is simple, just return the minimum we stored. 
+     * 
+     * The reason to store numbers and minimum with long is to prevent overflow. Since we are storing gaps, 0 - Integer.MIN_VALUE could lead to overflow. 
+     */
+    
+    Deque<Long> stack;
+    long min; 
+    
+    /** initialize your data structure here. */
+    public MinStack() {
+        stack = new ArrayDeque<>();
+    }
+    
+    public void push(int x) {
+        if (stack.isEmpty()) {
+            stack.push(0L);
+            min = x;
+        } else {
+            stack.push(x - min);
+            if (x - min < 0) {
+                min = x;
+            }
+        }
+        
+    }
+    
+    public void pop() {
+        if (stack.isEmpty()) return;
+        
+        long gap = stack.pop();
+        if (gap < 0) {
+            min = min - gap; //if gap is negative, update minimum
+        }
+    }
+    
+    public int top() {
+        long gap = stack.peek();
+        
+        if (gap > 0) {
+            return (int)(gap + min);
+        } else {
+            return (int)min;
+        }
+    }
+    
+    public int getMin() {
+        return (int)min;
+    }
+}
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack obj = new MinStack();
+ * obj.push(x);
+ * obj.pop();
+ * int param_3 = obj.top();
+ * int param_4 = obj.getMin();
+ */
