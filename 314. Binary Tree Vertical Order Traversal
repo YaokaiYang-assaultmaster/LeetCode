@@ -66,4 +66,65 @@ public class Solution {
             }
         }
     }
+    
+    /**
+     * Using a HashMap may waste space and may cause key conflict. 
+     * We could also solve this question by double-linked list or ArrayList.
+     * Start from root node and peform BFS. 
+     * While perform a normal BFS, keep queues for both current tree node and its column index.
+     * At the same time, keep a minCol and maxCol variable to record the minimum and maximum column. 
+     * Once we meet a new column, we compare its column index with the minimum and maximum column. There is 3 conditions:
+     * 1. current column > maximum column. Then we need to add a new List to the end of ret List<List<Integer>>. And we put current node's value to this column. Update the maxCol value. 
+     * 2. current column < mimimum column. Then we need to add a new List to the start of ret List<List<Integer>>. And we put current node's value to this column. Update the minCol value. 
+     * 3. current column is within the range minCol and maxCol. Take out the corresponding column list and add current node's value to this column. 
+     * After this step, add current node's left and right child to the BFS queue. 
+     */
+    
+    public List<List<Integer>> verticalOrder(TreeNode root) {
+        List<List<Integer>> ret = new ArrayList<>();
+        if (root == null) return ret;
+        
+        List<Integer> zeroCol = new ArrayList<>();
+        ret.add(zeroCol);
+        
+        int minCol = 0;
+        int maxCol = 0;
+        
+        Deque<TreeNode> level = new ArrayDeque<>();
+        Deque<Integer> levelCol = new ArrayDeque<>();
+        level.offer(root);
+        levelCol.offer(0);
+        while (!level.isEmpty() && !levelCol.isEmpty()) {
+            TreeNode curr = level.poll();
+            int currCol = levelCol.poll();
+            
+            if (currCol > maxCol) {
+                List<Integer> newCol = new ArrayList<>();
+                ret.add(newCol);
+                newCol.add(curr.val);
+                maxCol = currCol;
+            }
+            else if (currCol < minCol) {
+                List<Integer> newCol = new ArrayList<>();
+                ret.add(0, newCol);
+                newCol.add(curr.val);
+                minCol = currCol;
+            }
+            
+            else {
+                ret.get(currCol - minCol).add(curr.val);
+            }
+            
+            if (curr.left != null) {
+                level.offer(curr.left);
+                levelCol.offer(currCol - 1);
+            }
+            if (curr.right != null) {
+                level.offer(curr.right);
+                levelCol.offer(currCol + 1);
+            }
+        }
+        
+        return ret;
+    }
 }
