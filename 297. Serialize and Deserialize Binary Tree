@@ -53,6 +53,71 @@ public class Codec {
             return node;
         }
     }
+    
+    
+    
+    /**
+     * Iterative BFS solution using a queue. 
+     * Note that a queue implemented in LinkedList allow null element to be stored in it. 
+     */
+    
+    public String splitter = ",";
+    public String None = "n";
+
+    // Encodes a tree to a single string.
+    public String serialize(TreeNode root) {
+        StringBuilder sb = new StringBuilder();
+        if (root == null) {
+            sb.append(None);
+            return sb.toString();
+        }
+        
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            TreeNode curr = queue.poll();
+            if (curr == null) {
+                sb.append(None).append(splitter);
+            } else {
+                sb.append(String.valueOf(curr.val)).append(splitter);
+                queue.add(curr.left);
+                queue.add(curr.right);
+            }
+            
+        }
+        
+        return sb.toString();
+    }
+
+    // Decodes your encoded data to tree.
+    public TreeNode deserialize(String data) {
+        if (data.equals("n")) return null;
+        
+        List<String> tree = new ArrayList<>();
+        tree.addAll(Arrays.asList(data.split(splitter)));
+        Queue<TreeNode> queue = new LinkedList<>();
+        
+        TreeNode root = new TreeNode(Integer.parseInt(tree.get(0)));
+        queue.offer(root);
+        
+        for (int i = 1; i < tree.size(); i++) {
+            TreeNode curr = queue.poll();
+            if (tree.get(i).equals("n")) {
+                curr.left = null;
+            } else {
+                curr.left = new TreeNode(Integer.parseInt(tree.get(i)));
+                queue.offer(curr.left);
+            }
+            if (tree.get(++i).equals("n")) {
+                curr.right = null;
+            } else {
+                curr.right = new TreeNode(Integer.parseInt(tree.get(i)));
+                queue.offer(curr.right);
+            }
+        }
+        
+        return root;
+    }
 }
 
 // Your Codec object will be instantiated and called as such:
