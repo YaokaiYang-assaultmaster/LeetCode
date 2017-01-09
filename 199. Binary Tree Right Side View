@@ -1,0 +1,64 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Obviously, what we want is the rightmost nodes of each level of the tree. 
+     * We know that to traverse a tree there is basically 2 approach: BFS and DFS.
+     * Using DFS seems good but there is a problem, we can never know if a node is on the right most side. 
+     * Using BFS, on the other hand, seems reasonable since the result naturally gives out the position of a node in its level
+     * Thus we could use BFS to traverse each level and return the rigntmose nodes of each level. 
+     * O(n) time where n is the size of the tree. 
+     */
+    public List<Integer> rightSideView(TreeNode root) {
+        List<Integer> ret = new ArrayList<>();
+        if (root == null) return ret;
+        
+        Deque<TreeNode> deque = new ArrayDeque<>();
+        deque.offer(root);
+        while (!deque.isEmpty()) {
+            int level = deque.size();
+            for (int i = 0; i < level; i++) {
+                TreeNode curr = deque.poll();
+                if (i == level - 1) {
+                    ret.add(curr.val);
+                }
+                if (curr.left != null) deque.offer(curr.left);
+                if (curr.right != null) deque.offer(curr.right);
+            }
+        }
+        
+        return ret;
+    }
+    
+    
+    
+    /**
+     * Another elegent algorithm
+     * The idea is to traverse each level in a right first way. Since we only want the right most node of each level and we are traverse in a right first way, the first node we meet at each level is the node viewed from right side. 
+     * O(n) time, n is the size of the tree. O(logn ~ n) space for the recursion stack.
+     */
+    public List<Integer> rightSideView(TreeNode root) {
+        List<Integer> ret = new ArrayList<>();
+        
+        rightSideView(root, ret, 0);
+        return ret;
+    }
+    
+    private void rightSideView(TreeNode curr, List<Integer> ret, int depth) {
+        if (curr == null) return;
+        
+        if (ret.size() == depth) {
+            ret.add(curr.val);
+        }
+        
+        rightSideView(curr.right, ret, depth + 1);
+        rightSideView(curr.left, ret, depth + 1);
+    }
+}
