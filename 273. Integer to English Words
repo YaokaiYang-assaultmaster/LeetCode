@@ -1,0 +1,54 @@
+public class Solution {
+    /**
+     * Notice that every 3 digits is a unit to convert. 
+     * Thus we could write a seperate to deal with this function.
+     * 
+     * In the numberToWords() function, keep a counter to counting the number of 3-digit unit and give them corresponding scales -- thousand, million or billion. 
+     * 
+     * (1) At the same time, remember that every number below 20 has its own word, hence we have to deal with them independently. Making up the first condition. 
+     * (2) And every tens number has its own word as well. This is the second condition. 
+     * (3) The last condition is hundreds, we have to count the number of hundreds a 3-digit unit has. 
+     * (4) The case of 0 has to be deal with explicitly as well. --> A statement and B statement
+     * After deal with a 3-digit unit, give them the corresponding thousands scale based on the counter. 
+     * 
+     * Meanwhile, take care of spicial conditions like 1000100, in which the second 3-digit unit from right should not appear. Thus we have to judge if a 3-digit unit is 0 and deal with it explicitly. --> C statement
+     */
+    
+    static String[] lessThan20 = new String[]{"", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"};
+    static String[] tens = new String[]{"", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"};
+    static String[] thousands = new String[]{"", "Thousand", "Million", "Billion"};
+    
+    public String numberToWords(int num) {
+        if (num == 0) return "Zero"; //A
+        StringBuilder sb = new StringBuilder();
+        
+        int count = 0;
+        while (num > 0) {
+            if (num % 1000 != 0) { //C
+                String tmp = converter(num % 1000);
+                tmp += thousands[count] + " ";
+                sb.insert(0, tmp);
+            }
+            
+            num /= 1000;
+            count++;
+        }
+        
+        return sb.toString().trim();
+    }
+    
+    private String converter(int num) {
+        if (num == 0) { //B
+            return "";
+        }
+        else if (num < 20) {
+            return lessThan20[num] + " ";
+        }
+        else if (num < 100) {
+            return tens[num / 10] + " " + converter(num % 10);
+        }
+        else {
+            return lessThan20[num / 100] + " Hundred " + converter(num % 100);
+        }
+    }
+}
