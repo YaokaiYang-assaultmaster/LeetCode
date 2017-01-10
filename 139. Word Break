@@ -1,0 +1,32 @@
+public class Solution {
+    /**
+     * Dynamic programming solution. 
+     * Overlapping subproblem: 
+     * if substring of s from j to i is matched with a word in wordDict, we have to record it and consider substring from i as following.
+     * The dynamic programming equation is: dp[i] = dp[j] && match(substring(j, i) with wordDict) 
+     * O(n^2) time? 
+     */
+    public boolean wordBreak(String s, List<String> wordDict) {
+        if (s.length() == 0) return true;
+        if (wordDict.size() == 0) return false;
+        
+        Set<String> words = new HashSet<String>();
+        words.addAll(wordDict);
+        
+        boolean[] ret = new boolean[s.length() + 1];
+        ret[0] = true;
+        
+        for (int i = 1; i < s.length() + 1; i++) {
+            
+            //j iterate from tail to start, makes the matching more effective. 
+            for (int j = i - 1; j >= 0; j--) {
+                if (ret[j] && words.contains(s.substring(j, i))) {
+                    ret[i] = true;
+                    break;
+                }
+            }
+        }
+        
+        return ret[s.length()];
+    }
+}
