@@ -1,0 +1,147 @@
+public class Solution {
+    
+    /**
+     * DP BFS solution.
+     * Store all intermediate result in an array of List. 
+     * The last list in the array is the result. 
+     * Inefficient and TLE.
+     */
+    public List<String> wordBreak(String s, List<String> wordDict) {
+        List<String> ret = new ArrayList<>();
+        if (s == null || s.length() == 0) return ret;
+        if (wordDict == null || wordDict.size() == 0) return ret;
+        
+        List<String>[] list = new ArrayList[s.length() + 1];
+        Set<String> words = new HashSet<String>();
+        words.addAll(wordDict);
+        boolean[] dp = new boolean[s.length() + 1];
+        dp[0] = true;
+        list[0] = new ArrayList<String>();
+        list[0].add("");
+        
+        for (int i =  1; i < s.length() + 1; i++) {
+            list[i] = new ArrayList<String>();
+            for (int j = 0; j < i; j++) {
+                if (dp[j] == true && words.contains(s.substring(j, i))) {
+                    dp[i] = true;
+                    for (String ele : list[j]) {
+                        String tmp = ele + " " + s.substring(j, i);
+                        list[i].add(tmp.trim());
+                    }
+                }
+            }
+        }
+                
+        return list[s.length()];
+    }
+    
+    
+    
+    /**
+     * Can we do better?
+     * Yes. Store all result and perform BFS search is time and space consuming. 
+     * Backtracking/DFS and get the result. 
+     * Meanwhile, instead try every possible substring of s, try to match words from wordDict with s.
+     * Thus avoiding trying too much useless case. 
+     * O(n^2) time because by DP we pruned all the overlapping subproblems. 
+     * However, if the wordDict is really large and s is not that large, we should still traverse s.
+     * See the third solution. 
+     */
+    public List<String> wordBreak(String s, List<String> wordDict) {
+        List<String> ret = new ArrayList<>();
+        if (s == null || s.length() == 0) return ret;
+        if (wordDict == null || wordDict.size() == 0) return ret;
+        
+        return dfs(s, wordDict, new HashMap<String, List<String>>());
+    }
+    
+    private List<String> dfs(String s, List<String> wordDict, Map<String, List<String>> map) {
+        if (map.containsKey(s)) {
+            return map.get(s);
+        }
+        
+        List<String> ret = new ArrayList<>();
+        if (s.length() == 0) {
+            ret.add("");
+            return ret;
+        }
+        
+        for (String word : wordDict) {
+            if (s.startsWith(word)) {
+                List<String> subRet = dfs(s.substring(word.length()), wordDict, map);
+                for (String ele : subRet) {
+                    if (ele == "") {
+                        ret.add(word);
+                    } else {
+                        ret.add(word + " " + ele);
+                    }
+                }
+            }
+        }
+        
+        map.put(s, ret);
+        return ret;
+    }
+    
+    
+    /**
+     * First using method from Work Break I to generate the boolean array dp[].
+     * Then only test those cases that is true in dp[]. 
+     * Use a HashMap to store intermediate results and use as dynamic programming cache. 
+     * O(n^2) time.
+     * O(n^2) space because of the hashmap. 
+     */
+    public List<String> wordBreak(String s, List<String> wordDict) {
+        if (s == null || s.length() == 0 || wordDict == null || wordDict.size() == 0) {
+            return new ArrayList<String>();
+        }
+        
+        boolean[] dp = new boolean[s.length() + 1];
+        dp[0] = true;
+        Set<String> words = new HashSet<>();
+        words.addAll(wordDict);
+        
+        for (int i = 1; i < s.length() + 1; i++) {
+            for (int j = 0; j < i; j++) {
+                if (dp[j] && words.contains(s.substring(j, i))) {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        
+        Map<String, List<String>> map = new HashMap<>();
+        
+        return dfs(s, words, map, dp);
+    }
+    
+    private List<String> dfs(String s, Set<String> words, Map<String, List<String>> map, boolean[] dp) {
+        if (map.containsKey(s)) {
+            return map.get(s);
+        }
+        
+        if (s.length() == 0) {
+            return new ArrayList<>();
+        }
+        
+        List<String> ret = new ArrayList<>();
+        
+        if (words.contains(s)) {
+            ret.add(s);
+        }
+        
+        int end = s.length();
+        for (int i = end - 1; i >= 0; i--) {
+            String curr = s.substring(i, end);
+            if (words.contains(curr) && dp[i]) {
+                List<String> list = dfs(s.substring(0, i), words, map, dp);
+                for (String tmp : list) {
+                    ret.add(tmp + " " + curr);
+                }
+            }
+        }
+        
+        map.put(s, ret);
+        return ret;
+    }
+}
