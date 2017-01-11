@@ -81,9 +81,78 @@ public class Solution {
 }
 ```						 
 						 
-Thus we have to think of another data structure to solve it. A list sorted based on frequencies works. The code is showed as following. 
+Thus we have to think of another data structure to solve it. A list sorted based on frequencies works. We create a wrapper class to store the tasks and its corresponding frequencies. The code is showed as following. 
 						 
 ```
+class Task {
+	char task;
+	int freq;
+	
+	public Task(char task, int freq) {
+		this.task = task;
+		this.freq = freq;
+	}
+	
+	public static Comparator<Task> freqComparator = new Comparator<Task>() {
+		
+		@Override
+		public int compare(Task o1, Task o2) {
+			return o2.freq - o1.freq;
+		}
+	};
+}
 
+public class Solution {
+	
+	public String taskSchedule(String tasks, int coldTime) {
+		if (tasks == null || tasks.length() == 0) {
+			return "";
+		}
+
+		StringBuilder sb = new StringBuilder();
+		Map<Character, Integer> map = new HashMap<Character, Integer>();
+		
+		for (int i = 0; i < tasks.length(); i++) {
+			if (!map.containsKey(tasks.charAt(i))) {
+				map.put(tasks.charAt(i), 1);
+			} else {
+				map.put(tasks.charAt(i), map.get(tasks.charAt(i)) + 1);
+			}
+		}
+
+		List<Task> list = new ArrayList<>();
+		for (Map.Entry<Character, Integer> e : map.entrySet()) {
+			list.add(new Task(e.getKey(), e.getValue()));
+		}
+		
+		Collections.sort(list, Task.freqComparator);
+
+		int totalCount = 0;
+		int currLen = 0;
+		while (totalCount < tasks.length()) {
+			for (Task ele : list) {
+				if (ele.freq > 0) {
+					sb.append(String.valueOf(ele.task));
+					ele.freq--;
+					totalCount++;
+					currLen++;
+				}
+			}
+
+			if (totalCount == tasks.length()) {
+				break;
+			}
+
+			while (currLen <= coldTime) {
+				sb.append("_");
+				currLen++;
+			}
+
+			currLen = 0;
+		}
+
+		return sb.toString();
+	}
+}
 ```
 	
