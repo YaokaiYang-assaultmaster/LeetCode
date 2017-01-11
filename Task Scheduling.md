@@ -81,7 +81,7 @@ public class Solution {
 }
 ```						 
 						 
-Thus we have to think of another data structure to solve it. A list sorted based on frequencies works. We create a wrapper class to store the tasks and its corresponding frequencies. The code is showed as following. 
+Thus we have to think of another data structure to solve it. A list sorted based on frequencies works. A wrapper class Task is created to store the tasks and its corresponding frequencies. The code is showed as following. 
 						 
 ```
 class Task {
