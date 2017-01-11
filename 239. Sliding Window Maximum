@@ -1,0 +1,85 @@
+public class Solution {
+    /**
+     * Basic idea: Since we only want the maximum values in each window, every value less than current value and is in the sliding window is useless can be dropped. 
+     * The algorithm works like following:
+     * We scan the array from 0 to n - 1, keep "promising" the elements in the deque.
+     * At each step, we keep promising elements in the deque to be the potential maximum element in window [i - (k - 1), i] or any subsequent window. This means:
+     * 1. if an element is in the deque, and it is out of the range of [i - (k - 1), i], we discard them. Discard by poll them from the head. 
+     * 2. Now only the elements in [i - (k + 1), i] are in the deque. We then discard elements less than nums[i] in the deque. Since if nums[x] < nums[i] for x < i, then nums[x] has no chance to be the max in [i - (k + 1), i] or any subsequent window. nums[i] would always be a better candidate than nums[x]. 
+     * 3. As a result of the elements in the deque are ordered in sequence of both from the array and based on their value, the element at the head of the deque is always the max in [i - (k - 1), i]. 
+     * Considering we have to discard elements if it is out of range of current window, we keep indexes rather than values in the deque. 
+     * O(n) time because each element is put into and take out of the deque for at most once. n is the length of the nums array
+     */
+    
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        if (nums == null || nums.length == 0 || k <= 0) return new int[]{};
+        
+        int l = nums.length;
+        int[] ret = new int[l - (k - 1)];
+        int index = 0;
+        Deque<Integer> deque = new ArrayDeque<>();
+        
+        for (int i = 0; i < l; i++) {
+            while (!deque.isEmpty() && deque.peekFirst() < i - k + 1) {
+                deque.pollFirst();
+            }
+            
+            while (!deque.isEmpty() && nums[deque.peekLast()] < nums[i]) {
+                deque.pollLast();
+            }
+            
+            deque.offerLast(i);
+            
+            if (i >= k - 1) {
+                ret[index++] = nums[deque.peekFirst()];
+            }
+        }
+        
+        return ret;
+    }
+    
+    
+    
+    //My code, not that good
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        if (nums == null || nums.length == 0) return new int[]{};
+        
+        int[] ret = new int[nums.length - k + 1];
+        Deque<Integer> deque = new ArrayDeque<>();
+        
+        for (int i = 0; i < k; i++) {
+            if (deque.isEmpty()) {
+                deque.offerLast(i);
+            }
+            else if (deque.peekLast() != null && nums[deque.peekLast()] > nums[i]) {
+                deque.offerLast(i);
+            }
+            else {
+                while (deque.peekLast() != null && nums[deque.peekLast()] < nums[i]) {
+                    deque.pollLast();
+                }
+                deque.offerLast(i);
+            }
+        }
+        
+        int index = 0;
+        for (int i = k; i < nums.length; i++) {
+            ret[index++] = nums[deque.peekFirst()];
+            if (deque.peekFirst() == i - k) {
+                deque.pollFirst();
+            }
+            if (deque.peekLast() != null && nums[deque.peekLast()] > nums[i]) {
+                deque.offerLast(i);
+            }
+            else {
+                while (deque.peekLast() != null && nums[deque.peekLast()] < nums[i]) {
+                    deque.pollLast();
+                }
+                deque.offerLast(i);
+            }
+        }
+        
+        ret[index] = nums[deque.pollFirst()];
+        return ret;
+    }
+}
