@@ -1,0 +1,127 @@
+public class Solution {
+    
+    /**
+     * BFS
+     * Since we want to find out the minimum number of parentheses s need to remove to be valid, a BFS would be suitable. 
+     * Thus we perform a brute-force BFS search for this question. 
+     * In each level, we remove one parenthesis ("(" or ")") from the string and check if it is valid. If it is valid, the minimum number has been found, put it in the return list and check the remaining ones. 
+     * Otherwise, add them in a queue and wait for next level iteration. 
+     * 
+     * It may be wired that once we find a valid string, we stop generating any new substrings. 
+     * The reason is that in any time, the strings in the deque is different in length by only 1. And the length of a valid string must be even. And thus all strings 1 smaller than current valid one is impossible to be valid. Thus we could simply stop. 
+     * 
+     * Complexity:
+     * In the worst case, we have to check all the levels. 
+     * For first level, it is O(n) time for each valid check, and C(n,n) cases. 
+     * For the second level, it is O(n - 1) time and C(n, n-1) cases. 
+     * For the third level, it is O(n - 2) time and C(n, n-2) cases. 
+     * ...
+     * Thus the total time T is n * C(n,n) + (n - 1) * C(n,n-1) + ... + O(1) * C(n, 1) = n * 2 ^ (n-1)
+     */
+    public List<String> removeInvalidParentheses(String s) {
+        List<String> ret = new ArrayList<String>();
+        
+        if (s == null) {
+            return ret;
+        }
+        
+        Set<String> visited = new HashSet<String>();
+        Deque<String> deque = new ArrayDeque<>();
+        
+        deque.offer(s);
+        visited.add(s);
+        boolean found = false;
+        while (!deque.isEmpty()) {
+            String curr = deque.poll();
+            if (isValid(curr)) {
+                ret.add(curr);
+                found = true;
+            }
+            
+            if (found) continue;
+            
+            for (int i = 0; i < curr.length(); i++) {
+                if (curr.charAt(i) != '(' && curr.charAt(i) != ')') continue;
+                
+                String tmp = curr.substring(0, i) + curr.substring(i + 1);
+                if (!visited.contains(tmp)) {
+                    deque.offer(tmp);
+                    visited.add(tmp);
+                }
+            }
+        }
+        
+        return ret;
+    }
+    
+    private boolean isValid(String s) {
+        int count = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (s.charAt(i) != '(' && s.charAt(i) != ')') continue;
+            
+            if (s.charAt(i) == '(') count++;
+            if (s.charAt(i) == ')') count--;
+            
+            if (count < 0) return false;
+        }
+        
+        return count == 0;
+    }
+    
+    
+    /**
+     * Key idea:
+     * 1. Generate each result once and only once.
+     * 2. No preprocess
+     * 
+     * Checking of the validness of a string need a stack or a counter. 
+     * The counter will increase by 1 if encounters "(" and decrease by 1 if encounters ")". When the counter is negative, we have more ")" than "(" in the prefix. 
+     * In order to make the prefix valid, we need to remove a ")". The problem is: Which one should we remove in order to prevent generating duplicate results? The answer is to remove the first extra ")". For example, for "())". We could remove s[1] or s[2] but the result is the same. Thus we restrict ourselves to remove only the first ")" in a series of concecutive ")"s. 
+     * After the removal, the prefix is valid. We then call the function recursively to solve the rest of the string. However, we need to keep another information: the last removal position. If we don't have this position, we will generate duplicate by removing 2 ")" in 2 steps only with a different order. 
+     * For this, we keep tracking the last removal position and only remove ")" after that. 
+     * 
+     * Now we have to deal with "(". 
+     * The general answer is to scan the string from right to left and do the same thing. 
+     * However, there is a more clever idea: reverse the string and reuse the code.
+     * 
+     * Since this algorithm only generate valid cases, suppose there is k valid cases. 
+     * And each case need O(n) time to check. Thus it is O(nk) time. 
+     */
+    public List<String> removeInvalidParentheses(String s) {
+        List<String> ret = new ArrayList<>();
+        if (s == null) {
+            return ret;
+        }
+        
+        remove(s, ret, 0, 0, new char[]{'(', ')'});
+        
+        return ret;
+    }
+    
+    private void remove(String s, List<String> ret, int prev_i, int prev_j, char[] par) {
+        for (int count = 0, i = prev_i; i < s.length(); i++) {
+            if (s.charAt(i) == par[0]) count++;
+            if (s.charAt(i) == par[1]) count--;
+            
+            if (count >= 0) continue;
+            
+            //count < 0, need to remove parenthesis
+            for (int j = prev_j; j <= i; j++) {
+                if (s.charAt(j) == par[1] && (j == prev_j || s.charAt(j - 1) != par[1])) {
+                    remove(s.substring(0, j) + s.substring(j + 1), ret, i, j, par);
+                }
+            }
+            
+            return;
+        }
+        
+        String reversed = new StringBuilder(s).reverse().toString();
+        
+        if (par[0] == '(') {
+            remove(reversed, ret, 0, 0, new char[]{')', '('});
+        }
+        else {
+            ret.add(reversed);
+        }
+    }
+}
