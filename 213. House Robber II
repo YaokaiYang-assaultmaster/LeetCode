@@ -1,0 +1,38 @@
+public class Solution {
+    /**
+     * Since this question is a follow-up for House Robber, we can solve this question by modifying the original solution. 
+     * We can use it as a helper function with 2 arguments lo and hi indicates the start and end point of the robbing process.
+     * Now the problem is how to rob house placed in a circul row. 
+     * So in this condition whether to rob nums[lo] is our entire solution. But, this decision is also contrainted by whether nums[hi] is robbed. 
+     * However, since we already have a helper solution, it becomes how to make the decision based on our helper solution. 
+     * We can make the problem into a simpler one by break the houses circle. 
+     * Considering the logic of if we rob nums[i] then we cannot rob nums[i + 1], we can break the circle by assuming house i is not robbed. 
+     * For example, house 1,2,3,1 becomes 2,3 if 1 is not robbed. 
+     * Since each house is either robbed or not robbed. We can break the problem into 2 subproblems as following:
+     * 1. if the first house is robbed, then the house we have to consider is 0 to n - 2. 
+     * 2. if the first house is not robbed, then the house we have to consider is 1 to n - 1. 
+     * And the solution is simply the greater one among the 2 conditions. 
+     * O(n) time, O(1) space. 
+     */
+    public int rob(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        if (nums.length == 1) return nums[0];
+        
+        return Math.max(helper(nums, 0, nums.length - 2), helper(nums, 1, nums.length - 1));
+    }
+    
+    
+    private int helper(int[] nums, int lo, int hi) {
+        int include = 0;
+        int exclude = 0;
+        for (int j = lo; j <= hi; j++) {
+            int i = include;
+            int e = exclude;
+            
+            include = e + nums[j];
+            exclude = Math.max(i, e);
+        }
+        
+        return Math.max(include, exclude);
+    }
+}
