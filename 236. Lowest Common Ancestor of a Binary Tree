@@ -1,0 +1,70 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+    /**
+     * Recursive solution
+     * There are 3 conditions:
+     * 1. if current substree contains both p and q, then current node is the LCA of p and q.
+     * 2. if current subtree contains only p or q, then current node is one of the ancesters.
+     * 3. if current subtree contains no p and q, then the function returns null.
+     * O(n) time, O(1) space without considering the recursion stack. The recursion stack could be O(logn) in depth
+     */
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null || root == p || root == q) return root;
+        
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+        
+        return left == null ? right : right == null ? left : root;
+    }
+    
+    /**
+     * Iterative solution
+     * Search for q and q in the Binary Tree
+     * Use a HashMap to record the parent of each node
+     * After find both p and q, create a HashSet for p's ancestors. 
+     * Then we traverse through q's ancestors, the first one appears in p's ancestor set is what we want. 
+     * O(n) time, O(n) space because we have to traverse the tree to find p and q and keep parent for each node.
+     * n is the size of the tree.
+     */
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        Map<TreeNode, TreeNode> parent = new HashMap<>();
+        Deque<TreeNode> stack = new ArrayDeque<>();
+        parent.put(root, null);
+        stack.push(root);
+        
+        while (!stack.isEmpty() && (!parent.containsKey(p) || !parent.containsKey(q))) {
+            TreeNode curr = stack.pop();
+            if (curr.left != null) {
+                parent.put(curr.left, curr);
+                stack.push(curr.left);
+            }
+            
+            if (curr.right != null) {
+                parent.put(curr.right, curr);
+                stack.push(curr.right);
+            }
+            
+        }
+        
+        Set<TreeNode> set = new HashSet<>();
+        while (p != null) {
+            set.add(p);
+            p = parent.get(p);
+        }
+        
+        while (!set.contains(q)) {
+            q = parent.get(q);
+        }
+        
+        return q;
+        
+    }
+}
