@@ -1,0 +1,59 @@
+public class Solution {
+    /**
+     * A first thought of this problem would be to use the sliding window template. 
+     * However, noticing that the current minimum value can make up the next maximum under the condition that current minimum and next number in the array both being negative values. 
+     * Meanwhile, sliding window is aiming at questions with requirement for window size(max window/min window)
+     * Thus sliding window template is not appropriate. 
+     * 
+     * Then what should we use?
+     * Considering the fact that the next max product is only related to current number and previous max or min(based on the symbol of current number). Thus we can merelt keep the previous max and previous min. And in each step, we derive a new max and min value. 
+     * At the same time, update the result maximum in each step is necessary. 
+     * O(1) space, O(n) time since we only traverse the whole array once. 
+     */
+    public int maxProduct(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        
+        int preMax = 1;
+        int preMin = 1;
+        int res = Integer.MIN_VALUE;
+        
+        for (int i = 0; i < nums.length; i++) {
+            int currMax = Math.max(preMin * nums[i], Math.max(preMax * nums[i], nums[i]));
+            int currMin = Math.min(preMax * nums[i], Math.min(preMin * nums[i], nums[i]));
+            res = Math.max(res, currMax);
+            
+            preMax = currMax;
+            preMin = currMin;
+        }
+        
+        return res;
+    }
+    
+    
+    
+    /**
+     * Another method to write the same solution
+     */
+    public int maxProduct(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        
+        int res = nums[0];
+        int currMax = res;
+        int currMin = res;
+        
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] < 0) {
+                int tmp = currMax;
+                currMax = currMin;
+                currMin = tmp;
+            }
+            
+            currMax = Math.max(currMax * nums[i], nums[i]);
+            currMin = Math.min(currMin * nums[i], nums[i]);
+            
+            res = Math.max(res, currMax);
+        }
+        
+        return res;
+    }
+}
