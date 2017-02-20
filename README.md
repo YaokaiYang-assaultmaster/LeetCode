@@ -9,3 +9,5 @@
 - The solutions are written in `Java`. 
 
 - Please contact me if you find any faluts in the answers. 
+
+- Oh! Almost forget! Forks and stars are __veeeeery welcomed__. 
