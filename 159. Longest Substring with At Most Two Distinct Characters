@@ -1,0 +1,99 @@
+public class Solution {
+    /**
+     * Still using Sliding window template. 
+     * Use a counter to record the total number of distinct characters showed up. 
+     * Use a int array of length 128 to record the characters in current substring. 
+     * 
+     * Moving the end pointer forward. 
+     * Once we encounter a character with frequency 0 in the map, add 1 to the counter. 
+     * While counter reaches 3, 
+     *  Moving the start pointer forward and deduce the frequency of character at position pointed by start until the counter becomes 2 again. 
+     * Record the maximum length every time we move the end pointer. 
+     * O(n) time since we traverse the whole string once. 
+     * The counter makes it possible to check for if we have meet the requirement(at most 2 distinct number) in O(1) time. 
+     * O(1) space since we keep an array of fixed length. 
+     */
+    public int lengthOfLongestSubstringTwoDistinct(String s) {
+        if (s == null || s.length() == 0) return 0;
+        
+        int[] map = new int[128];
+        int ret = Integer.MIN_VALUE;
+        int start = 0, end = 0;
+        int counter = 0;
+        
+        while (end < s.length()) {
+            char c = s.charAt(end);
+            if (map[c]++ == 0) {
+                counter++;
+            }
+            
+            while (counter > 2) {
+                char cTemp = s.charAt(start);
+                if (map[cTemp]-- == 1) {
+                    counter--;
+                }
+                start++;
+            }
+            
+            ret = Math.max(ret, end - start + 1);
+            end++;
+        }
+        
+        return ret;
+    }
+    
+    
+    
+    /** 
+     * A O(n) time, O(1) space solution. 
+     * Since we know that we need the substring with at most 2 distince characters, we could simply keep track of the 2 characters in current substring and their last appearance index. 
+     * Once we reaches a new character, set the start index to 1 + smaller appearance index 
+     * Since we only keep 2 characters and can check for if the next character is an existing character or a new character in   O(1) time already, we don't have to keep the counter. 
+     * O(n) time, O(1) space. 
+     */
+    public int lengthOfLongestSubstringTwoDistinct(String s) {
+        if (s == null || s.length() == 0) {
+            return 0;
+        }
+        
+        char first, second;
+        int firstIndex, secondIndex;
+        
+        first = s.charAt(0);
+        firstIndex = 0;
+        
+        while (firstIndex + 1 < s.length() && s.charAt(firstIndex + 1) == s.charAt(firstIndex)) {
+            firstIndex++;
+        }
+        
+        if (firstIndex == s.length() - 1) {
+            return s.length();
+        }
+        
+        second = s.charAt(firstIndex + 1);
+        secondIndex =  firstIndex + 1;
+    
+        int startIndex = 0;
+        int len = secondIndex + 1;
+        
+        for (int i = secondIndex + 1; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c != first && c != second) { //if a new character is encountered
+                startIndex = Math.min(firstIndex, secondIndex) + 1;
+                firstIndex = Math.max(firstIndex, secondIndex);
+                first = firstIndex == secondIndex ? second : first;
+                secondIndex = i;
+                second = c;
+            } else { //if a existing character is encountered
+                if (c == first) {
+                    firstIndex = i;
+                } else {
+                    secondIndex = i;
+                }
+                len = Math.max(i - startIndex + 1, len);
+            }
+        }
+        
+        return len;
+    }
+}
