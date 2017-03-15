@@ -1,0 +1,75 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    /**We use 2 pointers pointing at the head of the 2 arrays at the beginning respectively
+     * We let the 2 pointers move one step each time
+     * If the pointer reaches the end of the array, say, currA reaches the last one of the linkedlist A, let it points to the head of B. Vise versa. 
+     * (1) if the 2 linkedlist are of different length and have intersection, then the 2 pointers would meet at the second roll
+     * (2) if the 2 linkedlist are of the same length and have intersection, the 2 pointers would meet at the first roll
+     * (3) if the 2 linkedlist have no intersection, lastA will not equal lastB, and a null is returned.
+     * (4) if the while loop ends, it indicates that the 2 linkedlist are of the same length and have no intersection, return null.
+     * O(n) time, O(1) space. Since we need at most 2 rounds to get the result. 
+     * If the 2 linkedlist has intersection, then during the second round we will find the same node on both linkedlist at the same time(currA == currB). 
+     * Otherwise, we will find both currA and currB become null at the end of second round. 
+     * Thus it is O(2n) = O(n). n is the length of the longerlist. 
+    **/
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if (headA == null || headB == null) return null;
+        ListNode currA = headA;
+        ListNode currB = headB;
+        ListNode lastA = null, lastB = null;
+        while (currA != null || currB != null) {
+            if (currA.next == null) {
+                lastA = currA;
+            }
+            if (currB.next == null) {
+                lastB = currB;
+            }
+            if (currA == currB) return currA; //(1), (2)
+            if (lastA != null && lastB != null && lastA != lastB) return null; //(3)
+            currA = currA.next == null ? headB : currA.next;
+            currB = currB.next == null ? headA : currB.next;
+        }
+        return null; //(4)
+    }
+    
+    
+    
+    
+    
+    /**
+     * naive approach
+     * Traverse listA and store all existing values
+     * Then traverse listB and check if it contains any existed values
+     * If contains, return that list node, otherwise return false 
+     * O(n) time O(n) space
+     **/
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if (headA == null || headB == null) {
+            return null;
+        }
+        
+        HashSet<Integer> existed = new HashSet<Integer>();
+        while (headA.next != null) {
+            existed.add(headA.val);
+            headA = headA.next;
+        }
+        existed.add(headA.val);
+        
+        while (headB.next != null) {
+            if (existed.contains(headB.val)) return headB;
+            headB = headB.next;
+        }
+        if (existed.contains(headB.val)) return headB;
+        else return null;
+    }
+}
