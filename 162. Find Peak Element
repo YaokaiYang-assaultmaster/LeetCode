@@ -36,7 +36,6 @@ public class Solution {
         return start;
     }
     
-    
     /**
      * Yet another binary search solution. 
      * Simpler logic.
