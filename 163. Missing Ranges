@@ -1,0 +1,87 @@
+public class Solution {
+    /**
+     * Another solution with a simpler logic.
+     * Use a variable next to keep track of the next number we want. 
+     * And use the getRange() function to give back the right String we want. 
+     */
+    public List<String> findMissingRanges(int[] nums, int lower, int upper) {
+        List<String> ret = new ArrayList<>();
+        
+        Long next = Long.valueOf(lower);
+        
+        for (int i = 0; i < nums.length; i++) {
+            Long curr = Long.valueOf(nums[i]);
+            if (curr < next) continue;
+            
+            if (curr.equals(next)) {
+                next++;
+                continue;
+            }
+            
+            ret.add(getRange(next, curr - 1));
+            
+            next = curr + 1;
+        }
+        
+        if (next <= upper) {
+            ret.add(getRange(next, Long.valueOf(upper)));
+        }
+        
+        return ret;
+    }
+    
+    private String getRange(Long start, Long end) {
+        if (start.equals(end)) {
+            return String.valueOf(start);
+        } else {
+            return start + "->" + end;
+        }
+    }
+
+    
+    /**
+      * 1. Deal with the first number in the array. Compare it with `lower`, and add result to `ret` if necessary. 
+      * 2. Deal with every elements from `1` to `nums.length - 2`(both inclusive) in the `for` loop. 
+      * 3. Deal with the last element in the array. Compare it with `upper`, and add result to 'ret' if necessary. 
+      * The helper function stores the right range into the ret list. 
+      * 
+      * In order to take care of the overflow and underflow problem for `Integer.MAX_VALUE` and `Integer.MIN_VALUE`, cast `int` to `Long` in the codes. 
+      * However, notice that I could use `(start + 1 == end - 1)` in the helper function to check the difference between `start` and `end` point because Java do __auto unboxing__ for me at this step (since I perform some calculation on them). 
+      * Otherwise, for 2 `Long` object, we have to use `.equals()` function to check for their equality. 
+     */
+    public List<String> findMissingRanges(int[] nums, int lower, int upper) {
+        if (nums == null || nums.length == 0) {
+            if (upper == lower) {
+                return new ArrayList<String>(Arrays.asList(String.valueOf(lower)));
+            } else {
+                return new ArrayList<String>(Arrays.asList(lower + "->" + upper));
+            }
+        }
+        
+        List<String> ret = new ArrayList<>();
+        
+        if (nums[0] > lower) {
+            helper(ret, Long.valueOf(lower) - 1, Long.valueOf(nums[0]));
+        }
+        
+        for (int i = 0; i < nums.length - 1; i++) {
+            if (Long.valueOf(nums[i + 1]) - Long.valueOf(nums[i]) > 1) {
+                helper(ret, Long.valueOf(nums[i]), Long.valueOf(nums[i + 1]));
+            }
+        }
+        
+        if (nums[nums.length - 1] < upper) {
+            helper(ret, Long.valueOf(nums[nums.length - 1]), Long.valueOf(upper) + 1);
+        }
+        
+        return ret;
+    }
+    
+    private void helper(List<String> list, Long start, Long end) {
+        if (start + 1 == end - 1) {
+            list.add(String.valueOf(start + 1));
+        } else {
+            list.add((start + 1) + "->" + (end - 1));
+        }
+    }
+}
