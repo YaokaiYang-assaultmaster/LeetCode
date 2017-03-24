@@ -1,0 +1,55 @@
+public class Solution {
+    /**
+     * For this question, it is obvious that sorting the whole array would solve it. 
+     * That solution would be O(logn + n) = O(logn) time. 
+     * However, in order to solve it in O(n) time, sorting is definitely not suitable. 
+     * Then we may need to consider keep some record to solve it. 
+     * Since we got n numbers and a length-n array, we can use another array to keep records. 
+     * The records keeping can be implemented like this: for each number from 1 to n, we put it to position n-1 in the new array
+     * Then the first pisition which has the initial value of 0 is where the number is missing. 
+     * However, this is a O(n) time, O(n) space solution. 
+     * 
+     * In order to solve it in O(n) time, O(1) space, we need to keep the record in place. 
+     * That is, considering that the possible missing number range is 1 to n + 1(since we only got n position, the extreme condition is that if we have no number missing, we need n + 1. Or if we have some number missing less than n + 1, there must be a empty position in the record keeping array in the previous method.)
+     * Thus, the algorithm could be implemented as following:
+     * For each number `num` in the array, if it is not at position num - 1 and it is within the range of 1~n, put it in the right position.
+     * After the whole swap process, check if every position `pos` have the number `pos + 1`. 
+     *  - If not, than we missed pos + 1
+     *  - If every position is correct, we need n + 1
+     * Done!
+     * 
+     * The space is obviously O(1).
+     * The time, however, is somewhat harder to prove. 
+     * Consider, that, for each number we are interested in(i.e. number within 1~n), we can only swap it once before it goes to its correct position, we can swap at most n times in the worst case(all numbers are qualified for our interest). And after that, we traverse the whole array once to find out the missing number. Thus the run time is O(n) since swap is a O(1) operation. 
+     */
+    
+    public int firstMissingPositive(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 1;
+        }
+        
+        int n = nums.length;
+        
+        for (int i = 0; i < n; i++) {
+            int num = nums[i];
+            while (num <= n  && num > 0 && nums[num - 1] != num) {
+                swap(nums, i, num - 1);
+                num = nums[i];
+            }
+        }
+        
+        for (int i = 0; i < n; i++) {
+            if (nums[i] != i + 1) {
+                return i + 1;
+            }
+        }
+        
+        return n + 1;
+    }
+    
+    private void swap(int[] nums, int i, int j) {
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
+    }
+}
