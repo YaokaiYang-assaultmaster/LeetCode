@@ -1,6 +1,7 @@
 public class Solution {
     /**
-     * For explanation and analysis, see 
+     * For explanation and analysis, see http://blog.csdn.net/Yaokai_AssultMaster/article/details/68878950
+     */
     public int findKthSmallest(int[] nums, int k) {
         if (nums == null || nums.length == 0) {
             return Integer.MIN_VALUE;
