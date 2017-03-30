@@ -1,0 +1,55 @@
+public class Solution {
+    /**
+     * Randomized quick select. 
+     * Using random chosen pivot to partition the arrray. 
+     * Average case and best case O(n), worst case O(n^2)
+     * In place swap, O(1) space. 
+     */
+    public int findKthLargest(int[] nums, int k) {
+        if (nums == null || nums.length == 0) {
+            return Integer.MIN_VALUE;
+        }
+        
+        int len = nums.length;
+        
+        return quickSelect(nums, k, 0, len - 1);
+    }
+    
+    private int quickSelect(int[] nums, int k, int start, int end) {
+        
+        //Choose a pivot randomly
+        Random rand = new Random();
+        int index = rand.nextInt(end - start + 1) + start;
+        int pivot = nums[index];
+        System.out.println(pivot);
+        swap(nums, index, end);
+        
+        int left = start, right = end;
+        
+        while(left < right) {
+            if (nums[left++] > pivot) {
+                swap(nums, --left, --right);
+            }
+        }
+        //left is pointing to the first number that is greater than pivot
+        
+        //m is the number of numbers that is greater than pivot
+        int m = end - left;
+        
+        if (m == k - 1) { //in order to find the kth largest number, there must be k - 1 number greater than it 
+            return pivot;
+        }
+        else if (k < m + 1) { //target is in the right subarray
+            return quickSelect(nums, k, left, end);
+        }
+        else { //target is in the left subarray, but need to update k since we have discarded m + 1 numbers greater than it which is in the right subarray
+            return quickSelect(nums, k - m - 1, start, left - 1);
+        }
+    }
+    
+    private void swap(int[] nums, int i, int j) {
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
+    }
+}
