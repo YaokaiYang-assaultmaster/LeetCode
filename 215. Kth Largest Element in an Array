@@ -21,7 +21,6 @@ public class Solution {
         Random rand = new Random();
         int index = rand.nextInt(end - start + 1) + start;
         int pivot = nums[index];
-        System.out.println(pivot);
         swap(nums, index, end);
         
         int left = start, right = end;
