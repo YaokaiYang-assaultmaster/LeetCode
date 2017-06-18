@@ -13,10 +13,12 @@ public class Solution {
      * This traverse can be done in BFS or DFS style. 
      * We do it in BFS in this solution. 
      * It is obvious that the key problem here is to maintain the order of traversal.
-     * We only want to traverse those nodes that both t1 and t2 have. 
+     * We only want to traverse those nodes that t1 and t2 both have. 
      * For those nodes that only one of them has, simply put the nodes and the entire subtree of the nodes in the corresponding position in the result.  
-     * In order to save space, we use t1 as the result, meaning we will modify the nodes in t1 based on traversal status. 
+     * In order to save space, we use t1 as the result, meaning we will modify the nodes in t1 based on traversal status.
+     
      * The algorithm is showed as following:
+     
      * 1. Put root of t1 and t2 into queue. 
      * 2. Take one node out from queue1 and queue2 as curr1 and curr2 respectively. Sum up the val (since this is the node that both t1 and t2 have) as the val of the new node at this position. 
      * 3. Check for the left child of curr1 and curr2. 
@@ -25,7 +27,7 @@ public class Solution {
      * 4. Check for the right child of curr1 and curr2. Do the same checking as step3 above. 
      * 5. Check for if the 2 queue is both empty. If so, stop the loop. Otherwise continue. 
      * The time complexity of this algorithm is O(h) where h is the depth of the deepest common nodes t1 and t2 have. 
-     * The space complexity of this o(n) where n is the number of the common nodes of t1 and t2. 
+     * The space complexity of this O(n) where n is the number of the common nodes of t1 and t2. 
      */
     public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
         if (t1 == null) return t2;
