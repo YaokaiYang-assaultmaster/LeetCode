@@ -70,7 +70,7 @@ public class Solution {
      * 
      * Considering the recursion feature of Binary Tree, using recursion to solve this question is straightforward. 
      * If both current TreeNode of t1 and t2 is not null, set the result tree's current node val as t1.val + t2.val.
-     * Otherweise return the not null one or null. 
+     * Otherwise return the not null one or null. 
      * 
      * Recursively do this for t1 and t2's left and right child. 
      * 
