@@ -64,4 +64,28 @@ public class Solution {
         
         return t1;
     }
+    
+    
+    /** (2) recursive solution
+     * 
+     * Considering the recursion feature of Binary Tree, using recursion to solve this question is straightforward. 
+     * If both current TreeNode of t1 and t2 is not null, set the result tree's current node val as t1.val + t2.val.
+     * Otherweise return the not null one or null. 
+     * 
+     * Recursively do this for t1 and t2's left and right child. 
+     * 
+     * Time and space complexity is the same as iteration. 
+     */
+    public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
+        if (t1 == null) return t2;
+        if (t2 == null) return t1;
+        
+        t1.val += t2.val;
+        
+        t1.left = mergeTrees(t1.left, t2.left);
+        t1.right = mergeTrees(t1.right, t2.right);
+        
+        return t1;
+    }
+    
 }
