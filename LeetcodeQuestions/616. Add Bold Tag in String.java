@@ -45,8 +45,8 @@ public class Solution {
     }
     
     private void findAndBoldSubstring(StringBuilder str, Map<Character, List<Integer>> charMap, String substr, boolean[] bold) {
-        int subPointer = 0;
-        int indexPointer = 0;
+        int subPointer = 0; // pointer for index of current char we are checking in substr
+        int indexPointer = 0; // pointer for index of current start point of current char in the corresponding index list of s
         List<Integer> indexes = charMap.get(substr.charAt(subPointer));
         
         if (indexes == null) return;
