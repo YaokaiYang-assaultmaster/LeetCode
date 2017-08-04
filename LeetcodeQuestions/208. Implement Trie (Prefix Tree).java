@@ -1,3 +1,6 @@
+/**
+ * A pure Trie
+ */
 class TrieNode {
     // Initialize your data structure here.
     char val;
