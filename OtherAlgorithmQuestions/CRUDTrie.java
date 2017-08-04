@@ -4,6 +4,9 @@ public KeyNotFound extends Exception {
     }
 }
 
+
+package test;
+
 public class Trie {
     class TrieNode {
         char curr;
@@ -98,12 +101,12 @@ public class Trie {
         return true;
     }
     
-    public String getData(String key) throw KeyNotFound {
+    public String getData(String key) throws KeyNotFound {
         /** 
          * Gets the corresponding data for the given key if the key exists in the Trie.
          * Throw KeyNotFound error if no such key exists
          */   
-        char[] chars = word.toCharArray();
+        char[] chars = key.toCharArray();
         TrieNode currPos = this.root;
         for (int i = 0; i < chars.length; i++) {
             int index = chars[i] - 'a';
@@ -160,7 +163,15 @@ public class Trie {
             } else {
                 currPos.children[index].decreaseCount();
             }
+            
+            // if a word is deleted but the prefix still exists, delete the data
+            if (i == chars.length - 1) {
+            	if (currPos.children[index] != null) {
+            		currPos.children[index].data = "";
+            	}
+            }
             currPos = tmp;
         }
+        
     }
 }
