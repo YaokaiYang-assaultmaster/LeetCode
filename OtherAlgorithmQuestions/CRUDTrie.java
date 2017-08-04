@@ -8,8 +8,9 @@ public class Trie {
     class TrieNode {
         char curr;
         TrieNode[] children;
-        boolean isEnd;
+        private boolean isEnd;
         String data; 
+        private int count;
         TrieNode (char curr, boolean isEnd, String data) {
             // Cast all the chars to lower case
             curr = Character.toLowerCase(curr);
@@ -17,10 +18,23 @@ public class Trie {
             this.isEnd = isEnd;
             this.data = data;
             this.children = new TrieNode[26];
+            this.count = 1;
         }
         
         void setEnd() {
             this.isEnd = true;
+        }
+        
+        void increaseCount() {
+            this.count++;
+        }
+        
+        int getCount() {
+            return this.count;
+        }
+        
+        void decreaseCount() {
+            this.count--;
         }
     }
     
