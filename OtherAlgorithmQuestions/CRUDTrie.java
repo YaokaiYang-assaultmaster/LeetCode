@@ -4,9 +4,6 @@ public KeyNotFound extends Exception {
     }
 }
 
-
-package test;
-
 public class Trie {
     class TrieNode {
         char curr;
@@ -24,8 +21,8 @@ public class Trie {
             this.count = 1;
         }
         
-        void setEnd() {
-            this.isEnd = true;
+        void setEnd(boolean end) {
+            this.isEnd = end;
         }
         
         void increaseCount() {
@@ -61,7 +58,7 @@ public class Trie {
             }
             // If this is the end of the word, store the data in to the Trie and set end.
             if (i == chars.length - 1) {
-                currPos.children[index].setEnd();
+                currPos.children[index].setEnd(true);
                 currPos.children[index].data = data;
             }
             // Move one level down
@@ -70,7 +67,7 @@ public class Trie {
     }
     
     public boolean search(String word) {
-        /** Returns if the word is in the trie. */
+        /** Returns if the word is in the Trie. */
         char[] chars = word.toCharArray();
         TrieNode currPos = this.root;
         for (int i = 0; i < chars.length; i++) {
@@ -88,7 +85,7 @@ public class Trie {
     }
     
     public boolean startsWith(String prefix) {
-        /** Returns if there is any word in the trie that starts with the given prefix. */
+        /** Returns if there is any word in the Trie that starts with the given prefix. */
         char[] chars = prefix.toCharArray();
         TrieNode currPos = this.root;
         for (int i = 0; i < chars.length; i++) {
@@ -164,10 +161,11 @@ public class Trie {
                 currPos.children[index].decreaseCount();
             }
             
-            // if a word is deleted but the prefix still exists, delete the data
+            // if a word is deleted but the prefix still exists, delete the data and flip isEnd flag.
             if (i == chars.length - 1) {
             	if (currPos.children[index] != null) {
             		currPos.children[index].data = "";
+            		currPos.children[index].setEnd(false);
             	}
             }
             currPos = tmp;
