@@ -17,8 +17,8 @@ public class MedianFinder {
      * min-heap, which allows us to get the minimum of the greater half. And combines the 2 will give us the median given the
      * size of the input stream (odd or even).
      * In this way, the time of get the median will be O(1) for get, O(logn) for insert. Space is still O(n). 
-     * Or specifically the time for insertion is O(5 * logn) in the worst case, the condition is: when the 2 heap is of the same size,
-     * we insert a number. Then it takes O(2 * logn) to insert the number, take out the max and repercolate the the max. 
+     * Or specifically the time for insertion is O(5 * logn) in the worst case, the condition is: when the 2 heap is of the same size
+     * brefore we insert a number. Then it takes O(2 * logn) to insert the number, take out the max and repercolate the the max. 
      * Then it takes another O(3 * logn) to insert the number to right, take the min from right, repercolate min of right 
      * and insert the min to left. 
      * Also keep in mind that when the total number of data is odd, we keep the smaller half heap to hold 1 more element than 
