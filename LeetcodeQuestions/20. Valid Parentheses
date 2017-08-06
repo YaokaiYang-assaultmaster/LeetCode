@@ -1,0 +1,30 @@
+public class Solution {
+    /**
+     * Considering we are checking the parentheses backward, we probably need some datastructure that 
+     * gives us the ability to check the previous element in a LIFO style. 
+     * Yeah, a stack works!
+     * The algorithm is simple: 
+     * 1. if it's a left parenthesis, put it in the stack.
+     * 2. if it's a right parenthesis, check the very last input. 
+     * 3. return false if not match, pop out the last input and continue otherwise.
+     */
+    public boolean isValid(String s) {
+        if (s == null || s.length() == 0) {
+            return true;
+        }
+        
+        char[] input = s.toCharArray();
+        Deque<Character> stack = new ArrayDeque<>();
+        for (char c : input) {
+            if (c == '(' || c == '{' || c == '[') {
+                stack.push(c);
+            } else {
+                char expected = c == ')' ? '(' : c == '}' ? '{' : '[';
+                if (stack.isEmpty() || stack.pop() != expected) {
+                    return false;
+                }
+            }
+        }
+        return stack.isEmpty() ? true : false;
+    }
+}
