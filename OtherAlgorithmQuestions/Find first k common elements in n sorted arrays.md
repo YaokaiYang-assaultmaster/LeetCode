@@ -10,15 +10,14 @@ arrays.Thus there are roughly 2 ideas for it, showed as following:
     searches in the remaining arrays. Each binary search takes `O(logn)` time. In total, the time complexity is `O(n * (n - 1) * logn) = O(n^2logn)`. 
   2. However, we did some duplicate works in the above algorithm. That is, in the binary search step, we compare the elements in the pivot array
     again and again with all the elements from `0` to `n - 1`. In order to optimize, we could keep indexes of the farmost position we have traversed 
-    for each array. Because all the arrays are sorted or monotonically non-decreasing, so positions we have already checked is useless for us. Thus the algorithm
-    could be described as following:
-    1. Choose a pivot array, in which each element is going to be used for comparing. 
-    2. Keep an array of length n - 1, in which stores the pointer indexes of each remaining arrays. 
-    3. For an element of pivot array, compare it with elements from each remaining arrays from the corresponding pointer index.
-      - if pivot element is greater than current number, increase the index.
-      - if pivot element is equal to current number, increase the counter.
-      - if pivot element is less than current number, no match is found. break.
-    4. if the counter reaches n, a common element is found. 
+    for each array. Because all the arrays are sorted or monotonically non-decreasing, so positions we have already checked is useless for us. Thus the algorithm could be described as following:
+		1. Choose a pivot array, in which each element is going to be used for comparing. 
+		2. Keep an array of length n - 1, in which stores the pointer indexes of each remaining arrays. 
+		3. For an element of pivot array, compare it with elements from each remaining arrays from the corresponding pointer index.
+		  - if pivot element is greater than current number, increase the index.
+		  - if pivot element is equal to current number, increase the counter.
+		  - if pivot element is less than current number, no match is found. break.
+		4. if the counter reaches n, a common element is found. 
     
     This algorithm takes `O(n * n)` time and `O(n)` space. Since we have to traverse each number in the 2d array and need to keep a pointer for 
     each row in it. However, the `O(n)` space can be saved by using the pivot array to store the pointer indexes. 
