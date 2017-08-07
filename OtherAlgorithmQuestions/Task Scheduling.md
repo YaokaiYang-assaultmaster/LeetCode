@@ -1,4 +1,5 @@
-> Given a sequence of tasks, e.g. A, B, C (3 different tasks) and a cold time, e.g. 2, which means that you need to wait for that much time to start next __same__ task. Now:  
+> Given a sequence of tasks, e.g. A, B, C (3 different tasks) and a cold time, e.g. 2, which means that you need to wait for that much time to start next __same__ task. Note that even the cold time is 0, we still cannot execute the same task consecutively. 
+> Now:  
 > Given a input String of tasks, s, output the best task-finishing sequence.   
 > e.g. input: AAABBB, 2  
 > output: AB_AB_AB ("_" means do nothing and wait)  
