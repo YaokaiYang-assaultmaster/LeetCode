@@ -5,8 +5,7 @@
 - Analysis:
 This problem asks us to calculate how many airplanes are there at most simultaneously in the sky. That is, to check how many lines are there
 sumultaneously in the sky, if we treat each interval as a line with start point and end point. 
-In this case, we need to construct a wrapper class to store the point, in which contains time and flag. Flag indicates if this point is a start
-point or an end point. 
+In this case, we need to construct a wrapper class to store the point, in which contains time and flag. Flag indicates if this point is a start point or an end point. 
 
 So the algorithm is following:
 
@@ -14,7 +13,6 @@ So the algorithm is following:
 2. Sort the list based on time. End point has priority in case of same time based on the requirement. 
 3. Count the number of lines existing simultaneously. 
 
-<br>
 Suppose the size of the airplanes list is n. 
 The time complexity of this code is `O(nlogn)`. For adding the points into the list, it is `O(2n)`. Sorting the Point list is `O(2nlog(2n))` = `O(nlogn)`.
 Then traverse the point list need `O(2n)`. So the total time would be `O(nlogn)`. 
