@@ -1,6 +1,4 @@
 public class Solution {
-    
-    
     /**
      * It's hard to start from inside the 2-D graph and find out the boarder of a crater. But if we start from the boarder and traverse into the graph from the smallest height of the boarders, we know we can trap some water once there is some height less than current height. 
      * This is easy to solve with a minimum heap, since we only want to take out the smallest height among all boarders we have encountered. 
