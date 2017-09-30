@@ -1,0 +1,88 @@
+# Solution1 
+
+Java constnat time, constant space solution. But a little verbose.
+
+For this question, we basically have to consider 2 parts of the time: the hour and the minute. 
+
+Thus we first gather all of the numbers and generate all of the possible combinations. This is guaranteed to use at most `O(16)` space since there is at most 16 unique combinations of numbers. 
+
+Then we first try to get a greater minute. If a valid minute cannot be got, we try to get a greater hour. And if a valid hour cannot be got, the solution is simple, just repeat the minimum value we get as both minute and hour. 
+
+Since we only checked all of the combinations twice, this is at most `O(16 * 2)` time. 
+
+```
+class Solution {
+    // Since we "may assume the given input string is always valid"
+    // we can safely write the function without doing extra input checking.
+    public String nextClosestTime(String time) {
+        String[] input = time.split(":");
+        HashSet<Integer> set = new HashSet<Integer>() {{
+            add(Integer.parseInt(input[0].substring(0, 1)));
+            add(Integer.parseInt(input[0].substring(1, 2)));
+            add(Integer.parseInt(input[1].substring(0, 1)));
+            add(Integer.parseInt(input[1].substring(1, 2)));
+        }};
+        
+        // Generate all possible combinations.
+        HashSet<Integer> possible = new HashSet<Integer>();
+        int minValue = Integer.MAX_VALUE;
+        for (int i : set) {
+            for (int j : set) {
+                int tmp = i * 10 + j;
+                possible.add(tmp);
+                minValue = Math.min(minValue, tmp);
+            }
+        }
+        
+        String minTime;
+        if (minValue < 10) {
+            minTime = "0" + String.valueOf(minValue);
+        } else {
+            minTime = String.valueOf(minValue);
+        }
+        
+        String ret = "";
+        int currMinute = Integer.parseInt(input[1]);
+        int currHour = Integer.parseInt(input[0]);
+        if (currMinute < 59) {
+            int tmpMin = Integer.MAX_VALUE;
+            for (int i : possible) {
+                if (i > currMinute && i < 60) {
+                    tmpMin = Math.min(tmpMin, i);
+                }
+            }
+            if (tmpMin != Integer.MAX_VALUE) {
+                if (tmpMin < 10) {
+                    ret = ret + input[0] + ":0" + String.valueOf(tmpMin);
+                } else {
+                    ret = ret + input[0] + ":" + String.valueOf(tmpMin);
+                }
+                return ret;
+            }
+        }
+
+        if (currHour < 23) {
+            int tmpMin = Integer.MAX_VALUE;
+            for (int i : possible) {
+                if (i > currHour && i < 24) {
+                    tmpMin = Math.min(tmpMin, i);
+                }
+            }
+            
+            if (tmpMin != Integer.MAX_VALUE) {
+                if (tmpMin < 10) {
+                    ret = ret + "0" + String.valueOf(tmpMin) + ":" + minTime;
+                } else {
+                    ret = ret + String.valueOf(tmpMin) + ":" + minTime;
+                }
+                
+                return ret;
+            }
+        }
+        
+        ret = ret + minTime + ":" + minTime;
+        
+        return ret;
+    }
+}
+```
