@@ -7,7 +7,8 @@ However, these methods have several pain points:
 
 1. For LinkedList, the stopping point is hard to tell.    
 2. For arrayList, the stopping point is also hard to tell because we are deleting elements constantly. 
-3. We need to adjust the current start checking position constantly, which requires complex and trivial contolling logic that is hard to implement. 
+3. We need to adjust the current start checking position constantly, which requires complex and trivial contolling logic that is hard to implement.    
+4. The process of adjust the position and deleting elements is uncertain because we don't know how many elements are the same, should they exceeds smashLevel. 
 
 However, take into consideration that we are checking backwards, a stack would be much more convenient. We can always check the previous elements by peek the top elements of the stack. And once we want to delete a sequence, simply pop the top. And the new top would naturally be the elements of the previous position.     
 Meanwhile, inorder to keep track the number of elements with the same value with in the input, we keep another stack storing the `count` information of each elements. After putting consecutive elements with the same value into the stack all at once, we could decide if we should delete it or not by simply checking the corresponding `count` in the count stack. 
