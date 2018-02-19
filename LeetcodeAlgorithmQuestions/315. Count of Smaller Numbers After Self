@@ -1,0 +1,45 @@
+# Solution1: Binary Search Tree
+
+
+```Java
+class Solution {
+    class Node {
+        int val;
+        int leftCount;
+        int dup;
+        Node left;
+        Node right;
+        public Node (int val, int count, int dup) {
+            this.val = val;
+            this.leftCount = count;
+            this.dup = dup;
+        }
+    }
+
+    public List<Integer> countSmaller(int[] nums) {
+        Node root = null;
+        Integer[] ret = new Integer[nums.length];
+        for (int i = nums.length - 1; i >= 0; i--) {
+            root = insertIntoBST(root, nums[i], i, 0, ret);
+        }
+        
+        return Arrays.asList(ret);
+    }
+    
+    private Node insertIntoBST(Node root, int num, int index, int preSum, Integer[] ret) {
+        if (root == null) { // no Node exists at this position yet, insert the current number here
+            root = new Node(num, 0, 1);
+            ret[index] = preSum;
+        } else if (root.val == num) {
+            root.dup++;
+            ret[index] = preSum + root.leftCount;
+        } else if (root.val > num) { // record this count into current root's left count
+            root.leftCount++;
+            root.left = insertIntoBST(root.left, num, index, preSum, ret);
+        } else { // root.val < num, we need to add all numbers smaller than current root into current number's result
+            root.right = insertIntoBST(root.right, num, index, preSum + root.dup + root.leftCount, ret);
+        }
+        return root;
+    }
+}
+```
