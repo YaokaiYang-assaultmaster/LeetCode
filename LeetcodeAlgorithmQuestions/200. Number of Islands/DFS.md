@@ -119,3 +119,90 @@ public class Solution {
     }
 }
 ```
+
+# Solution3: Union find
+
+If we look through the question, it could actually be a dynamic connectivity problem. With every `1` we have, it could be connected to other `1`s that is horizontally or vertically adjacent to it. So each island here is actually a connected graph.
+
+Hence we can effectively use union find algorithm to find all the connected subgraphs here. Also we need to keep in mind that since it is a `m*n` grid, we only need to move to 1 cell left and 1 cell down for each `1` we meeti during the iteration.  
+
+Here we utilized _Weighted Union with Quick Find_ algorithm.  
+
+## Time complexity:
+
+`O(m*n)` where `m` and `n` is the number of rows and columns we have.  
+
+## Space complexity:
+
+`O(m*n)`
+
+```java
+class Solution {
+    public int numIslands(char[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return 0;
+        }
+        
+        int row = grid.length;
+        int col = grid[0].length;
+        int[] id = new int[row * col];
+        int[] weight = new int[row * col];
+        
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                id[i * col + j] = grid[i][j] == '1' ? i * col + j : -1;
+                weight[i * col + j] = 1;
+            }
+        }
+        
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (grid[i][j] == '0') continue;
+                if (j + 1 < col && grid[i][j + 1] == '1') {
+                    union(i * col + j, i * col + j + 1, id, weight);
+                }
+                
+                if (i + 1 < row && grid[i + 1][j] == '1') {
+                    union(i * col + j, (i + 1) * col + j, id, weight);
+                }
+            }
+        }
+        
+        int ret = 0;
+        for (int i = 0; i < id.length; i++) {
+            if (id[i] == i) ret++;
+        }
+        
+        return ret;
+    }
+    
+    private void union(int i, int j, int[] id, int[] weight) {
+        int rootI = getRoot(i, id);
+        int rootJ = getRoot(j, id);
+        if (rootI == rootJ) return;
+        
+        if (weight[rootI] < weight[rootJ]) {
+            id[rootI] = id[rootJ];
+            weight[rootJ] += weight[rootI];
+        } else {
+            id[rootJ] = id[rootI];
+            weight[rootI] += weight[rootJ];
+        }
+    }
+    
+    private int getRoot(int i, int[] id) {
+        if (id[i] != i) {
+            id[i] = id[id[i]];
+            i = id[i];
+        }
+        
+        return i;
+    }
+}
+```
+
+# Solution4: BFS
+
+```java
+
+```
