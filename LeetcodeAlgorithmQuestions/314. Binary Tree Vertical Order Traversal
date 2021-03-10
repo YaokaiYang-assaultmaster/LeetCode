@@ -1,130 +1,74 @@
+# Solution1: BFS  with vertical index
+
+Vertical order traversal includes 2 aspects: horizontal index and vertical index. A vertical order traversal is to visit the nodes from top to bottom, from left to right. And we need to output the traversal result orderred by vertical index. 
+
+For tree traversal, normally there are 2 methods, BFS and DFS. Since we want to visit the nodes from top to bottom, left to right, BFS can be picked since it preserve the horizontal index naturally (visit from top to bottom). Hence we just need to add extra logic during the traversal to keep the vertical index. Given BFS visits from left to right, and we don't know the width of the tree upon start, we can assume the root if at index 0. Every time we move left one step (go to left child), we minus 1 to the index; every time we move right one step (go to right child), we add 1 to the index. And during the traversal, we can keep a HashMap to record the traversal result list corresponding to each vertical index. 
+
+So the algorithm would be described as following:  
+1. Create a HashMap to store the traversal result of each vertical index, where root node is at index `0`.  
+2. As is a standard practice in BFS, create a Queue to store the nodes visited. In addition, create another Queue to store the vertical index of each node. 
+3. While the queue is not empty, take out the first element `curr` of the queue and put its value in the corresponding list of HashMap. Put its left child in the queue with vertical index `curr.idx - 1`, and put its right child in the queue with vertical index `curr.idx + 1`.  
+4. Sort the key of the HashMap and output the lists.  
+
+```java
 /**
  * Definition for a binary tree node.
  * public class TreeNode {
  *     int val;
  *     TreeNode left;
  *     TreeNode right;
- *     TreeNode(int x) { val = x; }
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
  * }
  */
-public class Solution {
-    /**
-     * This question ask us to traverse a tree in vertical order from top to bottom and from left to right. 
-     * Since traverse a tree is either BFS or DFS essentially, and noticed that we are required to traverse from top to bottom, it is reasonable to use BFS. 
-     * However, during the BFS, we need to add the value of nodes into the corresponding list of this column. 
-     * Thus we have to keep another stack to store the corresponding column of each node. 
-     * Meanwhile, we have to keep a hashmap of <Integer, List<Integer>> to record each list of a given column. 
-     * Here comes a question. What information should we use as the key?
-     * It should be the column index. We could minus 1 to the index each time we go left and add 1 to the index each time we go right. In this way we get the unique key of the map. 
-     * However, we have to also keep the order of the key-value pairs in order to return them as required. 
-     * We could make use of the tree map which is sorted based on key values. 
-     * Thus we got our algorithm like following:
-     * 1. Construct a treemap
-     * 2. BFS the tree, keep 2 stack, one for tree nodes, the other for column indexes. Store values in the lists corresponding to a given column index. 
-     * 3. Return all the lists corresponding to column indexes in the treemap. 
-     * O(n) time since we have to traverse each node in the tree. 
-     * O(n) space since we have to store the intermediate information in the treemap. 
-     * n is the number of nodes in the tree. 
-     * 
-     * Optimization:
-     * TreeMap is a little slow since it uses a red-black implementation and have to perform balancing and sorting. 
-     * We could get the minimum and maximum column index during traversal, and then use a for loop to get each list in the hashmap and store them in a list of list. 
-     */
+class Solution {
     public List<List<Integer>> verticalOrder(TreeNode root) {
         List<List<Integer>> ret = new ArrayList<>();
-        if (root == null) return ret;
+        if (root == null ) return ret;
         
-        Map<Integer, List<Integer>> levels = new TreeMap<>();
-        verticalTraverse(root, levels);
-        ret.addAll(levels.values());
-        return ret;
-    }
-    
-    private void verticalTraverse(TreeNode root, Map<Integer, List<Integer>> levels) {
-        if (root == null) return;
-        Deque<TreeNode> deque = new ArrayDeque<>();
-        deque.offer(root);
-        Deque<Integer> colIndex = new ArrayDeque<>();
-        colIndex.offer(0);
-        while (!deque.isEmpty()) {
-            int size = deque.size();
-            for (int i = 0; i < size; i++) {
-                TreeNode curr = deque.poll();
-                int level = colIndex.poll();
-                if (!levels.containsKey(level)) {
-                    levels.put(level, new ArrayList<Integer>());
-                }
-                levels.get(level).add(curr.val);
-                if (curr.left != null) {
-                    deque.offer(curr.left);
-                    colIndex.offer(level - 1);
-                }
-                if (curr.right != null) {
-                    deque.offer(curr.right);
-                    colIndex.offer(level + 1);
-                }
-            }
-        }
-    }
-    
-    /**
-     * Using a HashMap may waste space and may cause key conflict. 
-     * We could also solve this question by double-linked list or ArrayList.
-     * Start from root node and peform BFS. 
-     * While perform a normal BFS, keep queues for both current tree node and its column index.
-     * At the same time, keep a minCol and maxCol variable to record the minimum and maximum column. 
-     * Once we meet a new column, we compare its column index with the minimum and maximum column. There is 3 conditions:
-     * 1. current column > maximum column. Then we need to add a new List to the end of ret List<List<Integer>>. And we put current node's value to this column. Update the maxCol value. 
-     * 2. current column < mimimum column. Then we need to add a new List to the start of ret List<List<Integer>>. And we put current node's value to this column. Update the minCol value. 
-     * 3. current column is within the range minCol and maxCol. Take out the corresponding column list and add current node's value to this column. 
-     * After this step, add current node's left and right child to the BFS queue. 
-     */
-    
-    public List<List<Integer>> verticalOrder(TreeNode root) {
-        List<List<Integer>> ret = new ArrayList<>();
-        if (root == null) return ret;
+        Deque<TreeNode> nodeDeque = new ArrayDeque<>();
+        Deque<Integer> vIndex = new ArrayDeque<>();
+        addNode(nodeDeque, vIndex, root, 0);
         
-        List<Integer> zeroCol = new ArrayList<>();
-        ret.add(zeroCol);
+        Map<Integer, List<Integer>> columns = new HashMap<>();  // If we use a TreeMap<>() here then the map is automatically sorted by keys
         
-        int minCol = 0;
-        int maxCol = 0;
-        
-        Deque<TreeNode> level = new ArrayDeque<>();
-        Deque<Integer> levelCol = new ArrayDeque<>();
-        level.offer(root);
-        levelCol.offer(0);
-        while (!level.isEmpty() && !levelCol.isEmpty()) {
-            TreeNode curr = level.poll();
-            int currCol = levelCol.poll();
-            
-            if (currCol > maxCol) {
-                List<Integer> newCol = new ArrayList<>();
-                ret.add(newCol);
-                newCol.add(curr.val);
-                maxCol = currCol;
-            }
-            else if (currCol < minCol) {
-                List<Integer> newCol = new ArrayList<>();
-                ret.add(0, newCol);
-                newCol.add(curr.val);
-                minCol = currCol;
-            }
-            
-            else {
-                ret.get(currCol - minCol).add(curr.val);
-            }
-            
+        while (!nodeDeque.isEmpty()) {
+            TreeNode curr = nodeDeque.poll();
+            int currIdx = vIndex.poll();
+            columns.computeIfAbsent(currIdx, k -> new ArrayList<Integer>()).add(curr.val);
             if (curr.left != null) {
-                level.offer(curr.left);
-                levelCol.offer(currCol - 1);
+                addNode(nodeDeque, vIndex, curr.left, currIdx - 1);
             }
             if (curr.right != null) {
-                level.offer(curr.right);
-                levelCol.offer(currCol + 1);
+                addNode(nodeDeque, vIndex, curr.right, currIdx + 1);
             }
+        }
+        
+        List<Integer> sortedIdx = new ArrayList<>(columns.keySet());
+        Collections.sort(sortedIdx);
+        for(int idx : sortedIdx) {
+            ret.add(new ArrayList<>(columns.get(idx))); // copy the list from the map into the return list
         }
         
         return ret;
     }
+    
+    private void addNode(Deque<TreeNode> nodeDeque, Deque<Integer> vIndex, TreeNode node, int vIdx) {
+        nodeDeque.offer(node);
+        vIndex.offer(vIdx);
+    }
 }
+```
+
+## Time complexity
+
+Assume there are `n` nodes in the tree, `O(n)` time needed to traverse every nodes. `O((logn)log(logn))` time needed to sort the keys of the HashMap, and then `O(n)` to copy the result lists. So `O(n)` time in total.  
+
+## Space complexity
+
+`O(2*n)` for the queue, `O(n)` for the HashMap, which is `O(n)` in total. 
